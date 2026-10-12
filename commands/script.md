@@ -45,7 +45,7 @@ Save `<project>/04-script.md`, per video:
 | Scene id | Voiceover (exact) | Visual type | Visual content | Cues → element | Sources on screen |
 ```
 
-followed by a **Recording sheet** per video: the lines in order, one per paragraph, a pronunciation guide for brand names, acronyms, code words (`whatsapp_click` → "whatsapp click") and numbers, and: "Record one take per video, in order, with about half a second of pause between lines."
+The recording guide is a separate file, `VOICEOVER_<CODE>.md` (Step 6), so the person recording never has to read the script tables.
 
 Then **publish** it for reading: if the host can publish a page or document the user can open and comment on, publish the script there and give the link; otherwise send the file. Present it as a script to read, not as a table dump: per scene, the spoken line first, then what is on screen.
 
@@ -55,7 +55,36 @@ On approval, put `Status: approved — [date]` as the first line of `04-script.m
 
 Update `<project>/project.json` (`stages.script`) and the Status column in `hookreel-output/PROJECTS.md`.
 
-End: "Script approved. Run /hookreel:storyboard."
+## Step 6 — Voiceover guide (after approval only)
+
+Write `<project>/VOICEOVER_<CODE>.md`, the guide for whoever records. Only approved lines go in it, so nobody records a draft. Instructions in the language the user writes in; the lines exactly as approved, in the voiceover language.
+
+```text
+# Voiceover · [project title] · [CODE]
+Approved script: [date]. Read every line exactly as written: captions and cues follow this text.
+
+## How to record
+- One take per video, lines in order, about half a second of pause between lines. Restart the line, not the take, after a slip.
+- Quiet room, phone or mic a hand's width away, no music. Any format (m4a, mp3, wav).
+- Changing a word? Ask first: the script must be re-approved, because captions and cues use the text.
+
+## After recording
+npm run vo -- <id> "<path to recording>"   (in hookreel-studio/<brand>/, or run /hookreel:voice)
+What it does: [normalise -16 LUFS / -3 dBTP, local Whisper, cut per scene at the pauses, word timings]. Check each printed "heard:" line; fix a bad cut with ranges in seconds: npm run vo -- <id> "<file>" "1.7-6.9,7.7-14.0,…"
+
+## Pronunciation
+| Written | Say |   (brand names, acronyms, code words, URLs, numbers: `whatsapp_click` → "whatsapp click", GA4 → "G A four")
+
+## Status
+| Video | Recorded | Date | File |   (filled by /hookreel:voice)
+
+## [video id] · [title] · ~[n] s
+| Scene | Line | Estimate |   (estimate = words ÷ 2.5 + 1 s; total at the end)
+```
+
+Send the user the file.
+
+End: "Script approved, VOICEOVER_<CODE>.md is ready for recording. Run /hookreel:storyboard."
 
 ## Rules
 - The voiceover text is also the caption text. What is written is what is said.

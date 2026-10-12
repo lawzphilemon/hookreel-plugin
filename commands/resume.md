@@ -21,7 +21,7 @@ If `PROJECTS.md` is missing or out of date, rebuild it from the `project.json` f
 
 ## Step 2 — Load it
 
-Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, the storyboards, and the studio's `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports the studio's coded file; restore the import line if it is missing.
+Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, `VOICEOVER_<CODE>.md`, the storyboards, and the studio's `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports the studio's coded file; restore the import line if it is missing.
 
 ## Step 3 — Show where it stands
 
@@ -44,7 +44,7 @@ Ask what the user wants, then route:
 | A rule or ban | Edit `CLAUDE_<CODE>.md` (and the studio's coded file for brand-level rules) | Re-check the script and storyboard against it |
 | Facts | `/hookreel:facts` | Everything after it needs re-approval |
 | Hook or beats | `/hookreel:story` | Script and storyboard need re-approval |
-| A line, a visual, a cue | Edit `04-script.md` | Republish the script for approval, then regenerate the storyboard |
+| A line, a visual, a cue | Edit `04-script.md` | Republish the script for approval, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then regenerate the storyboard |
 | Timing, layout or sound only | Edit the draft JSON | Regenerate and republish the storyboard |
 | New voiceover take | `/hookreel:voice` | QA again |
 

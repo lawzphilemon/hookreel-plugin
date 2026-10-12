@@ -48,7 +48,7 @@ npx remotion render <id> out/<id>-mix.wav --codec=wav
 npx remotion ffmpeg -hide_banner -i out/<id>-mix.wav -af loudnorm=print_format=summary -f null -
 ```
 
-Update `<project>/project.json` (`stages.voice.<id>`) and `PROJECTS.md`.
+Update `<project>/project.json` (`stages.voice.<id>`), `PROJECTS.md`, and the Status table in `<project>/VOICEOVER_<CODE>.md` (recorded, date, file).
 
 Targets: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP. If the peak is higher, find when it happens (scan the WAV samples) and lower the sound effect or music level at that moment rather than the voice. Send the user the mix file to listen to.
 

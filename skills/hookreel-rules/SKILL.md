@@ -19,7 +19,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | brief | project code, `<project>/01-brief.md`, **`<project>/CLAUDE_<CODE>.md`** (mandatory rulebook) + `CLAUDE.md` import, `project.json`, row in `hookreel-output/PROJECTS.md` |
 | facts | `02-facts.md` (bans added to `CLAUDE_<CODE>.md`) |
 | story | `03-story.md` (hooks + beat sheets, uses WTF Hook 999) |
-| script | `04-script.md`, published for review, `Status: approved` |
+| script | `04-script.md`, published for review, `Status: approved`; then `VOICEOVER_<CODE>.md` (recording guide) |
 | storyboard | `draft/brand.json`, `draft/videos/<id>.json`, `05-storyboard-<id>.md`, published for review, `Status: approved` |
 | build | `hookreel-studio/<brand>/` (brand.json, videos/, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `06-remotion-prompt.md` |
 | voice | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
