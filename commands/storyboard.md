@@ -6,7 +6,9 @@ allowed-tools: Read, Write, Edit, Bash
 
 # HKR-5 — Storyboard
 
-**Mission:** Before any Remotion JSON is released, the user sees and approves exactly what will happen on screen and in the ear, to the frame. Requires `04-script.md` with `Status: approved`. Read `hookreel-output/<slug>/CLAUDE.md` first and follow it. Follow the `hookreel-rules` skill and `references/visual-catalog.md` (including its layout specs).
+**Mission:** Before any Remotion JSON is released, the user sees and approves exactly what will happen on screen and in the ear, to the frame. Requires `04-script.md` with `Status: approved`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill and `references/visual-catalog.md` (including its layout specs).
+
+`<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
 The storyboard is written for a perfectionist: nothing is left to "and then it animates in". Every element has a place, a size, a colour token, a moment, a movement and, when it has one, a sound.
 
@@ -14,13 +16,13 @@ The storyboard is written for a perfectionist: nothing is left to "and then it a
 
 Write the draft that the storyboard is computed from, inside the project folder (this is not the studio, and not yet the released JSON):
 
-- `hookreel-output/<slug>/draft/brand.json` from the context profile, following the template's `src/schema.ts` (semantic colour tokens as 6-digit hex, Google Fonts names, logo path, `motion.entranceMs`).
-- `hookreel-output/<slug>/draft/videos/<id>.json` per video from the approved script: `vo` copied exactly, the visual and its cues, `cta`, `language`, `audio.sfx`, `audio.music`.
+- `<project>/draft/brand.json` from the context profile, following the template's `src/schema.ts` (semantic colour tokens as 6-digit hex, Google Fonts names, logo path, `motion.entranceMs`).
+- `<project>/draft/videos/<id>.json` per video from the approved script: `vo` copied exactly, the visual and its cues, `cta`, `language`, `audio.sfx`, `audio.music`.
 
 Validate the draft from its folder:
 
 ```bash
-cd hookreel-output/<slug>/draft && node "${CLAUDE_PLUGIN_ROOT}/template/scripts/check-video.mjs" --no-files
+cd <project>/draft && node "${CLAUDE_PLUGIN_ROOT}/template/scripts/check-video.mjs" --no-files
 ```
 
 Fix every error. Every cue must be an exact phrase from its line.
@@ -30,7 +32,7 @@ Fix every error. Every cue must be an exact phrase from its line.
 Generate the timed storyboard from the same planners the render uses (Node 22.18+, no install needed):
 
 ```bash
-node --no-warnings "${CLAUDE_PLUGIN_ROOT}/template/scripts/storyboard.mjs" --video hookreel-output/<slug>/draft/videos/<id>.json --brand hookreel-output/<slug>/draft/brand.json --out hookreel-output/<slug>/05-storyboard-<id>.md
+node --no-warnings "${CLAUDE_PLUGIN_ROOT}/template/scripts/storyboard.mjs" --video <project>/draft/videos/<id>.json --brand <project>/draft/brand.json --out <project>/05-storyboard-<id>.md
 ```
 
 It writes, per scene: start and end in seconds and frames; a row for every event (element entering, highlight, typing, strike, swap, dim, scene fade, caption line, voiceover start) with its movement, end time and sound effect at its final volume; and a second-by-second table of what is said, which caption is showing and what is moving. Times are **estimates at 2.5 words per second** until the voiceover is recorded; the file says so at the top.
@@ -45,7 +47,7 @@ Insert, right under each `## Scene` heading of the generated file, three blocks 
 - **Composition:** every element on screen at the end of the scene, top to bottom: what it is, its zone and approximate y range, size in px and weight, colour token, alignment, and its exact text. Use the layout specs; name the accent element and confirm it is the only accent.
 - **Transition in and out:** how the scene arrives (cut with whoosh, soft low hit) and leaves (fade over 0.2 s), and anything that carries over (header, captions, music state).
 
-Then add a **Video header** at the top: total length, fps and frame = f(t), sound effect intensity, music plan with where it ducks, caption style, and the list of bans from `CLAUDE.md` that the storyboard was checked against.
+Then add a **Video header** at the top: total length, fps and frame = f(t), sound effect intensity, music plan with where it ducks, caption style, and the list of bans from `CLAUDE_<CODE>.md` that the storyboard was checked against.
 
 ## Step 4 — Check
 
@@ -54,13 +56,15 @@ Before publishing, confirm and report:
 - Every number shows its source label.
 - No two sounds hit within 0.1 s of each other in a way that would stack loudly (call it out if they do, with a proposed offset).
 - No element appears after its scene has started fading out.
-- Nothing banned in `CLAUDE.md` appears.
+- Nothing banned in `CLAUDE_<CODE>.md` appears.
 
 ## Step 5 — Publish for review (mandatory)
 
 Publish each storyboard where the user can read and comment on it (a hosted page or document if the host offers one, otherwise the file), and ask for approval or changes. For changes: edit the draft JSON or the director's layer, regenerate, republish. Only an explicit approval counts.
 
-On approval, put `Status: approved — [date]` as the first line of each `05-storyboard-<id>.md` and fill **Storyboard approved on** in `CLAUDE.md`.
+On approval, put `Status: approved — [date]` as the first line of each `05-storyboard-<id>.md` and fill **Storyboard approved on** in `CLAUDE_<CODE>.md`.
+
+Update `<project>/project.json` (`stages.storyboard`) and the Status column in `hookreel-output/PROJECTS.md`.
 
 End: "Storyboard approved. Run /hookreel:build."
 

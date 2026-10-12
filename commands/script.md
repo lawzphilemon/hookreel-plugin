@@ -6,19 +6,21 @@ allowed-tools: Read, Write, Edit
 
 # HKR-4 — Script
 
-**Mission:** Every scene gets its exact spoken line, one visual, and the cue phrases that make the visual land on the word. The script is **published for review and approved** before any storyboard or Remotion JSON exists. Requires confirmed `03-story.md`. Read `hookreel-output/<slug>/CLAUDE.md` first and follow it. Follow the `hookreel-rules` skill and its `references/visual-catalog.md`.
+**Mission:** Every scene gets its exact spoken line, one visual, and the cue phrases that make the visual land on the word. The script is **published for review and approved** before any storyboard or Remotion JSON exists. Requires confirmed `03-story.md`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill and its `references/visual-catalog.md`.
+
+`<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
 ## Step 1 — Voiceover lines
 
 One scene per beat. For each scene write the line exactly as it will be spoken:
 - Written for the ear: short sentences, one idea per sentence, 10–30 words per scene.
 - Numbers written the way they are said where it matters ("900 million", "September 24"), and only numbers from the allowed claims.
-- Brand voice from `CLAUDE.md`; its casing and punctuation rules apply.
-- The CTA scene says the exact action from `CLAUDE.md` ("Type ChatGPT Ads in the comments").
+- Brand voice from `CLAUDE_<CODE>.md`; its casing and punctuation rules apply.
+- The CTA scene says the exact action from `CLAUDE_<CODE>.md` ("Type ChatGPT Ads in the comments").
 
 ## Step 2 — Visual per scene
 
-Pick one visual type per scene from the catalog and write its content: headline, labels, values, source labels (from `02-facts.md`, shown next to every number), mockup rows. Use `swap` for two visuals in sequence. A scene may add a `note` card. Respect the visual bans in `CLAUDE.md`.
+Pick one visual type per scene from the catalog and write its content: headline, labels, values, source labels (from `02-facts.md`, shown next to every number), mockup rows. Use `swap` for two visuals in sequence. A scene may add a `note` card. Respect the visual bans in `CLAUDE_<CODE>.md`.
 
 ## Step 3 — Cues
 
@@ -26,7 +28,7 @@ For every element that should appear on a word, pick a **cue**: a phrase copied 
 
 ## Step 4 — Check against the rules
 
-Before showing anything, check the whole script against `CLAUDE.md` and report the result:
+Before showing anything, check the whole script against `CLAUDE_<CODE>.md` and report the result:
 - No banned phrase (brand never-say list and the generic filler list), no banned punctuation or emoji.
 - No claim outside the allowed list; every number has a source label.
 - The CTA matches the exact wording.
@@ -36,7 +38,7 @@ Fix every hit before publishing.
 
 ## Step 5 — Publish for review (mandatory)
 
-Save `hookreel-output/<slug>/04-script.md`, per video:
+Save `<project>/04-script.md`, per video:
 
 ```text
 ## [video id] · [title] · eyebrow: "[small label]" · ~[n]s
@@ -49,7 +51,9 @@ Then **publish** it for reading: if the host can publish a page or document the 
 
 Ask the user to read it and reply with approval or changes. Apply changes and republish until they approve. Only an explicit approval counts; silence or "looks fine so far" does not.
 
-On approval, put `Status: approved — [date]` as the first line of `04-script.md` and fill **Script approved on** in `CLAUDE.md`.
+On approval, put `Status: approved — [date]` as the first line of `04-script.md` and fill **Script approved on** in `CLAUDE_<CODE>.md`.
+
+Update `<project>/project.json` (`stages.script`) and the Status column in `hookreel-output/PROJECTS.md`.
 
 End: "Script approved. Run /hookreel:storyboard."
 

@@ -6,7 +6,9 @@ allowed-tools: Read, Write, WebSearch, WebFetch, Bash
 
 # HKR-2 — Fact Gate
 
-**Mission:** Nothing reaches the screen or the voiceover unless it can be defended. Requires a confirmed `hookreel-output/<slug>/01-brief.md`. Read `hookreel-output/<slug>/CLAUDE.md` first and follow it. Follow the `hookreel-rules` skill.
+**Mission:** Nothing reaches the screen or the voiceover unless it can be defended. Requires a confirmed `<project>/01-brief.md`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill.
+
+`<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
 ## Step 1 — List the claims
 
@@ -32,7 +34,7 @@ When a number the user wants does not exist in any credible source, say so plain
 
 ## Step 4 — Save
 
-Save `hookreel-output/<slug>/02-facts.md`:
+Save `<project>/02-facts.md`:
 
 ```text
 Checked: [date]
@@ -47,7 +49,9 @@ Sources: [markdown links]
 
 Show the table in chat with the sources, and ask the user to confirm or pick alternatives. On confirmation add `Status: confirmed` as the first line.
 
-Then update `hookreel-output/<slug>/CLAUDE.md`: copy every NOT FOUND and CONTRADICTED claim, word for word, into **Bans → Claims**, and add any stale-fact recheck date to **Rules for this video**.
+Then update `<project>/CLAUDE_<CODE>.md`: copy every NOT FOUND and CONTRADICTED claim, word for word, into **Bans → Claims**, and add any stale-fact recheck date to **Rules for this video**.
+
+Update `<project>/project.json` (`stages.facts`) and the Status column in `hookreel-output/PROJECTS.md`.
 
 End: "Confirm the facts, then run /hookreel:story."
 

@@ -6,7 +6,9 @@ allowed-tools: Read, Write, Bash
 
 # HKR-7 — Voice
 
-**Mission:** One recorded take per video in, word-synced scenes and a clean mix out. Run inside `hookreel-studio/<brand-slug>/`. Read the project's `hookreel-output/<slug>/CLAUDE.md` and the studio `CLAUDE.md` first. Follow the `hookreel-rules` skill.
+**Mission:** One recorded take per video in, word-synced scenes and a clean mix out. Run inside `hookreel-studio/<brand-slug>/`. Read the project's `<project>/CLAUDE_<CODE>.md` and the studio's `CLAUDE_<CODE>.md` first. Follow the `hookreel-rules` skill.
+
+`<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
 ## Step 1 — Which video is this?
 
@@ -35,7 +37,7 @@ Regenerate the storyboard from the recording, so it is exact to the frame:
 npm run storyboard -- <id>
 ```
 
-Copy `storyboard/<id>.md` to `hookreel-output/<slug>/05-storyboard-<id>.recorded.md`, keep the director's layer from the approved storyboard on top of each scene, and report how much each scene moved against the plan (start and length in seconds). If a scene now runs long enough to push content past its fade-out, or a cue lands on the wrong word, fix it before going on.
+Copy `storyboard/<id>.md` to `<project>/05-storyboard-<id>.recorded.md`, keep the director's layer from the approved storyboard on top of each scene, and report how much each scene moved against the plan (start and length in seconds). If a scene now runs long enough to push content past its fade-out, or a cue lands on the wrong word, fix it before going on.
 
 ## Step 4 — Mix check
 
@@ -45,6 +47,8 @@ Render the audio alone and measure it:
 npx remotion render <id> out/<id>-mix.wav --codec=wav
 npx remotion ffmpeg -hide_banner -i out/<id>-mix.wav -af loudnorm=print_format=summary -f null -
 ```
+
+Update `<project>/project.json` (`stages.voice.<id>`) and `PROJECTS.md`.
 
 Targets: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP. If the peak is higher, find when it happens (scan the WAV samples) and lower the sound effect or music level at that moment rather than the voice. Send the user the mix file to listen to.
 

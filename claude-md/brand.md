@@ -1,6 +1,11 @@
-# CLAUDE.md · [brand] studio
+# CLAUDE_[CODE] · [brand] studio · project [CODE]
 
-Fixed rules for every video made in this Remotion studio. Written by `/hookreel:build` from the brand context profile; each video project also has its own `hookreel-output/<slug>/CLAUDE.md` with the rules for that video.
+Rules for building project **[CODE]** in this studio, written by `/hookreel:build`. Imported by the studio's `CLAUDE.md` together with every other project's coded file. The project's full rulebook is `hookreel-output/[CODE]_[slug]/CLAUDE_[CODE].md`.
+
+## This project
+- Code: [CODE] · slug: [slug] · folder: `hookreel-output/[CODE]_[slug]/`
+- Videos: [CODE]-[name], … (compositions, `videos/*.json`, `public/vo/<id>/`, `out/<id>.mp4`)
+- Bans that apply only to these videos: [..]
 
 ## Brand voice
 - [Speaks like / never sounds like / person / casing / punctuation / language]

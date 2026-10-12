@@ -24,20 +24,24 @@ The storyboard and video stages need Node.js 22.18 or newer.
 
 ```text
 /hookreel:brief → /hookreel:facts → /hookreel:story → /hookreel:script → /hookreel:storyboard → /hookreel:build → /hookreel:voice → /hookreel:qa
+/hookreel:resume <CODE>
 ```
 
 | Command | Stage | Output |
 |---|---|---|
-| `/hookreel:brief` | Interview in four rounds: brand context profile, topic, pain and why, audience awareness, evidence, proof, format, CTA, voice, music, sound effects, visual dislikes. Writes the project's **CLAUDE.md**: fixed rules, rules for this video, and concrete bans so nothing comes out generic. | `hookreel-output/<slug>/01-brief.md`, `CLAUDE.md` |
+| `/hookreel:brief` | Interview in four rounds: brand context profile, topic, pain and why, audience awareness, evidence, proof, format, CTA, voice, music, sound effects, visual dislikes. Gives the project a unique code and writes its rulebook **CLAUDE_<CODE>.md**: fixed rules, rules for this video, and concrete bans so nothing comes out generic. | `hookreel-output/<CODE>_<slug>/01-brief.md`, `CLAUDE_<CODE>.md`, `project.json` |
 | `/hookreel:facts` | Every number and claim verified against primary sources, dated, estimates labelled; allowed and forbidden claims | `02-facts.md` |
 | `/hookreel:story` | WTF Hook 999: three hooks per video (Gain, Pain, Curiosity), beat sheets; keeps your own storyline if you give one | `03-story.md` |
 | `/hookreel:script` | Exact voiceover per scene, visuals, cue phrases, recording sheet, checked against the bans. **Published for you to read and approve.** | `04-script.md` |
 | `/hookreel:storyboard` | Perfectionist-grade storyboard per video: composition, every movement, every sound effect, captions and words, in seconds and frames (60 fps, frame = f(t)), second by second. Computed by the same code that renders. **Published for you to read and approve.** | `05-storyboard-<id>.md` |
-| `/hookreel:build` | Releases the approved draft into the brand's Remotion studio, writes the studio CLAUDE.md, validates, checks every scene visually, and writes a standalone Remotion prompt built on frame = f(t) | `hookreel-studio/<brand>/`, `06-remotion-prompt.md` |
+| `/hookreel:build` | Releases the approved draft into the brand's Remotion studio, writes the studio's `CLAUDE_<CODE>.md`, validates, checks every scene visually, and writes a standalone Remotion prompt built on frame = f(t) | `hookreel-studio/<brand>/`, `06-remotion-prompt.md` |
 | `/hookreel:voice` | One recorded take per video: normalised, transcribed locally, cut per scene, visuals and captions synced to the spoken words, storyboard regenerated as recorded, mix checked | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
 | `/hookreel:qa` | Layout, sync, sources, stale facts, audio, licences and every ban; MP4 render; post caption | `07-qa-<id>.md`, `out/<id>.mp4` |
+| `/hookreel:resume <CODE>` | Reopens a project by its code: loads its rulebook, shows every stage and video, routes edits, and marks later stages for re-approval | — |
 
-Nothing goes into Remotion before the script and the storyboard are approved. Each project lives in `hookreel-output/<slug>/`, so the pipeline resumes after a restart and projects never overwrite each other. Each brand gets one studio folder, so several brands can share a machine.
+Nothing goes into Remotion before the script and the storyboard are approved.
+
+**Project codes.** Every project gets a code like `HKR-261012-7QF3`. It names the folder (`hookreel-output/HKR-261012-7QF3_chatgpt-ads-wa/`), both rulebooks (`CLAUDE_HKR-261012-7QF3.md` in the project and in the studio, each imported by a plain `CLAUDE.md` so Claude Code loads them automatically) and every video (`HKR-261012-7QF3-teaser`), and is listed in `hookreel-output/PROJECTS.md`. Come back any time with `/hookreel:resume HKR-261012-7QF3`. Each brand gets one studio folder, so several brands can share a machine.
 
 ## The template
 

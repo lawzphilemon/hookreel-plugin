@@ -11,24 +11,32 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 
 ```text
 /hookreel:brief → facts → story → script [publish + approve] → storyboard [publish + approve] → build → voice → qa
+/hookreel:resume <CODE>   (reopen any project later)
 ```
 
 | Stage | Output |
 |---|---|
-| brief | `hookreel-output/<slug>/01-brief.md` and **`hookreel-output/<slug>/CLAUDE.md`** (mandatory rulebook) |
-| facts | `02-facts.md` (bans added to `CLAUDE.md`) |
+| brief | project code, `<project>/01-brief.md`, **`<project>/CLAUDE_<CODE>.md`** (mandatory rulebook) + `CLAUDE.md` import, `project.json`, row in `hookreel-output/PROJECTS.md` |
+| facts | `02-facts.md` (bans added to `CLAUDE_<CODE>.md`) |
 | story | `03-story.md` (hooks + beat sheets, uses WTF Hook 999) |
 | script | `04-script.md`, published for review, `Status: approved` |
 | storyboard | `draft/brand.json`, `draft/videos/<id>.json`, `05-storyboard-<id>.md`, published for review, `Status: approved` |
-| build | `hookreel-studio/<brand>/` (brand.json, videos/, studio `CLAUDE.md`), `06-remotion-prompt.md` |
+| build | `hookreel-studio/<brand>/` (brand.json, videos/, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `06-remotion-prompt.md` |
 | voice | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
 | qa | `07-qa-<id>.md`, `out/<id>.mp4` |
 
-Each stage reads the previous files, so the pipeline resumes after a restart.
+Each stage reads the previous files and updates `project.json` and `PROJECTS.md`, so the pipeline resumes after a restart.
+
+## Project codes
+
+- Every project gets a unique code at `/hookreel:brief`: `HKR-YYMMDD-XXXX` (date plus four characters from `23456789ABCDEFGHJKMNPQRSTVWXYZ`).
+- The code is in every name that must stay findable and must never collide: the project folder `<project>` = `hookreel-output/<CODE>_<slug>/`, the rulebook `CLAUDE_<CODE>.md`, the studio file `CLAUDE_<CODE>.md`, every video id `<CODE>-<name>` (so compositions, `videos/<id>.json`, `public/vo/<id>/`, storyboards and `out/<id>.mp4` all carry it).
+- Claude Code auto-loads only files named `CLAUDE.md`, so each folder's `CLAUDE.md` imports the coded files with `@CLAUDE_<CODE>.md` lines. Never delete another project's import line or coded file.
+- `/hookreel:resume <CODE>` reopens a project; editing a stage marks every later stage `needs re-approval`.
 
 ## The project CLAUDE.md is the rulebook
 
-Every project has `hookreel-output/<slug>/CLAUDE.md` with three sections: **fixed rules** (brand voice, look, motion and time, sound, evidence), **rules for this video** (topic, pain, audience, storyline, CTA, approvals) and **bans** (claims, words and phrases, visuals, sound, process). Read it before every stage; it overrides defaults and framework examples. Bans are concrete items, never "avoid being generic". Every stage that learns a new rule or ban writes it there.
+Every project has `<project>/CLAUDE_<CODE>.md` (imported by the folder's `CLAUDE.md`) with three sections: **fixed rules** (brand voice, look, motion and time, sound, evidence), **rules for this video** (topic, pain, audience, storyline, CTA, approvals) and **bans** (claims, words and phrases, visuals, sound, process). Read it before every stage; it overrides defaults and framework examples. Bans are concrete items, never "avoid being generic". Every stage that learns a new rule or ban writes it there.
 
 ## Review gates
 
