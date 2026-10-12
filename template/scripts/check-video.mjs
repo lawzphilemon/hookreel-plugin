@@ -1,4 +1,4 @@
-// Usage: node scripts/check-video.mjs [video id]
+// Usage: node scripts/check-video.mjs [video id] [--no-files]
 // Checks brand.json and videos/*.json before anything renders: every cue must appear in its
 // scene's vo, colours must be 6-digit hex, referenced files must exist. Exits 1 on errors.
 import fs from "fs";
@@ -11,9 +11,11 @@ const brand = JSON.parse(fs.readFileSync("brand.json", "utf8"));
 for (const [k, v] of Object.entries(brand.colors ?? {})) {
   if (!/^#[0-9a-fA-F]{6}$/.test(v)) errors.push(`brand.json colors.${k} must be a 6-digit hex like #1E1E1E (got "${v}")`);
 }
-if (brand.logo && !fs.existsSync(path.join("public", brand.logo))) errors.push(`brand.json logo not found: public/${brand.logo}`);
+// --no-files: check a draft (cues and colours only), before logo and music are in a studio.
+const checkFiles = !process.argv.includes("--no-files");
+if (checkFiles && brand.logo && !fs.existsSync(path.join("public", brand.logo))) errors.push(`brand.json logo not found: public/${brand.logo}`);
 
-const only = process.argv[2];
+const only = process.argv.slice(2).find((a) => !a.startsWith("--"));
 const files = fs.readdirSync("videos").filter((f) => f.endsWith(".json") && (!only || f === `${only}.json`));
 if (!files.length) errors.push(only ? `videos/${only}.json not found` : "no videos/*.json yet");
 
@@ -33,7 +35,7 @@ for (const file of files) {
   const video = JSON.parse(fs.readFileSync(path.join("videos", file), "utf8"));
   const tag = `videos/${file}`;
   if (`${video.id}.json` !== file) errors.push(`${tag}: id "${video.id}" must match the file name`);
-  if (video.audio?.music?.src && !fs.existsSync(path.join("public", video.audio.music.src))) {
+  if (checkFiles && video.audio?.music?.src && !fs.existsSync(path.join("public", video.audio.music.src))) {
     errors.push(`${tag}: music not found: public/${video.audio.music.src}`);
   }
   const ids = new Set();

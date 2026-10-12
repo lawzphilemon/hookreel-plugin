@@ -1,6 +1,6 @@
 ---
 name: hookreel-rules
-description: Shared rules for the hookreel short-video pipeline (brief, facts, story, script, build, voice, qa) — evidence and claims, brand context profiles, writing voiceover for the ear, cue phrases, visual catalog, safe areas, motion and audio defaults. Use whenever a /hookreel command runs or a hookreel video is being written, built, or reviewed.
+description: Shared rules for the hookreel short-video pipeline (brief, facts, story, script, storyboard, build, voice, qa) — the project CLAUDE.md, review gates, evidence and claims, brand context profiles, writing voiceover for the ear, cue phrases, the 60 fps time model (frame = f(t)), visual catalog, safe areas, motion and audio defaults. Use whenever a /hookreel command runs or a hookreel video is being written, built, or reviewed.
 ---
 
 # HOOKREEL rules
@@ -10,20 +10,37 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 ## Pipeline and files
 
 ```text
-/hookreel:brief → /hookreel:facts → /hookreel:story → /hookreel:script → /hookreel:build → /hookreel:voice → /hookreel:qa
+/hookreel:brief → facts → story → script [publish + approve] → storyboard [publish + approve] → build → voice → qa
 ```
 
 | Stage | Output |
 |---|---|
-| brief | `hookreel-output/<slug>/01-brief.md` |
-| facts | `02-facts.md` |
+| brief | `hookreel-output/<slug>/01-brief.md` and **`hookreel-output/<slug>/CLAUDE.md`** (mandatory rulebook) |
+| facts | `02-facts.md` (bans added to `CLAUDE.md`) |
 | story | `03-story.md` (hooks + beat sheets, uses WTF Hook 999) |
-| script | `04-script.md` (voiceover, visuals, cues, recording sheet) |
-| build | `hookreel-studio/<brand>/brand.json`, `videos/<id>.json`, `05-remotion-prompt.md` |
-| voice | `hookreel-studio/<brand>/public/vo/<id>/` |
-| qa | `06-qa-<id>.md`, `out/<id>.mp4` |
+| script | `04-script.md`, published for review, `Status: approved` |
+| storyboard | `draft/brand.json`, `draft/videos/<id>.json`, `05-storyboard-<id>.md`, published for review, `Status: approved` |
+| build | `hookreel-studio/<brand>/` (brand.json, videos/, studio `CLAUDE.md`), `06-remotion-prompt.md` |
+| voice | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
+| qa | `07-qa-<id>.md`, `out/<id>.mp4` |
 
-Each stage reads the previous files, so the pipeline resumes after a restart. A stage starts only when the previous file says `Status: confirmed`.
+Each stage reads the previous files, so the pipeline resumes after a restart.
+
+## The project CLAUDE.md is the rulebook
+
+Every project has `hookreel-output/<slug>/CLAUDE.md` with three sections: **fixed rules** (brand voice, look, motion and time, sound, evidence), **rules for this video** (topic, pain, audience, storyline, CTA, approvals) and **bans** (claims, words and phrases, visuals, sound, process). Read it before every stage; it overrides defaults and framework examples. Bans are concrete items, never "avoid being generic". Every stage that learns a new rule or ban writes it there.
+
+## Review gates
+
+- No storyboard before the script is published and explicitly approved.
+- No Remotion JSON in a studio before the storyboard is published and explicitly approved.
+- Changing the draft after approval means regenerating and re-approving.
+
+## Time model: 60 fps, frame = f(t)
+
+- Every duration and offset is written in seconds and converted with `frame = f(t) = round(t × 60)` (`src/motion.ts`). Never hard-code a frame count.
+- Every animated property is a pure function of the frame: `value(F) = from + (to − from) · ease(clamp((F − F0) / D))`, ease-out cubic-bezier(0.16, 1, 0.3, 1), via `interpolate()`. No CSS transitions or keyframe animations.
+- When things happen and which sounds play comes only from `src/plan.ts`. Components read their times from it; the storyboard script prints it. So the storyboard is the render.
 
 ## The brand comes from its context profile
 
@@ -55,6 +72,8 @@ Pick from the catalog in `references/visual-catalog.md`; one visual per scene, `
 Safe area for 1080×1920: content between y ≈ 330 and y ≈ 1300, sides 80 px; captions sit at y ≈ 1340; the platform UI covers the bottom ~420 px and the right edge. Headlines at least 84 px, supporting text at least 32 px.
 
 Motion: fade-and-rise entrances (about 360 ms, ease-out), no bounce, no looping, no story-style progress bar.
+
+Storyboards are perfectionist-grade: every element's place, size, colour token, moment, movement and sound, in seconds and frames, plus a second-by-second table.
 
 ## Audio
 

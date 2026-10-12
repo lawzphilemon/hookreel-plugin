@@ -1,27 +1,28 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import type { CtaSpec, SwapVisual, Visual } from "../schema";
-import { useCueFn } from "../timing";
+import { planSwap } from "../plan.ts";
+import { usePlanCtx } from "../timing";
 import { Cta, HeadlineScene, List, Logo } from "./basic";
 import { Bars, Ranking, Stat, Tiles, Timeline } from "./data";
 import { Flow, Journey } from "./flow";
 import { Chat, Ui } from "./mock";
 
-// First visual, then a crossfade to the second when the narration reaches `at`.
+// First visual, then a crossfade to the second when the narration reaches `at`. Times come
+// from planSwap, which also lists only the sounds of the half that is on screen.
 const Swap: React.FC<{ v: SwapVisual; cta?: CtaSpec }> = ({ v, cta }) => {
-  const cue = useCueFn();
+  const p = planSwap(v, usePlanCtx(), Boolean(cta));
   const frame = useCurrentFrame();
-  const at = cue(v.at);
-  const out = interpolate(frame, [at - 10, at - 2], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const out = interpolate(frame, [p.fadeStart, p.mountSecond], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <div style={{ position: "relative", height: "100%" }}>
       {/* Each half is only mounted while it is on screen, so its sounds don't play while hidden. */}
-      {frame < at ? (
+      {frame < p.at ? (
         <div style={{ position: "absolute", inset: 0, opacity: out }}>
           <VisualView v={v.first} cta={cta} />
         </div>
       ) : null}
-      {frame >= at - 2 ? (
+      {frame >= p.mountSecond ? (
         <div style={{ position: "absolute", inset: 0 }}>
           <VisualView v={v.second} cta={cta} />
         </div>

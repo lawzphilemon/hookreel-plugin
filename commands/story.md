@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Skill
 
 # HKR-3 — Story
 
-**Mission:** Turn the brief and the verified facts into a story that stops the scroll and earns the CTA. Requires confirmed `01-brief.md` and `02-facts.md` in `hookreel-output/<slug>/`. Follow the `hookreel-rules` skill.
+**Mission:** Turn the brief and the verified facts into a story that stops the scroll and earns the CTA. Requires confirmed `01-brief.md` and `02-facts.md` in `hookreel-output/<slug>/`. Read `hookreel-output/<slug>/CLAUDE.md` first: its bans override the framework's examples. Follow the `hookreel-rules` skill.
 
 ## Step 1 — Load the framework
 
@@ -45,6 +45,8 @@ Budget about 2.5 spoken words per second. Keep each video within the brief's tar
 ## Step 5 — Save
 
 Save `hookreel-output/<slug>/03-story.md` with the hook options, the recommendation, and the beat sheets. Show it and ask the user to pick hooks and confirm the beats. Revising here is cheap; revising after the build is not. On confirmation add `Status: confirmed` as the first line, with the chosen hook per video.
+
+Record the chosen hook per video under **Rules for this video** in `CLAUDE.md`.
 
 End: "Confirm the story, then run /hookreel:script."
 

@@ -145,3 +145,6 @@ for (const [i, [start, end]] of segments.entries()) {
   console.log(`  script: ${scene.vo}`);
   console.log(`  heard:  ${words.map((x) => x.text).join(" ")}`);
 }
+
+// Let the studio know about the new clips.
+execSync("node scripts/register-videos.mjs", { stdio: "inherit" });

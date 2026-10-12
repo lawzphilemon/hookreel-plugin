@@ -1,7 +1,7 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import { C, ENTER, easeOut, mono, RADIUS, sans } from "../brand";
-import { Sfx } from "./sfx";
+import { f, FPS, TIME } from "../motion.ts";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const NEVER = 1e9;
@@ -14,7 +14,7 @@ export const useEnter = (at: number, length = ENTER) => {
 // Fade + short rise. Every element enters this way; nothing bounces or loops.
 export const Appear: React.FC<{ at?: number; dy?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
   at = 0,
-  dy = 28,
+  dy = TIME.rise,
   style,
   children,
 }) => {
@@ -114,8 +114,7 @@ export const Pill: React.FC<{
 export const Chips: React.FC<{ items: string[]; at: number; accent?: string; size?: number }> = ({ items, at, accent, size = 32 }) => (
   <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
     {items.map((c, i) => (
-      <Appear key={c} at={at + i * 4} dy={12}>
-        <Sfx name="tick" at={at + i * 4} />
+      <Appear key={c} at={at + i * f(TIME.chips.step)} dy={12}>
         <Pill tone={c === accent ? "accent" : "light"} size={size}>
           {c}
         </Pill>
@@ -124,7 +123,7 @@ export const Chips: React.FC<{ items: string[]; at: number; accent?: string; siz
   </div>
 );
 
-// Accent outline that switches on at `at`, with a click.
+// Accent outline that switches on at `at` (its click is in the plan).
 export const Highlight: React.FC<{ at: number; children: React.ReactNode; radius?: number; style?: React.CSSProperties }> = ({
   at,
   children,
@@ -142,7 +141,6 @@ export const Highlight: React.FC<{ at: number; children: React.ReactNode; radius
         ...style,
       }}
     >
-      <Sfx name="click" at={at} />
       {children}
     </div>
   );
@@ -188,7 +186,7 @@ export const Panel: React.FC<{ label: string; children: React.ReactNode; style?:
   </div>
 );
 
-// Text that types itself in from `at`, with key taps.
+// Text that types itself in from `at` (key taps are in the plan).
 export const Typed: React.FC<{ text: string; at: number; cps?: number; style?: React.CSSProperties }> = ({
   text,
   at,
@@ -196,10 +194,9 @@ export const Typed: React.FC<{ text: string; at: number; cps?: number; style?: R
   style,
 }) => {
   const frame = useCurrentFrame();
-  const n = Math.max(0, Math.min(text.length, Math.floor(((frame - at) / 30) * cps)));
+  const n = Math.max(0, Math.min(text.length, Math.floor(((frame - at) / FPS) * cps)));
   return (
     <span style={style}>
-      <Sfx name="typing" at={at} length={Math.ceil((text.length / cps) * 30)} />
       {text.slice(0, n)}
       <span style={{ opacity: 0 }}>{text.slice(n)}</span>
     </span>
@@ -209,7 +206,6 @@ export const Typed: React.FC<{ text: string; at: number; cps?: number; style?: R
 // "Watch out" card.
 export const Note: React.FC<{ at: number; label?: string; text: string }> = ({ at, label = "Watch out", text }) => (
   <Appear at={at}>
-    <Sfx name="pop" at={at} />
     <div style={{ background: C.surface, borderRadius: RADIUS.card, padding: "24px 32px", fontFamily: sans }}>
       <Eyebrow>{label}</Eyebrow>
       <div style={{ fontSize: 38, fontWeight: 500, color: C.text, lineHeight: 1.3, marginTop: 12 }}>
@@ -220,7 +216,7 @@ export const Note: React.FC<{ at: number; label?: string; text: string }> = ({ a
 );
 
 export const Switch: React.FC<{ at: number }> = ({ at }) => {
-  const p = useEnter(at, 6);
+  const p = useEnter(at, f(TIME.toggle));
   return (
     <div
       style={{
@@ -233,17 +229,15 @@ export const Switch: React.FC<{ at: number }> = ({ at }) => {
         justifyContent: p > 0.5 ? "flex-end" : "flex-start",
       }}
     >
-      <Sfx name="switch" at={at} />
       <div style={{ width: 36, height: 36, borderRadius: 18, background: C.panel, boxShadow: "0 2px 6px rgba(0,0,0,0.2)" }} />
     </div>
   );
 };
 
 export const Checkbox: React.FC<{ at?: number; label: string }> = ({ at = NEVER, label }) => {
-  const p = useEnter(at, 6);
+  const p = useEnter(at, f(TIME.toggle));
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 32, fontWeight: 600, padding: "10px 12px" }}>
-      <Sfx name="switch" at={at} />
       <div
         style={{
           width: 40,

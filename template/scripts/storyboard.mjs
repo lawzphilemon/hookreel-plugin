@@ -1,0 +1,126 @@
+// Usage:
+//   node scripts/storyboard.mjs <video id>                       (inside a studio)
+//   node scripts/storyboard.mjs --video <file.json> [--brand <brand.json>] [--vo <dir>] [--out <file.md>]
+//
+// Writes a frame-exact storyboard from the same planners the render uses (src/plan.ts), so what
+// it says is what the video does: every element, movement, sound effect, caption and spoken
+// word, with times in seconds and frames, frame = round(t × FPS). Before a voiceover exists the
+// times are estimates at 2.5 words per second; after `npm run vo` they follow the recording.
+// Needs only Node 22.18+ (no npm install).
+import fs from "fs";
+import path from "path";
+import { scriptWordTimes, splitWords } from "../src/align.ts";
+import { captionChunks, charToFrame, estimateSeconds, LEAD_IN, makeCue, toTiming } from "../src/cue.ts";
+import { f, FPS, sfxVolume, TIME } from "../src/motion.ts";
+import { planShell, planVisual } from "../src/plan.ts";
+
+const args = process.argv.slice(2);
+const opt = (name) => {
+  const i = args.indexOf(`--${name}`);
+  return i === -1 ? undefined : args[i + 1];
+};
+const id = args[0] && !args[0].startsWith("--") ? args[0] : undefined;
+const videoPath = opt("video") ?? (id ? path.join("videos", `${id}.json`) : undefined);
+if (!videoPath) {
+  console.error("Usage: node scripts/storyboard.mjs <video id> | --video <file.json> [--brand <brand.json>] [--vo <dir>] [--out <file.md>]");
+  process.exit(1);
+}
+const video = JSON.parse(fs.readFileSync(videoPath, "utf8"));
+const brandPath = opt("brand") ?? "brand.json";
+const brand = fs.existsSync(brandPath) ? JSON.parse(fs.readFileSync(brandPath, "utf8")) : {};
+const voDir = opt("vo") ?? path.join("public", "vo", video.id);
+const outPath = opt("out") ?? path.join("storyboard", `${video.id}.md`);
+const enter = f((brand.motion?.entranceMs ?? 360) / 1000);
+const level = video.audio?.sfx ?? "medium";
+
+// Duration of a PCM WAV from its header.
+const wavSeconds = (file) => {
+  const b = fs.readFileSync(file);
+  let p = 12;
+  let byteRate = 0;
+  while (p < b.length) {
+    const id = b.toString("ascii", p, p + 4);
+    const size = b.readUInt32LE(p + 4);
+    if (id === "fmt ") byteRate = b.readUInt32LE(p + 16);
+    if (id === "data") return size / byteRate;
+    p += 8 + size + (size % 2);
+  }
+  return null;
+};
+
+const s = (frames) => (frames / FPS).toFixed(2);
+const clean = (x) => String(x).replace(/\|/g, "\\|");
+let recorded = 0;
+const timings = video.scenes.map((scene) => {
+  const wav = path.join(voDir, `${scene.id}.wav`);
+  const words = path.join(voDir, `${scene.id}.words.json`);
+  if (fs.existsSync(wav)) {
+    recorded++;
+    const seconds = wavSeconds(wav) ?? estimateSeconds(scene.vo);
+    const heard = fs.existsSync(words) ? JSON.parse(fs.readFileSync(words, "utf8")) : null;
+    return toTiming(seconds, wav, heard ? scriptWordTimes(scene.vo, heard, seconds) : null);
+  }
+  return toTiming(estimateSeconds(scene.vo), null);
+});
+const total = timings.reduce((a, t) => a + t.duration, 0);
+const status =
+  recorded === video.scenes.length ? "AS RECORDED — times follow the voiceover" : recorded ? `PARTLY RECORDED (${recorded}/${video.scenes.length} scenes)` : "PLANNED — times are estimates (2.5 words/s) until the voiceover is recorded";
+
+const lines = [];
+lines.push(`# Storyboard · ${video.title} (\`${video.id}\`)`, "");
+lines.push(`- Status: **${status}**`);
+lines.push(`- Format: ${video.width ?? 1080}×${video.height ?? 1920}, **${FPS} fps**, frame = round(t × ${FPS})`);
+lines.push(`- Length: ${s(total)} s = ${total} frames · ${video.scenes.length} scenes`);
+lines.push(`- Entrance: ${Math.round((enter / FPS) * 1000)} ms, fade + rise ${TIME.rise}px, ease-out, no bounce, no loops`);
+lines.push(`- Sound effects: ${level} · Music: ${video.audio?.music ? `${video.audio.music.src} from ${video.audio.music.startAt ?? 0}s, ducked under the voice (${video.audio.music.underVoice ?? TIME.music.underVoice}) and up in pauses (${video.audio.music.inPauses ?? TIME.music.inPauses}), fade in ${TIME.music.fadeIn}s, fade out ${TIME.music.fadeOut}s` : "none"}`);
+lines.push(`- Captions: ${video.captions === false ? "off" : "on, from the voiceover text, at y≈1340"}`, "");
+lines.push("Times: **t** = seconds from the start of the video, **F** = frame from the start of the video, **f** = frame inside the scene.", "");
+
+let start = 0;
+video.scenes.forEach((scene, i) => {
+  const timing = timings[i];
+  const ctx = { vo: scene.vo, voFrames: timing.voFrames, duration: timing.duration, words: timing.words };
+  const planCtx = { cue: makeCue(ctx), enter };
+  const events = [...planShell(scene, planCtx, timing.duration, i === 0).events, ...planVisual(scene.visual, planCtx, Boolean(video.cta)).events];
+
+  // Spoken words and caption lines, as events too.
+  const words = splitWords(scene.vo).map((w) => ({ word: w.word, at: Math.round(charToFrame(ctx, w.offset)) }));
+  const captions = captionChunks(scene.vo).map((c) => ({ text: c.text, at: Math.round(charToFrame(ctx, c.start)) }));
+  events.push({ at: LEAD_IN, layer: "voiceover", action: `starts: "${scene.vo}"`, until: LEAD_IN + timing.voFrames });
+  for (const c of captions) events.push({ at: c.at, layer: "caption", action: `shows "${c.text}"`, motion: `fade in over ${Math.round(TIME.captionIn * 1000)} ms` });
+  events.sort((a, b) => a.at - b.at);
+
+  lines.push(`## Scene ${i + 1} · \`${scene.id}\` · ${scene.visual.type}`, "");
+  lines.push(`- From **${s(start)} s** to **${s(start + timing.duration)} s** (F ${start}–${start + timing.duration}, ${s(timing.duration)} s)`);
+  lines.push(`- Voiceover from f ${LEAD_IN} (${s(start + LEAD_IN)} s), ${s(timing.voFrames)} s long: "${scene.vo}"`, "");
+  lines.push("| t (s) | F | f | Layer | What happens | Movement | Ends (t) | Sound (final volume) |");
+  lines.push("|---:|---:|---:|---|---|---|---:|---|");
+  for (const e of events) {
+    if (e.at >= timing.duration) continue;
+    const sound = e.sfx ? (() => {
+      const v = sfxVolume(e.sfx.name, level, e.sfx.volume);
+      return v === null ? `${e.sfx.name} (muted at ${level})` : `${e.sfx.name} ${v.toFixed(2)}${e.sfx.length ? `, ${s(e.sfx.length)} s` : ""}`;
+    })() : "";
+    lines.push(`| ${s(start + e.at)} | ${start + e.at} | ${e.at} | ${clean(e.layer)} | ${clean(e.action)} | ${clean(e.motion ?? "")} | ${e.until !== undefined ? s(start + e.until) : ""} | ${sound} |`);
+  }
+
+  // Second by second: what is said, which caption shows, what moves.
+  lines.push("", "Second by second:", "", "| Second | Said | Caption on screen | Moving or entering |", "|---|---|---|---|");
+  for (let sec = Math.floor(start / FPS); sec * FPS < start + timing.duration; sec++) {
+    const a = sec * FPS - start;
+    const b = a + FPS;
+    const said = words.filter((w) => w.at >= a && w.at < b).map((w) => w.word).join(" ");
+    const cap = [...captions].reverse().find((c) => c.at <= b - 1);
+    const moving = events
+      .filter((e) => e.layer !== "caption" && e.layer !== "voiceover" && (e.at < b && (e.until ?? e.at + 1) > Math.max(0, a)))
+      .map((e) => e.layer)
+      .filter((v, k, arr) => arr.indexOf(v) === k);
+    lines.push(`| ${sec}–${sec + 1} s | ${clean(said)} | ${clean(cap?.text ?? "")} | ${clean(moving.join("; "))} |`);
+  }
+  lines.push("");
+  start += timing.duration;
+});
+
+fs.mkdirSync(path.dirname(outPath), { recursive: true });
+fs.writeFileSync(outPath, lines.join("\n"));
+console.log(`${status}\n${outPath}: ${video.scenes.length} scenes, ${s(total)} s, ${total} frames at ${FPS} fps`);

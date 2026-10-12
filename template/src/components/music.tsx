@@ -2,11 +2,13 @@ import React from "react";
 import { Audio } from "@remotion/media";
 import { interpolate, staticFile, useVideoConfig } from "remotion";
 import type { MusicSpec } from "../schema";
+import { f, TIME } from "../motion.ts";
 import { LEAD_IN, SceneTiming } from "../timing";
 
 // Background bed with ducking: under speech it sits ~13 dB below the voice, in pauses it comes
 // up to ~8 dB below. Defaults assume a track loudness-normalised to about -14 to -16 LUFS.
-const DUCK = { underVoice: 0.085, inPauses: 0.16, ramp: 8, fadeIn: 15, fadeOut: 45 };
+const M = TIME.music;
+const DUCK = { underVoice: M.underVoice, inPauses: M.inPauses, ramp: f(M.ramp), fadeIn: f(M.fadeIn), fadeOut: f(M.fadeOut), mergeGap: f(M.mergeGap) };
 
 // Frames (on the reel timeline) where the voice is speaking.
 const speechSpans = (timings: SceneTiming[], fps: number) => {
@@ -25,7 +27,7 @@ const speechSpans = (timings: SceneTiming[], fps: number) => {
   const merged: [number, number][] = [];
   for (const s of spans.sort((a, b) => a[0] - b[0])) {
     const last = merged[merged.length - 1];
-    if (last && s[0] - last[1] < 12) last[1] = Math.max(last[1], s[1]);
+    if (last && s[0] - last[1] < DUCK.mergeGap) last[1] = Math.max(last[1], s[1]);
     else merged.push([...s]);
   }
   return merged;

@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Glob, AskUserQuestion
 
 # HKR-1 — Video Brief
 
-**Mission:** Capture everything the story, script and video need, once, so later stages never have to come back and ask. Follow the `hookreel-rules` skill throughout.
+**Mission:** Capture everything the story, script and video need, once, so later stages never have to come back and ask, and write the project's rulebook (`CLAUDE.md`). Follow the `hookreel-rules` skill throughout.
 
 Talk to the user in their language. The brief file itself is written in English field names with the user's answers as given.
 
@@ -74,9 +74,20 @@ Visual assets: [logo path, screenshots allowed?] · Dislikes: [list]
 Open questions: [anything still unknown]
 ```
 
-End: "Confirm the brief, then run /hookreel:facts."
+## Step 4 — Export CLAUDE.md (mandatory)
+
+Every new project gets its own rules file, so later stages (and any later session) follow this brand and this video instead of generic defaults. Fill `${CLAUDE_PLUGIN_ROOT}/claude-md/project.md` and save it as `hookreel-output/<slug>/CLAUDE.md`:
+
+1. **Fixed rules**: from the context profile (voice, casing, punctuation, emoji, language, colours, typeface, logo, signature elements) plus the pipeline's fixed rules already in the skeleton (60 fps, frame = f(t), motion, safe area, sound targets, evidence).
+2. **Rules for this video**: from the brief (topic, pain and why, audience, storyline, format, length, CTA, proof).
+3. **Bans**: the profile's hard rules and never-say list, the brief's forbidden claims and dislikes, the generic filler list in the skeleton, and the visual and sound bans. Write bans as concrete items, never "avoid being generic".
+
+Leave no `[placeholder]` unfilled: write "none" where the answer is none. Show the file and tell the user it is now the rulebook for the project.
+
+End: "Confirm the brief and CLAUDE.md, then run /hookreel:facts."
 
 ## Rules
 - Ask, never assume, for anything that would end up as a claim on screen.
 - Keep the user's own storyline and wording when they give one.
 - One project, one folder. Never overwrite another slug.
+- No project without its `CLAUDE.md`.

@@ -6,7 +6,7 @@ allowed-tools: Read, Write, WebSearch, WebFetch, Bash
 
 # HKR-2 — Fact Gate
 
-**Mission:** Nothing reaches the screen or the voiceover unless it can be defended. Requires a confirmed `hookreel-output/<slug>/01-brief.md`. Follow the `hookreel-rules` skill.
+**Mission:** Nothing reaches the screen or the voiceover unless it can be defended. Requires a confirmed `hookreel-output/<slug>/01-brief.md`. Read `hookreel-output/<slug>/CLAUDE.md` first and follow it. Follow the `hookreel-rules` skill.
 
 ## Step 1 — List the claims
 
@@ -46,6 +46,8 @@ Sources: [markdown links]
 ```
 
 Show the table in chat with the sources, and ask the user to confirm or pick alternatives. On confirmation add `Status: confirmed` as the first line.
+
+Then update `hookreel-output/<slug>/CLAUDE.md`: copy every NOT FOUND and CONTRADICTED claim, word for word, into **Bans → Claims**, and add any stale-fact recheck date to **Rules for this video**.
 
 End: "Confirm the facts, then run /hookreel:story."
 

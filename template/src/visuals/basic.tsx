@@ -1,17 +1,21 @@
 import React from "react";
 import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { BRAND, C, logoFilter, RADIUS, sans } from "../brand";
-import { Sfx } from "../components/sfx";
+import { PlanSfx } from "../components/sfx";
 import { Appear, Chips, Eyebrow, Headline, Pill, Rich, Stack } from "../components/ui";
+import { f, TIME } from "../motion.ts";
+import { planCta, planHeadline, planList, planLogo } from "../plan.ts";
 import type { CtaSpec, CtaVisual, HeadlineVisual, ListVisual, LogoVisual } from "../schema";
-import { useCueFn } from "../timing";
+import { usePlanCtx } from "../timing";
+
+const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
 export const HeadlineScene: React.FC<{ v: HeadlineVisual }> = ({ v }) => {
-  const cue = useCueFn();
-  const at = cue(v.cue, 0);
+  const p = planHeadline(v, usePlanCtx());
   return (
     <Stack gap={44}>
-      <Appear at={at}>
+      <PlanSfx events={p.events} />
+      <Appear at={p.at}>
         {v.eyebrow ? (
           <div style={{ marginBottom: 18 }}>
             <Eyebrow>{v.eyebrow}</Eyebrow>
@@ -20,49 +24,37 @@ export const HeadlineScene: React.FC<{ v: HeadlineVisual }> = ({ v }) => {
         <Headline text={v.text} size={v.size ?? 104} />
       </Appear>
       {v.sub ? (
-        <Appear at={cue(v.sub.cue, at + 12)}>
+        <Appear at={p.subAt}>
           <div style={{ fontFamily: sans, fontSize: 44, fontWeight: 500, color: C.muted, lineHeight: 1.3 }}>
             <Rich text={v.sub.text} />
           </div>
         </Appear>
       ) : null}
-      {v.chips ? <Chips items={v.chips.items} at={cue(v.chips.cue, at + 20)} /> : null}
+      {v.chips ? <Chips items={v.chips.items} at={p.chipsAt} /> : null}
     </Stack>
   );
 };
 
 const StrikeItem: React.FC<{ at: number; struckAt: number; text: string }> = ({ at, struckAt, text }) => {
   const frame = useCurrentFrame();
-  const strike = interpolate(frame, [struckAt, struckAt + 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const strike = interpolate(frame, [struckAt, struckAt + f(TIME.list.strike)], [0, 1], clamp);
   return (
     <Appear at={at} dy={12}>
-      <Sfx name="tick" at={at} />
       <div style={{ position: "relative", display: "inline-block", opacity: 1 - 0.55 * strike }}>
         <Pill size={40}>
           <Rich text={text} />
         </Pill>
-        <div
-          style={{
-            position: "absolute",
-            left: 16,
-            top: "50%",
-            height: 5,
-            width: `calc(${strike * 100}% - 32px)`,
-            background: C.errorText,
-            borderRadius: 3,
-          }}
-        />
+        <div style={{ position: "absolute", left: 16, top: "50%", height: 5, width: `calc(${strike * 100}% - 32px)`, background: C.errorText, borderRadius: 3 }} />
       </div>
     </Appear>
   );
 };
 
 export const List: React.FC<{ v: ListVisual }> = ({ v }) => {
-  const cue = useCueFn();
-  const ats = v.items.map((it, i) => cue(it.cue, 10 + i * 6));
-  const strikeAt = cue(v.strikeCue, 1e9);
+  const p = planList(v, usePlanCtx());
   return (
     <Stack gap={36}>
+      <PlanSfx events={p.events} />
       {v.eyebrow || v.headline ? (
         <Appear>
           {v.eyebrow ? <Eyebrow>{v.eyebrow}</Eyebrow> : null}
@@ -76,10 +68,9 @@ export const List: React.FC<{ v: ListVisual }> = ({ v }) => {
       <div style={{ display: "flex", flexDirection: "column", gap: v.style === "strike" ? 18 : 24, alignItems: "flex-start" }}>
         {v.items.map((it, i) =>
           v.style === "strike" ? (
-            <StrikeItem key={i} at={ats[i]} struckAt={strikeAt + i * 4} text={it.text} />
+            <StrikeItem key={i} at={p.items[i]} struckAt={p.strikeAt + i * f(TIME.list.strikeStep)} text={it.text} />
           ) : (
-            <Appear key={i} at={ats[i]} dy={16}>
-              <Sfx name="tick" at={ats[i]} />
+            <Appear key={i} at={p.items[i]} dy={16}>
               <div style={{ display: "flex", gap: 22, alignItems: "baseline", fontFamily: sans, fontSize: v.style === "dash" ? 48 : 40, fontWeight: v.style === "dash" ? 600 : 500, color: C.text, lineHeight: 1.25 }}>
                 <span style={{ color: C.accent, fontWeight: 700 }}>{v.style === "dash" ? "—" : "✓"}</span>
                 <span>
@@ -91,8 +82,7 @@ export const List: React.FC<{ v: ListVisual }> = ({ v }) => {
         )}
       </div>
       {v.answer ? (
-        <Appear at={cue(v.answer.cue, strikeAt + 20)}>
-          <Sfx name="pop" at={cue(v.answer.cue, strikeAt + 20)} />
+        <Appear at={p.answerAt}>
           <Pill tone="accent" size={56}>
             {v.answer.text}
           </Pill>
@@ -106,25 +96,22 @@ export const BrandMark: React.FC<{ width: number; opacity?: number }> = ({ width
   BRAND.logo ? (
     <Img src={staticFile(BRAND.logo)} style={{ width, filter: logoFilter, opacity }} />
   ) : (
-    <div style={{ fontFamily: sans, fontSize: width / 6, fontWeight: 800, color: C.text, opacity, letterSpacing: "-0.02em" }}>
-      {BRAND.name}
-    </div>
+    <div style={{ fontFamily: sans, fontSize: width / 6, fontWeight: 800, color: C.text, opacity, letterSpacing: "-0.02em" }}>{BRAND.name}</div>
   );
 
 export const Logo: React.FC<{ v: LogoVisual }> = ({ v }) => {
-  const cue = useCueFn();
-  const at = cue(v.cue, 12);
+  const p = planLogo(v, usePlanCtx());
   return (
     <Stack gap={60} style={{ alignItems: "flex-start" }}>
+      <PlanSfx events={p.events} />
       <Appear>
         <BrandMark width={460} />
       </Appear>
-      <Appear at={at}>
-        <Sfx name="pop" at={at} />
+      <Appear at={p.at}>
         <Headline text={v.headline} size={92} />
       </Appear>
       {v.chip ? (
-        <Appear at={at + 16}>
+        <Appear at={p.chipAt}>
           <Pill tone="light" size={34}>
             {v.chip}
           </Pill>
@@ -136,44 +123,38 @@ export const Logo: React.FC<{ v: LogoVisual }> = ({ v }) => {
 
 // Closing card: what they get, and the one action to take.
 export const Cta: React.FC<{ v: CtaVisual; cta?: CtaSpec }> = ({ v, cta }) => {
-  const cue = useCueFn();
-  const at = cue(v.cue, 30);
+  const p = planCta(v, usePlanCtx(), Boolean(cta));
   return (
     <Stack gap={32}>
+      <PlanSfx events={p.events} />
       <Appear>
         <Headline text={v.headline} size={92} />
       </Appear>
       {cta ? (
-        <>
-          <Sfx name="riser" at={Math.max(0, at - 36)} />
-          <Appear at={at}>
-            {/* Lighter than elsewhere: this lands on top of the voice, the riser and the music. */}
-            <Sfx name="impact" at={at} volume={0.22} />
-            <Sfx name="ding" at={at} volume={0.28} />
-            <div style={{ background: C.surface, borderRadius: RADIUS.card, padding: 36, display: "flex", flexDirection: "column", gap: 24 }}>
-              {cta.kicker ? <div style={{ fontFamily: sans, fontSize: 28, fontWeight: 600, color: C.muted }}>{cta.kicker}</div> : null}
-              <Headline text={cta.title} size={56} />
-              {cta.chips?.length ? (
-                <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-                  {cta.chips.map((c) => (
-                    <Pill key={c} tone="light" size={28}>
-                      {c}
-                    </Pill>
-                  ))}
-                </div>
-              ) : null}
-              <div>
-                <Pill tone="accent" size={40}>
-                  {cta.button}
-                </Pill>
+        <Appear at={p.at}>
+          <div style={{ background: C.surface, borderRadius: RADIUS.card, padding: 36, display: "flex", flexDirection: "column", gap: 24 }}>
+            {cta.kicker ? <div style={{ fontFamily: sans, fontSize: 28, fontWeight: 600, color: C.muted }}>{cta.kicker}</div> : null}
+            <Headline text={cta.title} size={56} />
+            {cta.chips?.length ? (
+              <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+                {cta.chips.map((c) => (
+                  <Pill key={c} tone="light" size={28}>
+                    {c}
+                  </Pill>
+                ))}
               </div>
-              {cta.sub ? <div style={{ fontFamily: sans, fontSize: 32, fontWeight: 500, color: C.text }}>{cta.sub}</div> : null}
+            ) : null}
+            <div>
+              <Pill tone="accent" size={40}>
+                {cta.button}
+              </Pill>
             </div>
-          </Appear>
-        </>
+            {cta.sub ? <div style={{ fontFamily: sans, fontSize: 32, fontWeight: 500, color: C.text }}>{cta.sub}</div> : null}
+          </div>
+        </Appear>
       ) : null}
       {v.footer ? (
-        <Appear at={cue(v.footerCue, at + 30)}>
+        <Appear at={p.footerAt}>
           <div style={{ fontFamily: sans, fontSize: 38, fontWeight: 600, color: C.muted }}>{v.footer}</div>
         </Appear>
       ) : null}

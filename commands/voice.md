@@ -4,9 +4,9 @@ description: Put a recorded voiceover take into a video — normalise, transcrib
 allowed-tools: Read, Write, Bash
 ---
 
-# HKR-6 — Voice
+# HKR-7 — Voice
 
-**Mission:** One recorded take per video in, word-synced scenes and a clean mix out. Run inside `hookreel-studio/<brand-slug>/`. Follow the `hookreel-rules` skill.
+**Mission:** One recorded take per video in, word-synced scenes and a clean mix out. Run inside `hookreel-studio/<brand-slug>/`. Read the project's `hookreel-output/<slug>/CLAUDE.md` and the studio `CLAUDE.md` first. Follow the `hookreel-rules` skill.
 
 ## Step 1 — Which video is this?
 
@@ -27,7 +27,17 @@ Read the printed `heard:` line for every scene against its script line:
 
 Then `npm run align -- <id>` and confirm the cue words land where they are spoken.
 
-## Step 3 — Mix check
+## Step 3 — Storyboard as recorded
+
+Regenerate the storyboard from the recording, so it is exact to the frame:
+
+```bash
+npm run storyboard -- <id>
+```
+
+Copy `storyboard/<id>.md` to `hookreel-output/<slug>/05-storyboard-<id>.recorded.md`, keep the director's layer from the approved storyboard on top of each scene, and report how much each scene moved against the plan (start and length in seconds). If a scene now runs long enough to push content past its fade-out, or a cue lands on the wrong word, fix it before going on.
+
+## Step 4 — Mix check
 
 Render the audio alone and measure it:
 

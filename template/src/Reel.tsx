@@ -3,10 +3,12 @@ import { Audio } from "@remotion/media";
 import { AbsoluteFill, interpolate, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, sans } from "./brand";
 import { BackgroundMusic } from "./components/music";
-import { Sfx, SfxLevelContext } from "./components/sfx";
+import { PlanSfx, SfxLevelContext } from "./components/sfx";
 import { Note } from "./components/ui";
 import type { SceneSpec, VideoSpec } from "./schema";
-import { captionChunks, charToFrame, LEAD_IN, SceneContext, SceneTiming, useCueFn, useScene } from "./timing";
+import { f, TIME } from "./motion.ts";
+import { planShell } from "./plan.ts";
+import { captionChunks, charToFrame, LEAD_IN, SceneContext, SceneTiming, usePlanCtx, useScene } from "./timing";
 import { BrandMark } from "./visuals/basic";
 import { VisualView } from "./visuals";
 import { VIDEOS } from "./videos.generated";
@@ -39,9 +41,10 @@ const Caption: React.FC = () => {
   const scene = useScene();
   const chunks = captionChunks(scene.vo);
   const at = (c: { start: number }) => charToFrame(scene, c.start);
-  const current = [...chunks].reverse().find((c) => frame >= at(c) - 2);
+  const lead = f(TIME.captionIn) / 2;
+  const current = [...chunks].reverse().find((c) => frame >= at(c) - lead);
   if (!current) return null;
-  const p = interpolate(frame, [at(current) - 2, at(current) + 3], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const p = interpolate(frame, [at(current) - lead, at(current) + lead], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <div
       style={{
@@ -63,30 +66,20 @@ const Caption: React.FC = () => {
   );
 };
 
-const SceneNote: React.FC<{ note: NonNullable<SceneSpec["note"]> }> = ({ note }) => {
-  const cue = useCueFn();
-  return <Note at={cue(note.cue, 40)} label={note.label} text={note.text} />;
-};
-
-const SceneShell: React.FC<{ scene: SceneSpec; video: VideoSpec; first: boolean; captions: boolean }> = ({
-  scene,
-  video,
-  first,
-  captions,
-}) => {
+const SceneShell: React.FC<{ scene: SceneSpec; video: VideoSpec; first: boolean; captions: boolean }> = ({ scene, video, first, captions }) => {
   const frame = useCurrentFrame();
   const { duration } = useScene();
-  const out = interpolate(frame, [duration - 6, duration], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const p = planShell(scene, usePlanCtx(), duration, first);
+  const out = interpolate(frame, [p.fadeOut, duration], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <AbsoluteFill style={{ opacity: out }}>
-      <Sfx name="whoosh" at={0} volume={first ? 0.25 : undefined} />
-      <Sfx name="impact" at={5} volume={0.22} />
+      <PlanSfx events={p.events} />
       <div style={{ position: "absolute", top: CONTENT_TOP, left: SIDE, right: SIDE, height: CAPTION_TOP - CONTENT_TOP - 40 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 34, height: "100%" }}>
           <div style={{ flex: scene.note ? undefined : 1, position: "relative" }}>
             <VisualView v={scene.visual} cta={video.cta} />
           </div>
-          {scene.note ? <SceneNote note={scene.note} /> : null}
+          {scene.note ? <Note at={p.noteAt} label={scene.note.label} text={scene.note.text} /> : null}
         </div>
       </div>
       {captions ? <Caption /> : null}

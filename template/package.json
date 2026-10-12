@@ -28,10 +28,14 @@
     "register": "node scripts/register-videos.mjs",
     "check": "node scripts/check-video.mjs",
     "sfx": "node scripts/make-sfx.mjs",
-    "vo": "node scripts/prepare-vo.mjs",
-    "align": "node scripts/check-align.mjs",
+    "vo": "node --no-warnings scripts/prepare-vo.mjs",
+    "align": "node --no-warnings scripts/check-align.mjs",
     "render": "npm run register && remotion render",
     "lint": "eslint src && tsc",
-    "postinstall": "node scripts/make-sfx.mjs && node scripts/register-videos.mjs"
+    "postinstall": "node scripts/make-sfx.mjs && node scripts/register-videos.mjs",
+    "storyboard": "node --no-warnings scripts/storyboard.mjs"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }
