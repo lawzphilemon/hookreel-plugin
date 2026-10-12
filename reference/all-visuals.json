@@ -1,0 +1,176 @@
+{
+  "id": "all-visuals",
+  "title": "Reference · every visual type",
+  "eyebrow": "Visual reference",
+  "language": "en",
+  "audio": {
+    "music": null,
+    "sfx": "medium"
+  },
+  "cta": {
+    "kicker": "Free guide",
+    "title": "The complete checklist",
+    "button": "Comment “GUIDE”",
+    "sub": "We’ll send it to you."
+  },
+  "scenes": [
+    {
+      "id": "01-headline",
+      "vo": "Your WhatsApp trigger can look perfect and never fire once.",
+      "visual": {
+        "type": "headline",
+        "eyebrow": "Hook",
+        "text": "Looks perfect. Never fires.",
+        "sub": {
+          "text": "Most setups miss one checkbox.",
+          "cue": "never fire"
+        },
+        "chips": {
+          "items": [
+            "Tag Manager",
+            "GA4"
+          ],
+          "cue": "never fire"
+        }
+      }
+    },
+    {
+      "id": "02-strike",
+      "vo": "You blame the ad, the copy, or the landing page. The ad isn't failing. The tracking is.",
+      "visual": {
+        "type": "list",
+        "eyebrow": "So you blame",
+        "style": "strike",
+        "items": [
+          {
+            "text": "The ad",
+            "cue": "the ad,"
+          },
+          {
+            "text": "The copy",
+            "cue": "the copy"
+          },
+          {
+            "text": "The landing page",
+            "cue": "the landing page"
+          }
+        ],
+        "strikeCue": "isn't failing",
+        "answer": {
+          "text": "The tracking",
+          "cue": "The tracking is"
+        }
+      }
+    },
+    {
+      "id": "03-ui",
+      "vo": "Create a Just Links trigger, set Click URL to match the regex, then mark whatsapp_click as a key event.",
+      "visual": {
+        "type": "ui",
+        "step": "Step 2.2",
+        "headline": "Create the trigger.",
+        "window": "Tag Manager · Trigger",
+        "rows": [
+          {
+            "kind": "path",
+            "items": [
+              "Triggers",
+              "New",
+              "Just Links"
+            ],
+            "cue": "Just Links"
+          },
+          {
+            "kind": "field",
+            "label": "Click URL · matches RegEx",
+            "value": "wa\\.me|api\\.whatsapp\\.com",
+            "typed": true,
+            "mono": true,
+            "cue": "match the regex"
+          },
+          {
+            "kind": "toggle",
+            "label": "Mark as key event",
+            "cue": "key event"
+          }
+        ],
+        "after": {
+          "text": "Mark `whatsapp_click`, not `click`.",
+          "cue": "whatsapp_click"
+        }
+      },
+      "note": {
+        "text": "Event names are case sensitive.",
+        "cue": "key event"
+      }
+    },
+    {
+      "id": "04-bars",
+      "vo": "An old pixel counts every click twice, so your numbers look better than they are.",
+      "visual": {
+        "type": "bars",
+        "headline": "Better numbers. Not real ones.",
+        "items": [
+          {
+            "label": "Reported",
+            "value": "×2",
+            "ratio": 1,
+            "cue": "counts every click twice",
+            "hot": true
+          },
+          {
+            "label": "Real",
+            "value": "×1",
+            "ratio": 0.5,
+            "cue": "look better"
+          }
+        ],
+        "text": {
+          "text": "Budget follows the wrong number."
+        }
+      }
+    },
+    {
+      "id": "05-rows",
+      "vo": "Pause the old tag, and keep only the two new ones active.",
+      "visual": {
+        "type": "ui",
+        "headline": "Pause old tags.",
+        "window": "Tag Manager · Tags",
+        "rows": [
+          {
+            "kind": "row",
+            "text": "Custom HTML - old pixel",
+            "mono": true,
+            "highlightCue": "Pause the old tag",
+            "status": {
+              "from": "Active",
+              "to": "Paused",
+              "cue": "Pause the old tag"
+            }
+          },
+          {
+            "kind": "row",
+            "text": "OpenAI - Page viewed",
+            "mono": true,
+            "right": "Active"
+          },
+          {
+            "kind": "check",
+            "label": "Click URL",
+            "cue": "keep only"
+          }
+        ]
+      }
+    },
+    {
+      "id": "06-cta",
+      "vo": "Comment GUIDE and we'll send you the checklist.",
+      "visual": {
+        "type": "cta",
+        "headline": "Get the checklist.",
+        "cue": "Comment GUIDE"
+      }
+    }
+  ]
+}

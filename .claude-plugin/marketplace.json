@@ -1,0 +1,23 @@
+{
+  "name": "hookreel-plugin",
+  "owner": {
+    "name": "Lawrence Philemon"
+  },
+  "metadata": {
+    "description": "HOOKREEL short video pipeline plugin for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "hookreel",
+      "source": "./",
+      "description": "Interview-to-video pipeline for short vertical videos for any brand: interview, fact gate, WTF Hook 999 story, voiceover script, and a data-driven Remotion template.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Lawrence Philemon"
+      },
+      "license": "MIT",
+      "category": "content"
+    }
+  ]
+}

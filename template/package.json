@@ -1,0 +1,37 @@
+{
+  "name": "hookreel-studio",
+  "version": "1.0.0",
+  "description": "Remotion studio for hookreel videos: one brand.json, one videos/<id>.json per video",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@remotion/captions": "4.0.534",
+    "@remotion/cli": "4.0.534",
+    "@remotion/google-fonts": "4.0.534",
+    "@remotion/install-whisper-cpp": "4.0.534",
+    "@remotion/media": "4.0.534",
+    "mediabunny": "1.56.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.534"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.534",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.39.5",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "npm run register && remotion studio",
+    "register": "node scripts/register-videos.mjs",
+    "check": "node scripts/check-video.mjs",
+    "sfx": "node scripts/make-sfx.mjs",
+    "vo": "node scripts/prepare-vo.mjs",
+    "align": "node scripts/check-align.mjs",
+    "render": "npm run register && remotion render",
+    "lint": "eslint src && tsc",
+    "postinstall": "node scripts/make-sfx.mjs && node scripts/register-videos.mjs"
+  }
+}

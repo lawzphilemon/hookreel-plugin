@@ -1,0 +1,12 @@
+node_modules
+dist
+out
+.DS_Store
+.env
+whisper.cpp
+# generated
+public/sfx
+src/videos.generated.ts
+# recordings and licensed music stay out of git
+public/vo
+public/music

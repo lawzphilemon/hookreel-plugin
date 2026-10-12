@@ -1,0 +1,12 @@
+{
+  "name": "hookreel",
+  "displayName": "HOOKREEL Short Video Pipeline",
+  "version": "0.1.0",
+  "description": "Interview-to-video pipeline for short vertical videos (Reels, TikTok, Shorts) for any brand with its own context profile: structured interview, fact gate, WTF Hook 999 story, voiceover script, and a data-driven Remotion template with infographics, captions, voiceover sync, sound effects and music ducking.",
+  "author": { "name": "Lawrence Philemon" },
+  "repository": "https://github.com/lawzphilemon/hookreel-plugin",
+  "license": "MIT",
+  "commands": "./commands",
+  "skills": ["./skills"],
+  "keywords": ["reels", "tiktok", "shorts", "video", "remotion", "hook", "storytelling", "voiceover", "infographic", "brand"]
+}
