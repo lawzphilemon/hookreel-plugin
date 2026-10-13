@@ -43,7 +43,7 @@ All sizes in px on the 1080×1920 frame, taken from the template's components. C
 - Platform UI covers y > 1500 and the right ~120 px; nothing important there.
 
 **Shared**
-- Headline: weight 800, line-height 1.05, tracking -0.03em, `text`. Default size per type: headline 104, chat 100, ranking 96, bars 96, tiles 92, timeline 92, logo 92, cta 92, flow 88, list 88, stat 84, journey 84, ui 84.
+- Headline: weight 800, line-height 1.05, tracking -0.03em, `text`, in `fonts.display` when set (also big numbers: stat, tile and bar values), otherwise `fonts.sans`. `labels.source` sets the word before every source line (default "Source"). Default size per type: headline 104, chat 100, ranking 96, bars 96, tiles 92, timeline 92, logo 92, cta 92, flow 88, list 88, stat 84, journey 84, ui 84.
 - Pill: radius 999, padding 0.42 × size by 0.9 × size; accent pill has a soft accent glow.
 - Card: radius from `brand.json` (default 28). Panels (UI mockups) are `panel` with a 2 px `panelLine` title bar and three dots.
 - Highlight: 4 px `accent` outline, offset 4 px, 14% accent tint.

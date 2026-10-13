@@ -1,6 +1,6 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
-import { C, FPS, RADIUS, sans } from "../brand";
+import { C, display, FPS, RADIUS, sans } from "../brand";
 import { PlanSfx } from "../components/sfx";
 import { Appear, Body, Chips, Headline, Highlight, Pill, Rich, Source, Stack, useEnter } from "../components/ui";
 import { f, TIME } from "../motion.ts";
@@ -25,7 +25,7 @@ const DotGrid: React.FC<{ lit: number; at: number }> = ({ lit, at }) => {
 
 const BigNumber: React.FC<{ at: number; value: string; label: string; source?: string; size: number }> = ({ at, value, label, source, size }) => (
   <Appear at={at}>
-    <div style={{ fontFamily: sans, fontSize: size, fontWeight: 800, lineHeight: 0.95, letterSpacing: "-0.04em", color: C.accent }}>{value}</div>
+    <div style={{ fontFamily: display, fontSize: size, fontWeight: 800, lineHeight: 0.95, letterSpacing: "-0.04em", color: C.accent }}>{value}</div>
     <div style={{ fontFamily: sans, fontSize: 44, fontWeight: 600, color: C.text, marginTop: 14, lineHeight: 1.2 }}>
       <Rich text={label} />
     </div>
@@ -113,7 +113,7 @@ export const Tiles: React.FC<{ v: TilesVisual }> = ({ v }) => {
           {v.tiles.map((t, i) => (
             <Appear key={t.label} at={p.tiles[i]} style={{ flex: 1 }}>
               <div style={{ background: t.hot ? C.panel : C.surface, borderRadius: RADIUS.card, padding: "32px 24px", fontFamily: sans, textAlign: "center", height: "100%" }}>
-                <div style={{ fontSize: 132, fontWeight: 800, lineHeight: 1, color: t.hot ? C.panelText : C.accent, letterSpacing: "-0.04em" }}>{t.value}</div>
+                <div style={{ fontFamily: display, fontSize: 132, fontWeight: 800, lineHeight: 1, color: t.hot ? C.panelText : C.accent, letterSpacing: "-0.04em" }}>{t.value}</div>
                 <div style={{ fontSize: 32, fontWeight: 600, color: t.hot ? C.panelText : C.text, marginTop: 14, lineHeight: 1.2 }}>{t.label}</div>
               </div>
             </Appear>
@@ -188,7 +188,7 @@ const Bar: React.FC<{ label: string; value: string; ratio: number; at: number; h
   const p = useEnter(at, f(TIME.bars.grow));
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", fontFamily: sans }}>
-      <div style={{ fontSize: 56, fontWeight: 800, color: hot ? C.accent : C.text, opacity: p, marginBottom: 12 }}>{value}</div>
+      <div style={{ fontFamily: display, fontSize: 56, fontWeight: 800, color: hot ? C.accent : C.text, opacity: p, marginBottom: 12 }}>{value}</div>
       <div style={{ height: (height - 150) * ratio * p, borderRadius: 20, background: hot ? C.accent : C.track }} />
       <div style={{ fontSize: 32, fontWeight: 600, color: C.muted, marginTop: 14 }}>{label}</div>
     </div>

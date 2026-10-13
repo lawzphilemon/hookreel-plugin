@@ -1,6 +1,6 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
-import { C, ENTER, easeOut, mono, RADIUS, sans } from "../brand";
+import { BRAND, C, display, ENTER, easeOut, mono, RADIUS, sans } from "../brand";
 import { f, FPS, TIME } from "../motion.ts";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -62,7 +62,7 @@ export const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = 
 export const Headline: React.FC<{ text: string; size?: number; color?: string }> = ({ text, size = 88, color = C.text }) => (
   <div
     style={{
-      fontFamily: sans,
+      fontFamily: display,
       fontSize: size,
       fontWeight: 800,
       lineHeight: 1.05,
@@ -82,7 +82,7 @@ export const Body: React.FC<{ text: string; size?: number; color?: string }> = (
 );
 
 export const Source: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ fontFamily: sans, fontSize: 24, fontWeight: 500, color: C.muted, marginTop: 14 }}>Source: {children}</div>
+  <div style={{ fontFamily: sans, fontSize: 24, fontWeight: 500, color: C.muted, marginTop: 14 }}>{BRAND.labels?.source ?? "Source"}: {children}</div>
 );
 
 export const Pill: React.FC<{

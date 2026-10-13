@@ -28,7 +28,8 @@ export type Brand = {
     error: string;
     errorText: string; // error colour readable on bg
   };
-  fonts: { sans: string; mono: string }; // Google Fonts family names
+  fonts: { sans: string; mono: string; display?: string }; // Google Fonts family names; display (optional) for headlines and big numbers, defaults to sans
+  labels?: { source?: string }; // on-screen words in the voiceover language, e.g. { "source": "Sumber" }; default "Source"
   radius?: { card?: number; pill?: number };
   motion?: { entranceMs?: number }; // entrance length; easing is always ease-out, no bounce
   headlineCase?: "sentence" | "as-written";

@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { BRAND, C, logoFilter, RADIUS, sans } from "../brand";
+import { BRAND, C, display, logoFilter, RADIUS, sans } from "../brand";
 import { PlanSfx } from "../components/sfx";
 import { Appear, Chips, Eyebrow, Headline, Pill, Rich, Stack } from "../components/ui";
 import { f, TIME } from "../motion.ts";
@@ -96,7 +96,7 @@ export const BrandMark: React.FC<{ width: number; opacity?: number }> = ({ width
   BRAND.logo ? (
     <Img src={staticFile(BRAND.logo)} style={{ width, filter: logoFilter, opacity }} />
   ) : (
-    <div style={{ fontFamily: sans, fontSize: width / 6, fontWeight: 800, color: C.text, opacity, letterSpacing: "-0.02em" }}>{BRAND.name}</div>
+    <div style={{ fontFamily: display, fontSize: width / 6, fontWeight: 800, color: C.text, opacity, letterSpacing: "-0.02em" }}>{BRAND.name}</div>
   );
 
 export const Logo: React.FC<{ v: LogoVisual }> = ({ v }) => {
