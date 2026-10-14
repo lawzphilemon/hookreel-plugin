@@ -1,6 +1,6 @@
 ---
 name: hookreel-rules
-description: Shared rules for the hookreel short-video pipeline (brief, facts, story, script, storyboard, build, voice, qa) — the project CLAUDE.md, review gates, evidence and claims, brand context profiles, writing voiceover for the ear, cue phrases, the 60 fps time model (frame = f(t)), visual catalog, safe areas, motion and audio defaults. Use whenever a /hookreel command runs or a hookreel video is being written, built, or reviewed.
+description: Shared rules for the hookreel short-video pipeline (brief, facts, story, script, storyboard, build, voice, qa, publish) — the project CLAUDE.md, review gates, evidence and claims, brand context profiles, writing voiceover for the ear, cue phrases, the 60 fps time model (frame = f(t)), visual catalog, safe areas, motion and audio defaults. Use whenever a /hookreel command runs or a hookreel video is being written, built, or reviewed.
 ---
 
 # HOOKREEL rules
@@ -10,7 +10,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 ## Pipeline and files
 
 ```text
-/hookreel:brief → facts → story → script [publish + approve] → storyboard [publish + approve] → build → voice → qa
+/hookreel:brief → facts → story → script [publish + approve] → storyboard [publish + approve] → build → voice → qa → publish
 /hookreel:resume <CODE>   (reopen any project later)
 ```
 
@@ -24,6 +24,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | build | `hookreel-studio/<brand>/` (brand.json, videos/, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `06-remotion-prompt.md` |
 | voice | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
 | qa | `07-qa-<id>.md`, `out/<id>.mp4` |
+| publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` |
 
 Each stage reads the previous files and updates `project.json` and `PROJECTS.md`, so the pipeline resumes after a restart.
 

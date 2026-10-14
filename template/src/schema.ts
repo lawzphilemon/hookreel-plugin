@@ -63,7 +63,18 @@ export type VideoSpec = {
     mute?: string[]; // sound effects silenced in every scene, e.g. ["impact"]
   };
   cta?: CtaSpec;
+  cover?: CoverSpec[]; // reel cover variants, rendered as stills by `npm run cover -- <id>` (see /hookreel:publish)
   scenes: SceneSpec[];
+};
+
+// A still 1080×1920 cover. Instagram's profile grid shows only the centre 1080×1440 (3:4), so the
+// template keeps all of it inside y 420–1500.
+export type CoverSpec = {
+  kicker?: string; // small accent label above the headline
+  headline: string; // *word* marks accent words; at most about 10 words
+  big?: string; // optional big number line, e.g. "12 → 6 bulan"
+  sub?: string; // one muted line under the headline
+  source?: string; // source label when the cover shows a number
 };
 
 export type CtaSpec = {

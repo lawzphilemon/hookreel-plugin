@@ -34,7 +34,8 @@
     "lint": "eslint src && tsc",
     "postinstall": "node scripts/make-sfx.mjs && node scripts/prepare-sounds.mjs && node scripts/register-videos.mjs",
     "storyboard": "node --no-warnings scripts/storyboard.mjs",
-    "sounds": "node scripts/prepare-sounds.mjs"
+    "sounds": "node scripts/prepare-sounds.mjs",
+    "cover": "node scripts/render-covers.mjs"
   },
   "engines": {
     "node": ">=22.18"

@@ -47,6 +47,7 @@ Ask what the user wants, then route:
 | A line, a visual, a cue | Edit `04-script.md` | Republish the script for approval, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then regenerate the storyboard |
 | Timing, layout or sound only | Edit the draft JSON | Regenerate and republish the storyboard |
 | New voiceover take | `/hookreel:voice` | QA again |
+| Cover or caption | `/hookreel:publish` | — |
 
 **Cascade rule:** editing a stage marks every later stage `needs re-approval` in `project.json` and `PROJECTS.md` (files are kept, approvals are not). Nothing reaches the studio again until the script and storyboard are re-approved.
 

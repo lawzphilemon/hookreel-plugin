@@ -25,7 +25,7 @@ const CONTENT_TOP = 330;
 const CAPTION_TOP = 1340;
 
 // Eyebrow and logo only: no story-style progress bar.
-const Header: React.FC<{ eyebrow: string }> = ({ eyebrow }) => (
+export const Header: React.FC<{ eyebrow: string }> = ({ eyebrow }) => (
   <div style={{ position: "absolute", top: 150, left: SIDE, right: SIDE, fontFamily: sans }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: C.accent }}>
