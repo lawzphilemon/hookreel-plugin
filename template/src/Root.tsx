@@ -1,5 +1,6 @@
 import { ALL_FORMATS, Input, UrlSource } from "mediabunny";
-import { CalculateMetadataFunction, Composition, staticFile } from "remotion";
+import { CalculateMetadataFunction, Composition, staticFile, Still } from "remotion";
+import { Cover, CoverProps } from "./Cover";
 import { FPS } from "./brand";
 import { Reel, ReelProps } from "./Reel";
 import { VIDEOS, VO_FILES } from "./videos.generated";
@@ -34,9 +35,22 @@ const calculateMetadata: CalculateMetadataFunction<ReelProps> = async ({ props }
   };
 };
 
-// One composition per videos/<id>.json (registered by scripts/register-videos.mjs).
+// One composition per videos/<id>.json (registered by scripts/register-videos.mjs), plus one still
+// per cover variant: <id>-cover-1, <id>-cover-2, …
 export const RemotionRoot: React.FC = () => (
   <>
+    {VIDEOS.flatMap((video) =>
+      (video.cover ?? []).map((_, i) => (
+        <Still
+          key={`${video.id}-cover-${i + 1}`}
+          id={`${video.id}-cover-${i + 1}`}
+          component={Cover}
+          width={video.width ?? 1080}
+          height={video.height ?? 1920}
+          defaultProps={{ videoId: video.id, index: i } as CoverProps}
+        />
+      )),
+    )}
     {VIDEOS.map((video) => (
       <Composition
         key={video.id}

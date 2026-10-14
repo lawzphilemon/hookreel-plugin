@@ -1,6 +1,6 @@
 ---
 name: qa
-description: Final quality gate before posting — layout, sync, sources, stale facts, audio, licences — then render the MP4 and write the post caption
+description: Final quality gate before posting — layout, sync, sources, stale facts, audio, licences — then render the MP4
 allowed-tools: Read, Write, Bash
 ---
 
@@ -30,10 +30,10 @@ Fix what fails before rendering.
 npm run render -- <id> out/<id>.mp4
 ```
 
-## Step 3 — Post caption
+## Step 3 — Report
 
-Write the post caption in the brand voice: the hook line, two or three lines of value, the CTA exactly as in the video, the sources for the numbers shown, and the music credit if the licence requires one. Save it with the QA report as `<project>/07-qa-<id>.md`.
+Save the checklist with its evidence as `<project>/07-qa-<id>.md`. Update `<project>/project.json` (`stages.qa.<id>`) and `PROJECTS.md`. The file is `out/<id>.mp4`, so the project code is in its name.
 
-Update `<project>/project.json` (`stages.qa.<id>`) and `PROJECTS.md`. The file is `out/<id>.mp4`, so the project code is in its name.
+Send the user the MP4.
 
-Send the user the MP4 and the caption.
+End: "Watch it once more. When it is right, run /hookreel:publish for the cover and the caption."
