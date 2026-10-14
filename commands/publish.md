@@ -37,7 +37,7 @@ Follow `creator-os` Workflow B (`references/script-structures.md`, caption forma
 - The CTA exactly as in the video.
 - Three to five relevant hashtags.
 
-Then add what the project requires: the sources for every number shown, the disclaimers from `CLAUDE_<CODE>.md`, and the music credit (always when the licence requires it; as a courtesy otherwise). If the `humanizer-id` skill is available and the caption is Indonesian, run it as a last pass, then re-check the bans.
+Then add what the project requires: the sources for every number shown, the disclaimers from `CLAUDE_<CODE>.md`, and the music credit (always when the licence requires it; as a courtesy otherwise). Run the bundled humanizer as a last pass (`humanizer-id` for Indonesian, `humanizer-en` for English), then re-check the bans.
 
 Check the caption line by line against `CLAUDE_<CODE>.md` (claims, words, punctuation, person) and `02-facts.md` (every number and its source).
 

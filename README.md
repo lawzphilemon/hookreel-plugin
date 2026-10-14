@@ -37,6 +37,8 @@ Nothing goes into Remotion before the script and the storyboard are approved.
 
 The plugin bundles the **WTF Hook 999** skills (`wtf-hook-999`, `-generator`, `-auditor`, `-optimizer`, from [lawzphilemon/wtf-hook-999](https://github.com/lawzphilemon/wtf-hook-999), MIT): `/hookreel:story` builds the hooks with them, and they work on their own for any hook. No separate install needed.
 
+The plugin also bundles **humanizer-id** and **humanizer-en**, passive filters that remove AI writing patterns from Indonesian and English text; `/hookreel:publish` runs them on the caption.
+
 The plugin also bundles the **creator-os** skill (hook frameworks, 150 hook templates, script structures, caption format, content calendar, performance analysis, monetisation). `/hookreel:publish` uses it for the cover hooks and the caption; it also works on its own for any hook, caption or content-plan request.
 
 **Project codes.** Every project gets a code like `HKR-261012-7QF3`. It names the folder (`hookreel-output/HKR-261012-7QF3_chatgpt-ads-wa/`), both rulebooks (`CLAUDE_HKR-261012-7QF3.md` in the project and in the studio, each imported by a plain `CLAUDE.md` so Claude Code loads them automatically) and every video (`HKR-261012-7QF3-teaser`), and is listed in `hookreel-output/PROJECTS.md`. Come back any time with `/hookreel:resume HKR-261012-7QF3`. Each brand gets one studio folder, so several brands can share a machine.
