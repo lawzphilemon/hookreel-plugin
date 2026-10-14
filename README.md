@@ -11,13 +11,6 @@ Interview → verified facts → a story built with the WTF Hook 999 framework �
 /plugin install hookreel@hookreel-plugin
 ```
 
-The story stage needs the WTF Hook 999 plugin:
-
-```text
-/plugin marketplace add lawzphilemon/wtf-hook-999
-/plugin install wtf-hook-999@wtf-hook-999-marketplace
-```
-
 The storyboard and video stages need Node.js 22.18 or newer.
 
 ## Pipeline
@@ -41,6 +34,8 @@ The storyboard and video stages need Node.js 22.18 or newer.
 | `/hookreel:resume <CODE>` | Reopens a project by its code: loads its rulebook, shows every stage and video, routes edits, and marks later stages for re-approval | — |
 
 Nothing goes into Remotion before the script and the storyboard are approved.
+
+The plugin bundles the **WTF Hook 999** skills (`wtf-hook-999`, `-generator`, `-auditor`, `-optimizer`, from [lawzphilemon/wtf-hook-999](https://github.com/lawzphilemon/wtf-hook-999), MIT): `/hookreel:story` builds the hooks with them, and they work on their own for any hook. No separate install needed.
 
 The plugin also bundles the **creator-os** skill (hook frameworks, 150 hook templates, script structures, caption format, content calendar, performance analysis, monetisation). `/hookreel:publish` uses it for the cover hooks and the caption; it also works on its own for any hook, caption or content-plan request.
 
