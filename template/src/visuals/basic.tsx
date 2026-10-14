@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { BRAND, C, logoFilter, RADIUS, sans } from "../brand";
+import { BRAND, C, display, logoFilter, RADIUS, sans } from "../brand";
 import { PlanSfx } from "../components/sfx";
 import { Appear, Chips, Eyebrow, Headline, Pill, Rich, Stack } from "../components/ui";
 import { f, TIME } from "../motion.ts";
@@ -66,7 +66,18 @@ export const List: React.FC<{ v: ListVisual }> = ({ v }) => {
         </Appear>
       ) : null}
       <div style={{ display: "flex", flexDirection: "column", gap: v.style === "strike" ? 18 : 24, alignItems: "flex-start" }}>
-        {v.items.map((it, i) =>
+        {v.style === "pills" ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
+            {v.items.map((it, i) => (
+              <Appear key={i} at={p.items[i]} dy={16}>
+                <Pill tone={i % 2 === 0 ? "accent" : "outline"} size={44}>
+                  <Rich text={it.text} />
+                </Pill>
+              </Appear>
+            ))}
+          </div>
+        ) : null}
+        {v.style === "pills" ? null : v.items.map((it, i) =>
           v.style === "strike" ? (
             <StrikeItem key={i} at={p.items[i]} struckAt={p.strikeAt + i * f(TIME.list.strikeStep)} text={it.text} />
           ) : (
@@ -96,7 +107,7 @@ export const BrandMark: React.FC<{ width: number; opacity?: number }> = ({ width
   BRAND.logo ? (
     <Img src={staticFile(BRAND.logo)} style={{ width, filter: logoFilter, opacity }} />
   ) : (
-    <div style={{ fontFamily: sans, fontSize: width / 6, fontWeight: 800, color: C.text, opacity, letterSpacing: "-0.02em" }}>{BRAND.name}</div>
+    <div style={{ fontFamily: display, fontSize: width / 6, fontWeight: 800, color: C.text, opacity, letterSpacing: "-0.02em" }}>{BRAND.name}</div>
   );
 
 export const Logo: React.FC<{ v: LogoVisual }> = ({ v }) => {

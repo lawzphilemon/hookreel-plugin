@@ -4,7 +4,7 @@ import type { CtaSpec, SwapVisual, Visual } from "../schema";
 import { planSwap } from "../plan.ts";
 import { usePlanCtx } from "../timing";
 import { Cta, HeadlineScene, List, Logo } from "./basic";
-import { Bars, Ranking, Stat, Tiles, Timeline } from "./data";
+import { Bars, Months, Ranking, Split, Stat, Tiles, Timeline } from "./data";
 import { Flow, Journey } from "./flow";
 import { Chat, Ui } from "./mock";
 
@@ -45,6 +45,10 @@ export const VisualView: React.FC<{ v: Visual; cta?: CtaSpec }> = ({ v, cta }) =
       return <Timeline v={v} />;
     case "bars":
       return <Bars v={v} />;
+    case "months":
+      return <Months v={v} />;
+    case "split":
+      return <Split v={v} />;
     case "flow":
       return <Flow v={v} />;
     case "chat":

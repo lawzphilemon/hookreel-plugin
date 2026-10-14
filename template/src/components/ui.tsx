@@ -1,6 +1,6 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
-import { C, ENTER, easeOut, mono, RADIUS, sans } from "../brand";
+import { BRAND, C, display, ENTER, easeOut, mono, RADIUS, sans } from "../brand";
 import { f, FPS, TIME } from "../motion.ts";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -11,7 +11,13 @@ export const useEnter = (at: number, length = ENTER) => {
   return interpolate(frame, [at, at + length], [0, 1], { ...clamp, easing: easeOut });
 };
 
-// Fade + short rise. Every element enters this way; nothing bounces or loops.
+const FOCUS = BRAND.motion?.entrance === "focus";
+const KINETIC = BRAND.motion?.text === "kinetic";
+
+// The entrance time of the nearest Appear, so kinetic headlines can start their words from it.
+const AppearAt = React.createContext(0);
+
+// Fade + short rise (or, with motion.entrance "focus", fade in from a blur). Nothing bounces or loops.
 export const Appear: React.FC<{ at?: number; dy?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
   at = 0,
   dy = TIME.rise,
@@ -19,7 +25,11 @@ export const Appear: React.FC<{ at?: number; dy?: number; style?: React.CSSPrope
   children,
 }) => {
   const p = useEnter(at);
-  return <div style={{ opacity: p, translate: `0px ${(1 - p) * dy}px`, ...style }}>{children}</div>;
+  return (
+    <AppearAt.Provider value={at}>
+      <div style={{ opacity: p, translate: `0px ${(1 - p) * (FOCUS ? dy / 2 : dy)}px`, filter: FOCUS && p < 1 ? `blur(${(1 - p) * TIME.focus.blur}px)` : undefined, ...style }}>{children}</div>
+    </AppearAt.Provider>
+  );
 };
 
 export const Stack: React.FC<{ gap?: number; children: React.ReactNode; style?: React.CSSProperties }> = ({
@@ -47,11 +57,40 @@ export const Rich: React.FC<{ text: string; onPanel?: boolean }> = ({ text, onPa
           {part}
         </span>
       ) : (
-        <React.Fragment key={i}>{part}</React.Fragment>
+        <React.Fragment key={i}>
+          {part.split("*").map((bit, j) => (j % 2 === 1 ? <span key={j} style={{ color: C.accent }}>{bit}</span> : <React.Fragment key={j}>{bit}</React.Fragment>))}
+        </React.Fragment>
       ),
     )}
   </>
 );
+
+// Words of a headline with their emphasis (*word* marks accent words).
+const words = (text: string) =>
+  text.split("*").flatMap((part, i) => part.split(/\s+/).filter(Boolean).map((w) => ({ w, hot: i % 2 === 1 })));
+
+// Kinetic headline: each word fades in from a blur and rises, one after another.
+const KineticWords: React.FC<{ text: string }> = ({ text }) => {
+  const at = React.useContext(AppearAt);
+  return (
+    <>
+      {words(text).map((x, i) => (
+        <KineticWord key={i} at={at + i * f(TIME.kinetic.wordStep)} hot={x.hot}>
+          {x.w}
+        </KineticWord>
+      ))}
+    </>
+  );
+};
+
+const KineticWord: React.FC<{ at: number; hot: boolean; children: string }> = ({ at, hot, children }) => {
+  const p = useEnter(at);
+  return (
+    <span style={{ display: "inline-block", marginRight: "0.25em", opacity: p, translate: `0px ${(1 - p) * 0.35}em`, filter: p < 1 ? `blur(${(1 - p) * TIME.focus.blur}px)` : undefined, color: hot ? C.accent : undefined }}>
+      {children}
+    </span>
+  );
+};
 
 export const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color = C.accent }) => (
   <div style={{ fontFamily: sans, fontSize: 30, fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color }}>
@@ -62,7 +101,7 @@ export const Eyebrow: React.FC<{ children: React.ReactNode; color?: string }> = 
 export const Headline: React.FC<{ text: string; size?: number; color?: string }> = ({ text, size = 88, color = C.text }) => (
   <div
     style={{
-      fontFamily: sans,
+      fontFamily: display,
       fontSize: size,
       fontWeight: 800,
       lineHeight: 1.05,
@@ -71,7 +110,7 @@ export const Headline: React.FC<{ text: string; size?: number; color?: string }>
       textWrap: "balance",
     }}
   >
-    <Rich text={text} />
+    {KINETIC && !text.includes("`") ? <KineticWords text={text} /> : <Rich text={text} />}
   </div>
 );
 
@@ -82,12 +121,12 @@ export const Body: React.FC<{ text: string; size?: number; color?: string }> = (
 );
 
 export const Source: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ fontFamily: sans, fontSize: 24, fontWeight: 500, color: C.muted, marginTop: 14 }}>Source: {children}</div>
+  <div style={{ fontFamily: sans, fontSize: 24, fontWeight: 500, color: C.muted, marginTop: 14 }}>{BRAND.labels?.source ?? "Source"}: {children}</div>
 );
 
 export const Pill: React.FC<{
   children: React.ReactNode;
-  tone?: "accent" | "surface" | "light";
+  tone?: "accent" | "surface" | "light" | "outline";
   size?: number;
   style?: React.CSSProperties;
 }> = ({ children, tone = "surface", size = 32, style }) => (
@@ -101,8 +140,9 @@ export const Pill: React.FC<{
       fontWeight: tone === "accent" ? 700 : 600,
       padding: `${size * 0.42}px ${size * 0.9}px`,
       borderRadius: RADIUS.pill,
-      background: tone === "accent" ? C.accent : tone === "surface" ? C.surface : C.panelSoft,
-      color: tone === "accent" ? C.onAccent : tone === "surface" ? C.text : C.panelText,
+      background: tone === "accent" ? C.accent : tone === "surface" || tone === "outline" ? C.surface : C.panelSoft,
+      color: tone === "accent" ? C.onAccent : tone === "surface" || tone === "outline" ? C.text : C.panelText,
+      border: tone === "outline" ? `3px solid ${C.text}` : undefined,
       boxShadow: tone === "accent" ? `0 0 48px ${C.accent}59` : undefined,
       ...style,
     }}

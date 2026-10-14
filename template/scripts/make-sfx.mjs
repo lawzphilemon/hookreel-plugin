@@ -1,6 +1,7 @@
 // Usage: node scripts/make-sfx.mjs
 // Synthesises the reels' sound effects into public/sfx/*.wav. No samples, no licences:
-// short, quiet UI sounds that sit under the voiceover rather than compete with it.
+// short UI sounds that sit under the voiceover, plus a cinematic and musical set (snip, drop,
+// stamp, note-0…23, hit, crack, powerdown, check, resolve) for dramatic videos.
 import fs from "fs";
 import path from "path";
 
@@ -160,3 +161,106 @@ write("ding", withTail(render(1.4, (t) => {
     return bp(noise(), 2800, 0.55) * s;
   }));
 }
+
+// Snip: two quick metallic scissor clicks with a short rasp between them. A cut ("halved").
+{
+  const bp = bandpass();
+  const hp = bandpass();
+  write("snip", withTail(render(0.32, (t) => {
+    const a = t < 0.05 ? Math.exp(-t * 120) : 0;
+    const rasp = t > 0.03 && t < 0.16 ? Math.sin(Math.PI * (t - 0.03) / 0.13) * 0.35 : 0;
+    const b = t >= 0.15 ? Math.exp(-(t - 0.15) * 90) : 0;
+    return bp(noise(), 5200, 0.35) * (a + b) * 1.2 + hp(noise(), 7600, 0.5) * rasp + Math.sin(TAU * 3100 * t) * (a + b) * 0.25;
+  }), 0.04, 0.25, 0.2));
+}
+
+// Drop: deep sub sweeping down with a soft thump, the floor falling away after a cut.
+{
+  let phase = 0;
+  const rumble = bandpass();
+  write("drop", withTail(render(1.6, (t, p) => {
+    phase += (TAU * (38 + 140 * Math.exp(-t * 3.2))) / RATE;
+    const env = Math.min(1, t / 0.01) * Math.exp(-t * 1.6);
+    return Math.sin(phase) * env + rumble(noise(), 90, 0.9) * Math.exp(-t * 6) * 0.6;
+  }), 0.1, 0.25, 0.5));
+}
+
+// Stamp: a rubber stamp hitting paper on a desk: low knock, papery slap, tiny bounce.
+{
+  const body = bandpass();
+  const paper = bandpass();
+  write("stamp", withTail(render(0.4, (t) => {
+    const knock = Math.sin(TAU * (95 + 60 * Math.exp(-t * 40)) * t) * Math.exp(-t * 28);
+    const slap = paper(noise(), 1800, 0.45) * Math.exp(-t * 55) * 0.9;
+    const thud = body(noise(), 240, 0.7) * Math.exp(-t * 20) * 0.8;
+    const bounce = t > 0.09 ? paper(noise(), 2200, 0.5) * Math.exp(-(t - 0.09) * 120) * 0.25 : 0;
+    return knock * 1.2 + slap + thud + bounce;
+  }), 0.05, 0.22, 0.25));
+}
+
+// Note: a soft marimba tone (sine plus a quiet 4th partial, fast decay) in semitone steps:
+// note-0 … note-23 rise from C5. Months lighting up one by one play a rising scale.
+for (let st = 0; st < 24; st++) {
+  const fq = 523.25 * 2 ** (st / 12);
+  write(`note-${st}`, withTail(render(0.7, (t) => {
+    const attack = Math.min(1, t / 0.002);
+    return attack * (Math.sin(TAU * fq * t) * Math.exp(-t * 7) + 0.25 * Math.sin(TAU * fq * 4 * t) * Math.exp(-t * 26) + 0.1 * Math.sin(TAU * fq * 10 * t) * Math.exp(-t * 60));
+  }), 0.11, 0.2, 0.3));
+}
+
+// Hit: bright cinematic impact (sub punch, noise burst, shimmering bell on top). The payoff.
+{
+  const burst = bandpass();
+  let phase = 0;
+  write("hit", withTail(render(1.6, (t) => {
+    phase += (TAU * (50 + 110 * Math.exp(-t * 14))) / RATE;
+    const sub = Math.sin(phase) * Math.exp(-t * 3.5) * Math.min(1, t / 0.003);
+    const air = burst(noise(), 2600, 0.5) * Math.exp(-t * 18) * 0.7;
+    const bell = (Math.sin(TAU * 1046.5 * t) + 0.5 * Math.sin(TAU * 1568 * t) + 0.3 * Math.sin(TAU * 2093 * t)) * Math.exp(-t * 3) * 0.35;
+    return sub + air + bell;
+  }), 0.09, 0.32, 0.7));
+}
+
+// Crack: paper tearing apart, ragged band-passed noise bursts. A bill splitting into parts.
+{
+  const bp = bandpass();
+  const grains = [];
+  for (let t = 0; t < 0.42; t += 0.008 + ((noise() + 1) / 2) * 0.018) grains.push({ t, level: 0.4 + 0.6 * Math.abs(noise()) });
+  write("crack", withTail(render(0.5, (t, p) => {
+    let s = 0;
+    for (const g of grains) {
+      const d = t - g.t;
+      if (d >= 0 && d < 0.02) s += g.level * Math.exp(-d * 180);
+    }
+    return bp(noise(), 2400 + 1800 * Math.sin(Math.PI * p), 0.4) * s * (1 - p * 0.6);
+  }), 0.04, 0.2, 0.2));
+}
+
+// Powerdown: a tone and a filtered noise sweeping down and fading. Parts that are not paid.
+{
+  const bp = bandpass();
+  let phase = 0;
+  write("powerdown", render(0.9, (t, p) => {
+    phase += (TAU * (620 * (1 - p) ** 1.6 + 60)) / RATE;
+    const env = Math.min(1, t / 0.01) * (1 - p) ** 1.4;
+    return (Math.sin(phase) * 0.6 + bp(noise(), 2400 * (1 - p) + 200, 0.6) * 0.5) * env;
+  }));
+}
+
+// Check: a crisp two-step tick, up a fifth. A box getting ticked.
+write("check", render(0.16, (t) => {
+  const a = Math.exp(-t * 80) * Math.sin(TAU * 1760 * t);
+  const b = t > 0.06 ? Math.exp(-(t - 0.06) * 70) * Math.sin(TAU * 2637 * t) : 0;
+  return (a + b) * Math.min(1, t / 0.002);
+}));
+
+// Resolve: a warm major chord (C–E–G–C) rolled upward, piano-like decay. The closing card.
+write("resolve", withTail(render(2.2, (t) => {
+  const voice = (fq, start) => {
+    const d = t - start;
+    if (d < 0) return 0;
+    const env = Math.min(1, d / 0.004) * Math.exp(-d * 1.8);
+    return env * (Math.sin(TAU * fq * d) + 0.35 * Math.sin(TAU * fq * 2 * d) * Math.exp(-d * 4) + 0.12 * Math.sin(TAU * fq * 3 * d) * Math.exp(-d * 7));
+  };
+  return voice(261.63, 0) + voice(329.63, 0.05) + voice(392, 0.1) + voice(523.25, 0.15) * 0.8;
+}), 0.12, 0.3, 0.8));

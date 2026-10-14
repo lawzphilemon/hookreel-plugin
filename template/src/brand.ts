@@ -15,6 +15,7 @@ export const easeOut = Easing.bezier(...EASE.bezier);
 
 export const sans = `"${BRAND.fonts.sans}", sans-serif`;
 export const mono = `"${BRAND.fonts.mono}", monospace`;
+export const display = BRAND.fonts.display ? `"${BRAND.fonts.display}", sans-serif` : sans;
 
 // Load the brand's Google Fonts by name, holding the render until they are ready.
 const WEIGHTS = ["400", "500", "600", "700", "800"];
@@ -41,6 +42,7 @@ const loadGoogleFont = (family: string) => {
 
 loadGoogleFont(BRAND.fonts.sans);
 if (BRAND.fonts.mono !== BRAND.fonts.sans) loadGoogleFont(BRAND.fonts.mono);
+if (BRAND.fonts.display && BRAND.fonts.display !== BRAND.fonts.sans && BRAND.fonts.display !== BRAND.fonts.mono) loadGoogleFont(BRAND.fonts.display);
 
 // Logo recolouring for one-colour logos.
 export const logoFilter =

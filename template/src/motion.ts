@@ -24,6 +24,8 @@ export const TIME = {
   tiles: { first: 0.27, step: 0.33, source: 0.2, text: 0.33, chips: 0.53 },
   timeline: { first: 0.2, step: 0.33, lineDelay: 0.13, line: 0.47, chip: 0.33 },
   bars: { first: 0.27, step: 0.33, grow: 0.6, text: 0.33 },
+  split: { total: 0.27, split: 0.6, grow: 0.36, fade: 0.5, fadeLength: 0.4, text: 0.33 },
+  months: { first: 0.27, step: 0.6, cell: 0.12, grow: 0.36, source: 0.2, text: 0.33 },
   flow: { tools: 0.13, toolStep: 0.27, first: 0.2, firstAfterTools: 0.67, step: 0.33, linkLead: 0.2, link: 0.33, split: 0.47, splitStep: 0.2, break: 0.33, results: 0.33, resultStep: 0.27, chip: 0.53 },
   chat: { panel: 0.2, sponsored: 1.0, highlight: 0.2, chip: 0.67 },
   journey: { first: 0.27, step: 0.47, press: 0.27, chat: 0.27 },
@@ -37,6 +39,9 @@ export const TIME = {
   note: { at: 1.33 },
   music: { ramp: 0.27, fadeIn: 0.5, fadeOut: 1.5, mergeGap: 0.4, underVoice: 0.085, inPauses: 0.16 },
   typing: { cps: 40, cpsLong: 70 },
+  kinetic: { wordStep: 0.06 }, // headline words, one after another
+  focus: { blur: 14 }, // px of blur a focus entrance starts from (not seconds)
+  camera: { push: 0.025 }, // scale gained over a scene (not seconds)
 } as const;
 
 // Sound effects (synthesised by scripts/make-sfx.mjs). Base volumes sit under a voiceover
@@ -51,6 +56,15 @@ export const SOUNDS = {
   switch: 0.45,
   ding: 0.4,
   typing: 0.2,
+  snip: 0.5,
+  drop: 0.45,
+  stamp: 0.5,
+  note: 0.32,
+  hit: 0.45,
+  crack: 0.42,
+  powerdown: 0.38,
+  check: 0.35,
+  resolve: 0.42,
 } as const;
 
 export type SoundName = keyof typeof SOUNDS;

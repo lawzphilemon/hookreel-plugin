@@ -1,7 +1,7 @@
 import React from "react";
 import { Audio } from "@remotion/media";
 import { AbsoluteFill, interpolate, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { C, sans } from "./brand";
+import { BRAND, C, sans } from "./brand";
 import { BackgroundMusic } from "./components/music";
 import { PlanSfx, SfxLevelContext } from "./components/sfx";
 import { Note } from "./components/ui";
@@ -39,29 +39,46 @@ const Header: React.FC<{ eyebrow: string }> = ({ eyebrow }) => (
 const Caption: React.FC = () => {
   const frame = useCurrentFrame();
   const scene = useScene();
-  const chunks = captionChunks(scene.vo);
+  const chunks = captionChunks(scene.vo, BRAND.captions?.reveal === "word" ? 4 : 8);
   const at = (c: { start: number }) => charToFrame(scene, c.start);
   const lead = f(TIME.captionIn) / 2;
   const current = [...chunks].reverse().find((c) => frame >= at(c) - lead);
   if (!current) return null;
   const p = interpolate(frame, [at(current) - lead, at(current) + lead], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const center = BRAND.captions?.align === "center";
+  // Word reveal: every word of the line keeps its place (so a centred line never shifts) and fades
+  // in when the narrator reaches it.
+  const words = BRAND.captions?.reveal === "word"
+    ? current.text.split(/(\s+)/).reduce<{ w: string; at: number }[]>((acc, w, i, all) => {
+        const offset = all.slice(0, i).join("").length;
+        acc.push({ w, at: charToFrame(scene, current.start + offset) });
+        return acc;
+      }, [])
+    : null;
   return (
     <div
       style={{
         position: "absolute",
         top: CAPTION_TOP,
         left: SIDE,
-        width: 860,
+        width: center ? 1080 - 2 * SIDE : 860,
+        textAlign: center ? "center" : undefined,
         fontFamily: sans,
         fontSize: 46,
         fontWeight: 600,
         lineHeight: 1.25,
         color: C.text,
-        opacity: p,
+        opacity: words ? 1 : p,
         textWrap: "balance",
       }}
     >
-      {current.text}
+      {words
+        ? words.map((x, i) => (
+            <span key={i} style={{ opacity: interpolate(frame, [x.at - lead, x.at + lead], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
+              {x.w}
+            </span>
+          ))
+        : current.text}
     </div>
   );
 };
@@ -75,7 +92,7 @@ const SceneShell: React.FC<{ scene: SceneSpec; video: VideoSpec; first: boolean;
     <AbsoluteFill style={{ opacity: out }}>
       <PlanSfx events={p.events} />
       <div style={{ position: "absolute", top: CONTENT_TOP, left: SIDE, right: SIDE, height: CAPTION_TOP - CONTENT_TOP - 40 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 34, height: "100%" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 34, height: "100%", scale: BRAND.motion?.camera === "push" ? String(1 + (TIME.camera.push * frame) / Math.max(1, duration)) : undefined, transformOrigin: "50% 30%" }}>
           <div style={{ flex: scene.note ? undefined : 1, position: "relative" }}>
             <VisualView v={scene.visual} cta={video.cta} />
           </div>

@@ -12,6 +12,8 @@ Text fields accept `backticks` for inline code. Every `cue` is an exact phrase f
 | `tiles` | 2–3 numbers side by side ("1 trigger, 2 destinations, 4 formats") | `tiles[].value/label/hot`, `source`, `text`, `chips` |
 | `timeline` | Dates leading to "now" | `items[].date/text/hot`, `chip` |
 | `bars` | Two values compared (reported vs real) — heights are relative, not data | `items[].label/value/ratio/hot`, `text` |
+| `months` | A month grid: waiting periods, staged payouts ("months 1–6 wait, 7–11 pay 25%, 12 pays 100%") | `groups[].from/to/label/cell/fill/cue`, `columns`, `source`, `text` |
+| `split` | One amount split into equal parts, only some kept ("Rp100 juta into 4 x Rp25 juta, one paid") | `total.value/label/cue`, `parts`, `part`, `keep`, `keepLabel`, `restLabel`, `cue` (split), `fadeCue`, `text` |
 | `flow` | A process or a diagram: steps with connectors, a break where it fails, a split into two destinations, result cards | `tools`, `steps`, `breakAfter`, `split`, `results`, `chip` |
 | `chat` | An AI assistant answer, optionally with a sponsored card | `app`, `question`, `sponsored`, `chip` |
 | `journey` | The customer path in 2–4 screens: ad → page → tap → chat | `steps[].title/kind/text` (`kind`: ad, page, tap, chat, text) |
@@ -43,7 +45,7 @@ All sizes in px on the 1080×1920 frame, taken from the template's components. C
 - Platform UI covers y > 1500 and the right ~120 px; nothing important there.
 
 **Shared**
-- Headline: weight 800, line-height 1.05, tracking -0.03em, `text`. Default size per type: headline 104, chat 100, ranking 96, bars 96, tiles 92, timeline 92, logo 92, cta 92, flow 88, list 88, stat 84, journey 84, ui 84.
+- Headline: weight 800, line-height 1.05, tracking -0.03em, `text`, in `fonts.display` when set (also big numbers: stat, tile and bar values), otherwise `fonts.sans`. `labels.source` sets the word before every source line (default "Source"). Default size per type: headline 104, chat 100, ranking 96, bars 96, tiles 92, timeline 92, logo 92, cta 92, flow 88, list 88, stat 84, journey 84, ui 84.
 - Pill: radius 999, padding 0.42 × size by 0.9 × size; accent pill has a soft accent glow.
 - Card: radius from `brand.json` (default 28). Panels (UI mockups) are `panel` with a 2 px `panelLine` title bar and three dots.
 - Highlight: 4 px `accent` outline, offset 4 px, 14% accent tint.
@@ -55,6 +57,8 @@ All sizes in px on the 1080×1920 frame, taken from the template's components. C
 - tiles: equal-width cards, value 132 / 800 `accent` (hot tile: `panel` with `panelText`), label 32 / 600, padding 32 × 24.
 - timeline: 28 px dots (hot: `accent` with glow), 4 px connector drawing in `text`; date 30 / 700 `muted` (hot `accent`), text 40 / 600.
 - bars: area 420 px tall; value 56 / 800 above each bar; bars radius 20 (`accent` for hot, `track` otherwise); label 32 / 600 `muted`.
+- months: cells in a grid of `columns` (default 6), up to 160 px wide and 1.3× as tall, gap 16, radius 20; month number 44 / 800 top-left; `cell` text 30 / 700 `onAccent` bottom-left, always on the accent fill (a partial fill is at least 56 px tall); unlit cells at 25% opacity; `fill` 0 = `track`, 0–1 = `surface` with an `accent` fill from the bottom, 1 = solid `accent` with `onAccent` text; legend rows 36 / 600 with a 30 px swatch; blocks stack 32 px apart.
+- split: amount 84 / 800 `text`, label 36 / 600 `muted`; bar 920 x 240, outer radius 20; on split the blocks open 16 px gaps and round their inner corners; block text 44 / 800 bottom-left; kept blocks stay `accent` with `onAccent` text, the rest fade to `track` with `muted` text (with `start: "track"` the bar starts grey and only the kept blocks light up to `accent`, for "nothing paid → this part paid"); legend rows 36 / 600 with 30 px swatches.
 - flow: nodes radius 24, padding 20 × 26, label 24 / 600, text 36 / 700 (accent node: `panel`); connectors 44 px tall, 4 px `accent`; broken link 4 px dashed `error` with a 26 px `errorText` label; tool pills 30; result cards label 24, value 30 mono (or 56 / 800 when big).
 - chat: panel with the app name in the title bar; question bubble 30 / 500 on `panelSoft`, right-aligned; three 18 px answer lines; sponsored card: label 22 `panelMuted`, title 32 / 700, button 24 on `panelText`.
 - journey: 2 per row, cards 360 px tall, step number 44 / 800 `accent`, title 28 / 700; inner screen on `panel`, radius 20.
