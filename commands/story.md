@@ -12,12 +12,7 @@ allowed-tools: Read, Write, Skill
 
 ## Step 1 — Load the framework
 
-Load the WTF Hook 999 skill (`wtf-hook-999:wtf-hook-999`) and follow its workflow and hook types. If it is not installed, stop and tell the user to install it:
-
-```text
-/plugin marketplace add lawzphilemon/wtf-hook-999
-/plugin install wtf-hook-999@wtf-hook-999-marketplace
-```
+Load the WTF Hook 999 skill (`wtf-hook-999`, bundled with this plugin) and follow its workflow and hook types. Use `wtf-hook-999-auditor` to score and tighten the chosen hooks before the user picks one.
 
 Use only the **allowed claims** from `02-facts.md`. Apply the brand voice and hard rules from the context profile, not the framework author's personal voice rules.
 
