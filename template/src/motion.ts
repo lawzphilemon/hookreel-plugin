@@ -39,6 +39,9 @@ export const TIME = {
   note: { at: 1.33 },
   music: { ramp: 0.27, fadeIn: 0.5, fadeOut: 1.5, mergeGap: 0.4, underVoice: 0.085, inPauses: 0.16 },
   typing: { cps: 40, cpsLong: 70 },
+  kinetic: { wordStep: 0.06 }, // headline words, one after another
+  focus: { blur: 14 }, // px of blur a focus entrance starts from (not seconds)
+  camera: { push: 0.025 }, // scale gained over a scene (not seconds)
 } as const;
 
 // Sound effects (synthesised by scripts/make-sfx.mjs). Base volumes sit under a voiceover
@@ -53,6 +56,15 @@ export const SOUNDS = {
   switch: 0.45,
   ding: 0.4,
   typing: 0.2,
+  snip: 0.5,
+  drop: 0.45,
+  stamp: 0.5,
+  note: 0.32,
+  hit: 0.45,
+  crack: 0.42,
+  powerdown: 0.38,
+  check: 0.35,
+  resolve: 0.42,
 } as const;
 
 export type SoundName = keyof typeof SOUNDS;

@@ -32,8 +32,9 @@
     "align": "node --no-warnings scripts/check-align.mjs",
     "render": "npm run register && remotion render",
     "lint": "eslint src && tsc",
-    "postinstall": "node scripts/make-sfx.mjs && node scripts/register-videos.mjs",
-    "storyboard": "node --no-warnings scripts/storyboard.mjs"
+    "postinstall": "node scripts/make-sfx.mjs && node scripts/prepare-sounds.mjs && node scripts/register-videos.mjs",
+    "storyboard": "node --no-warnings scripts/storyboard.mjs",
+    "sounds": "node scripts/prepare-sounds.mjs"
   },
   "engines": {
     "node": ">=22.18"

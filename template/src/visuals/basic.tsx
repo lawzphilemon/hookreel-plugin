@@ -66,7 +66,18 @@ export const List: React.FC<{ v: ListVisual }> = ({ v }) => {
         </Appear>
       ) : null}
       <div style={{ display: "flex", flexDirection: "column", gap: v.style === "strike" ? 18 : 24, alignItems: "flex-start" }}>
-        {v.items.map((it, i) =>
+        {v.style === "pills" ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
+            {v.items.map((it, i) => (
+              <Appear key={i} at={p.items[i]} dy={16}>
+                <Pill tone={i % 2 === 0 ? "accent" : "outline"} size={44}>
+                  <Rich text={it.text} />
+                </Pill>
+              </Appear>
+            ))}
+          </div>
+        ) : null}
+        {v.style === "pills" ? null : v.items.map((it, i) =>
           v.style === "strike" ? (
             <StrikeItem key={i} at={p.items[i]} struckAt={p.strikeAt + i * f(TIME.list.strikeStep)} text={it.text} />
           ) : (

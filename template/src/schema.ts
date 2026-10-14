@@ -31,8 +31,14 @@ export type Brand = {
   fonts: { sans: string; mono: string; display?: string }; // Google Fonts family names; display (optional) for headlines and big numbers, defaults to sans
   labels?: { source?: string }; // on-screen words in the voiceover language, e.g. { "source": "Sumber" }; default "Source"
   radius?: { card?: number; pill?: number };
-  motion?: { entranceMs?: number }; // entrance length; easing is always ease-out, no bounce
+  motion?: {
+    entranceMs?: number; // entrance length; easing is always ease-out, no bounce
+    entrance?: "rise" | "focus"; // focus = fade in from a blur instead of rising; default rise
+    text?: "block" | "kinetic"; // kinetic = headlines enter word by word; default block
+    camera?: "still" | "push"; // push = the visual drifts slowly closer over each scene; default still
+  };
   headlineCase?: "sentence" | "as-written";
+  captions?: { align?: "left" | "center"; reveal?: "line" | "word" }; // center = centred at the bottom; word = each word appears as it is spoken
 };
 
 export type MusicSpec = {
@@ -72,6 +78,7 @@ export type SceneSpec = {
   vo: string; // exactly what is said; captions show this text
   visual: Visual;
   note?: { label?: string; text: Rich; cue?: Cue }; // "Watch out" style card under the visual
+  sfx?: { name: string; cue?: Cue; offset?: number; volume?: number }[]; // extra sounds on cues; offset in seconds (negative = before the cue, e.g. a riser)
 };
 
 export type Visual =
@@ -154,6 +161,9 @@ export type MonthsVisual = {
   type: "months";
   headline?: Rich;
   columns?: number; // cells per row, default 6
+  style?: "grid" | "calendar"; // calendar = square cells on a slightly tilted card, with a check on every paid month
+  title?: string; // calendar card title, e.g. "Tahun pertama polis"
+  notes?: boolean; // each cell plays a rising note as it lights up
   groups: { from: number; to: number; label: string; cell?: string; fill: number; cue?: Cue }[]; // months are 1-based and inclusive; label goes in the legend, cell (short) inside each cell
   source?: string;
   text?: { text: Rich; cue?: Cue };
@@ -170,8 +180,9 @@ export type SplitVisual = {
   keep: number; // blocks that stay accent, counted from the left
   keepLabel: string; // legend for the kept blocks
   restLabel: string; // legend for the faded blocks
+  start?: "accent" | "track"; // track = the bar starts grey ("nothing paid") and only the kept blocks turn accent; default accent
   cue?: Cue; // when the bar splits
-  fadeCue?: Cue; // when the rest fades
+  fadeCue?: Cue; // when the rest fades (or, with start "track", when the kept blocks light up)
   text?: { text: Rich; cue?: Cue };
 };
 
@@ -230,7 +241,7 @@ export type ListVisual = {
   type: "list";
   eyebrow?: string;
   headline?: Rich;
-  style: "dash" | "check" | "strike";
+  style: "dash" | "check" | "strike" | "pills"; // pills alternate accent-filled and outlined
   items: { text: Rich; cue?: Cue }[];
   strikeCue?: Cue; // for "strike": when the items get crossed out
   answer?: { text: string; cue?: Cue }; // for "strike": the real cause, in accent
@@ -254,6 +265,7 @@ export type CtaVisual = {
   type: "cta"; // closing card built from video.cta
   headline: Rich;
   cue?: Cue; // when the CTA card appears
+  sound?: string; // replaces the ding when the card lands, e.g. "resolve"
   footer?: string; // e.g. "Next: Phase 1 · Ads Manager"
   footerCue?: Cue;
 };

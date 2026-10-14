@@ -73,7 +73,8 @@ lines.push(`- Format: ${video.width ?? 1080}×${video.height ?? 1920}, **${FPS} 
 lines.push(`- Length: ${s(total)} s = ${total} frames · ${video.scenes.length} scenes`);
 lines.push(`- Entrance: ${Math.round((enter / FPS) * 1000)} ms, fade + rise ${TIME.rise}px, ease-out, no bounce, no loops`);
 lines.push(`- Sound effects: ${level} · Music: ${video.audio?.music ? `${video.audio.music.src} from ${video.audio.music.startAt ?? 0}s, ducked under the voice (${video.audio.music.underVoice ?? TIME.music.underVoice}) and up in pauses (${video.audio.music.inPauses ?? TIME.music.inPauses}), fade in ${TIME.music.fadeIn}s, fade out ${TIME.music.fadeOut}s` : "none"}`);
-lines.push(`- Captions: ${video.captions === false ? "off" : "on, from the voiceover text, at y≈1340"}`, "");
+const capStyle = [brand.captions?.align === "center" ? "centred at the bottom" : "left-aligned", brand.captions?.reveal === "word" ? "each word appears as it is spoken" : "one line at a time"].join(", ");
+lines.push(`- Captions: ${video.captions === false ? "off" : `on, from the voiceover text, at y≈1340, ${capStyle}`}`, "");
 lines.push("Times: **t** = seconds from the start of the video, **F** = frame from the start of the video, **f** = frame inside the scene.", "");
 
 let start = 0;
@@ -85,9 +86,9 @@ video.scenes.forEach((scene, i) => {
 
   // Spoken words and caption lines, as events too.
   const words = splitWords(scene.vo).map((w) => ({ word: w.word, at: Math.round(charToFrame(ctx, w.offset)) }));
-  const captions = captionChunks(scene.vo).map((c) => ({ text: c.text, at: Math.round(charToFrame(ctx, c.start)) }));
+  const captions = captionChunks(scene.vo, brand.captions?.reveal === "word" ? 4 : 8).map((c) => ({ text: c.text, at: Math.round(charToFrame(ctx, c.start)) }));
   events.push({ at: LEAD_IN, layer: "voiceover", action: `starts: "${scene.vo}"`, until: LEAD_IN + timing.voFrames });
-  for (const c of captions) events.push({ at: c.at, layer: "caption", action: `shows "${c.text}"`, motion: `fade in over ${Math.round(TIME.captionIn * 1000)} ms` });
+  for (const c of captions) events.push({ at: c.at, layer: "caption", action: `shows "${c.text}"`, motion: brand.captions?.reveal === "word" ? `words fade in one by one as they are spoken, ${Math.round(TIME.captionIn * 1000)} ms each` : `fade in over ${Math.round(TIME.captionIn * 1000)} ms` });
   events.sort((a, b) => a.at - b.at);
 
   lines.push(`## Scene ${i + 1} · \`${scene.id}\` · ${scene.visual.type}`, "");
@@ -99,7 +100,8 @@ video.scenes.forEach((scene, i) => {
     if (e.at >= timing.duration) continue;
     const sound = e.sfx ? (() => {
       const v = sfxVolume(e.sfx.name, level, e.sfx.volume);
-      return v === null ? `${e.sfx.name} (muted at ${level})` : `${e.sfx.name} ${v.toFixed(2)}${e.sfx.length ? `, ${s(e.sfx.length)} s` : ""}`;
+      const n = `${e.sfx.name}${e.sfx.pitch !== undefined ? ` +${e.sfx.pitch}` : ""}`;
+      return v === null ? `${n} (muted at ${level})` : `${n} ${v.toFixed(2)}${e.sfx.length ? `, ${s(e.sfx.length)} s` : ""}`;
     })() : "";
     lines.push(`| ${s(start + e.at)} | ${start + e.at} | ${e.at} | ${clean(e.layer)} | ${clean(e.action)} | ${clean(e.motion ?? "")} | ${e.until !== undefined ? s(start + e.until) : ""} | ${sound} |`);
   }

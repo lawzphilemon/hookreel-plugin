@@ -6,7 +6,7 @@ import { Appear, Body, Chips, Headline, Highlight, Pill, Rich, Source, Stack, us
 import { f, TIME } from "../motion.ts";
 import { planBars, planMonths, planRanking, planSplit, planStat, planTiles, planTimeline } from "../plan.ts";
 import type { BarsVisual, MonthsVisual, RankingVisual, SplitVisual, StatVisual, TilesVisual, TimelineVisual } from "../schema";
-import { usePlanCtx } from "../timing";
+import { usePlanCtx, useScene } from "../timing";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
@@ -220,9 +220,9 @@ export const Bars: React.FC<{ v: BarsVisual }> = ({ v }) => {
   );
 };
 
-const MonthCell: React.FC<{ month: number; at: number; fill: number; cell?: string; width: number }> = ({ month, at, fill, cell, width }) => {
+const MonthCell: React.FC<{ month: number; at: number; fill: number; cell?: string; width: number; calendar?: boolean }> = ({ month, at, fill, cell, width, calendar }) => {
   const p = useEnter(at, f(TIME.months.grow));
-  const height = Math.round(width * 1.3);
+  const height = Math.round(width * (calendar ? 1 : 1.3));
   // A partial fill is never shorter than the cell text, so the text always sits on accent.
   const fillPx = fill >= 1 ? height : fill > 0 ? Math.max(fill * height, 56) : 0;
   return (
@@ -232,6 +232,26 @@ const MonthCell: React.FC<{ month: number; at: number; fill: number; cell?: stri
       {cell ? (
         <div style={{ position: "absolute", left: 18, bottom: 12, fontSize: 30, fontWeight: 700, color: C.onAccent, opacity: p }}>{cell}</div>
       ) : null}
+      {calendar && fill > 0 ? (
+        <div style={{ position: "absolute", top: 12, right: 12, width: 34, height: 34, borderRadius: 17, display: "flex", alignItems: "center", justifyContent: "center", background: fill >= 1 ? C.onAccent : C.accent, color: fill >= 1 ? C.accent : C.onAccent, fontSize: 22, fontWeight: 800, scale: String(p) }}>
+          ✓
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+// Calendar card: tilted back a little and settling flatter over the scene, so it never sits still.
+const CalendarCard: React.FC<{ title?: string; children: React.ReactNode }> = ({ title, children }) => {
+  const frame = useCurrentFrame();
+  const { duration } = useScene();
+  const k = Math.min(1, frame / Math.max(1, duration));
+  return (
+    <div style={{ perspective: 1800 }}>
+      <div style={{ background: C.surface, borderRadius: RADIUS.card, padding: 28, boxShadow: "0 30px 60px rgba(0,0,0,0.10)", transform: `rotateX(${12 - 6 * k}deg) rotateY(${-14 + 8 * k}deg) rotateZ(${2 - k}deg)`, transformOrigin: "50% 50%" }}>
+        {title ? <div style={{ fontFamily: sans, fontSize: 30, fontWeight: 600, color: C.muted, marginBottom: 20 }}>{title}</div> : null}
+        {children}
+      </div>
     </div>
   );
 };
@@ -240,8 +260,17 @@ export const Months: React.FC<{ v: MonthsVisual }> = ({ v }) => {
   const p = planMonths(v, usePlanCtx());
   const columns = v.columns ?? 6;
   const gap = 16;
-  const width = Math.min(160, (920 - gap * (columns - 1)) / columns);
+  const calendar = v.style === "calendar";
+  const width = Math.min(160, ((calendar ? 864 : 920) - gap * (columns - 1)) / columns);
   const groupOf = (m: number) => v.groups.find((g) => m >= g.from && m <= g.to);
+  const grid = (
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, 1fr)`, gap }}>
+      {p.cellAt.map((at, i) => {
+        const g = groupOf(i + 1);
+        return <MonthCell key={i} month={i + 1} at={at} fill={g?.fill ?? 0} cell={g?.cell} width={width} calendar={calendar} />;
+      })}
+    </div>
+  );
   return (
     <Stack gap={32}>
       <PlanSfx events={p.events} />
@@ -250,12 +279,7 @@ export const Months: React.FC<{ v: MonthsVisual }> = ({ v }) => {
           <Headline text={v.headline} size={92} />
         </Appear>
       ) : null}
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, 1fr)`, gap }}>
-        {p.cellAt.map((at, i) => {
-          const g = groupOf(i + 1);
-          return <MonthCell key={i} month={i + 1} at={at} fill={g?.fill ?? 0} cell={g?.cell} width={width} />;
-        })}
-      </div>
+      {calendar ? <CalendarCard title={v.title}>{grid}</CalendarCard> : grid}
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {v.groups.map((g, i) => (
           <Appear key={g.label} at={p.groups[i]}>
@@ -302,6 +326,10 @@ export const Split: React.FC<{ v: SplitVisual }> = ({ v }) => {
         <div style={{ display: "flex", gap, height: 240, marginTop: 28 }}>
           {Array.from({ length: v.parts }, (_, i) => {
             const kept = i < v.keep;
+            const grey = v.start === "track";
+            // accent→track for the rest (default), or track→accent for the kept blocks (start "track")
+            const bg = grey ? (kept ? interpolateColors(fade, [0, 1], [C.track, C.accent]) : C.track) : kept ? C.accent : interpolateColors(fade, [0, 1], [C.accent, C.track]);
+            const fg = grey ? (kept ? interpolateColors(fade, [0, 1], [C.muted, C.onAccent]) : C.muted) : kept ? C.onAccent : interpolateColors(fade, [0, 1], [C.onAccent, C.muted]);
             const first = i === 0;
             const last = i === v.parts - 1;
             return (
@@ -309,7 +337,7 @@ export const Split: React.FC<{ v: SplitVisual }> = ({ v }) => {
                 key={i}
                 style={{
                   flex: 1,
-                  background: kept ? C.accent : interpolateColors(fade, [0, 1], [C.accent, C.track]),
+                  background: bg,
                   borderRadius: `${first ? 20 : inner}px ${last ? 20 : inner}px ${last ? 20 : inner}px ${first ? 20 : inner}px`,
                   display: "flex",
                   alignItems: "flex-end",
@@ -317,7 +345,7 @@ export const Split: React.FC<{ v: SplitVisual }> = ({ v }) => {
                   fontFamily: display,
                   fontSize: 44,
                   fontWeight: 800,
-                  color: kept ? C.onAccent : interpolateColors(fade, [0, 1], [C.onAccent, C.muted]),
+                  color: fg,
                 }}
               >
                 <span style={{ opacity: split }}>{v.part}</span>

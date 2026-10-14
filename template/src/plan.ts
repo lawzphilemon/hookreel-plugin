@@ -34,7 +34,7 @@ export type PlanEvent = {
   action: string; // what happens
   motion?: string; // how it moves
   until?: number; // frame the movement ends
-  sfx?: { name: SoundName; volume?: number; length?: number };
+  sfx?: { name: SoundName; volume?: number; length?: number; pitch?: number }; // pitch: semitones above the base note
 };
 
 export type PlanCtx = { cue: CueFn; enter: number /* entrance length in frames */ };
@@ -152,6 +152,8 @@ export const planBars = (v: BarsVisual, ctx: PlanCtx) => {
   return { bars, textAt, events };
 };
 
+const MAJOR = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23];
+
 export const planMonths = (v: MonthsVisual, ctx: PlanCtx) => {
   const { cue } = ctx;
   const T = TIME.months;
@@ -176,9 +178,18 @@ export const planMonths = (v: MonthsVisual, ctx: PlanCtx) => {
         action: "light up one by one",
         motion: `each cell opacity 0.25→1 and fill 0→${g.fill} over ${ms(f(T.grow))}, ${ms(f(T.cell))} apart, ${EASE.name}`,
         until: end,
-        sfx: g.fill >= 1 ? { name: "impact" as const, volume: 0.32 } : { name: "tick" as const },
+        sfx: v.notes ? (g.fill >= 1 ? { name: "hit" as const } : undefined) : g.fill >= 1 ? { name: "impact" as const, volume: 0.32 } : { name: "tick" as const },
       };
     }),
+    // A rising major scale, one note per lit month; a solid (100%) month gets the hit instead.
+    ...(v.notes
+      ? cellAt.flatMap((at, i) => {
+          const g = v.groups.find((x) => i + 1 >= x.from && i + 1 <= x.to);
+          if (!g || g.fill >= 1) return [];
+          const pitch = MAJOR[i % MAJOR.length];
+          return [{ at, layer: `month ${i + 1}`, action: `note +${pitch}`, sfx: { name: "note" as const, pitch } }];
+        })
+      : []),
     ...(v.source ? [ev(ctx, sourceAt, `source "${v.source}"`)] : []),
     ...(v.text ? [ev(ctx, textAt, `text "${v.text.text}"`)] : []),
   ];
@@ -194,9 +205,11 @@ export const planSplit = (v: SplitVisual, ctx: PlanCtx) => {
   const textAt = v.text ? cue(v.text.cue, fadeAt + f(T.text)) : NEVER;
   const events: PlanEvent[] = [
     ...(v.headline ? [ev(ctx, 0, `headline "${v.headline}"`)] : []),
-    ev(ctx, totalAt, `amount "${v.total.value}"${v.total.label ? ` with label "${v.total.label}"` : ""} + one solid accent bar`),
-    { at: splitAt, layer: `bar → ${v.parts} blocks "${v.part}"`, action: "splits", motion: `gaps 0→16px, inner corners 0→20px, block text fades in, over ${ms(f(T.grow))}, ${EASE.name}`, until: splitAt + f(T.grow), sfx: { name: "tick" } },
-    { at: fadeAt, layer: `blocks ${v.keep + 1}–${v.parts} + legend "${v.keepLabel}" / "${v.restLabel}"`, action: `fade from accent to track (blocks 1–${v.keep} stay accent)`, motion: `colour accent→track over ${ms(f(T.fadeLength))}, ${EASE.name}`, until: fadeAt + f(T.fadeLength), sfx: { name: "impact", volume: 0.32 } },
+    ev(ctx, totalAt, `amount "${v.total.value}"${v.total.label ? ` with label "${v.total.label}"` : ""} + one solid ${v.start === "track" ? "track (grey)" : "accent"} bar`),
+    { at: splitAt, layer: `bar → ${v.parts} blocks "${v.part}"`, action: "splits", motion: `gaps 0→16px, inner corners 0→20px, block text fades in, over ${ms(f(T.grow))}, ${EASE.name}`, until: splitAt + f(T.grow), sfx: { name: "crack" } },
+    v.start === "track"
+      ? { at: fadeAt, layer: `blocks 1–${v.keep} + legend "${v.keepLabel}" / "${v.restLabel}"`, action: `light up from track to accent (blocks ${v.keep + 1}–${v.parts} stay track)`, motion: `colour track→accent over ${ms(f(T.fadeLength))}, ${EASE.name}`, until: fadeAt + f(T.fadeLength), sfx: { name: "pop" as const } }
+      : { at: fadeAt, layer: `blocks ${v.keep + 1}–${v.parts} + legend "${v.keepLabel}" / "${v.restLabel}"`, action: `fade from accent to track (blocks 1–${v.keep} stay accent)`, motion: `colour accent→track over ${ms(f(T.fadeLength))}, ${EASE.name}`, until: fadeAt + f(T.fadeLength), sfx: { name: "powerdown" as const } },
     ...(v.text ? [ev(ctx, textAt, `text "${v.text.text}"`)] : []),
   ];
   return { totalAt, splitAt, fadeAt, textAt, events };
@@ -346,10 +359,10 @@ export const planList = (v: ListVisual, ctx: PlanCtx) => {
   const items = v.items.map((it, i) => cue(it.cue, f(T.first) + i * f(T.step)));
   const strikeAt = cue(v.strikeCue, NEVER);
   const answerAt = v.answer ? cue(v.answer.cue, strikeAt < NEVER ? strikeAt + f(T.answer) : NEVER) : NEVER;
-  const marker = v.style === "dash" ? "— (accent)" : v.style === "check" ? "✓ (accent)" : "pill";
+  const marker = v.style === "dash" ? "— (accent)" : v.style === "check" ? "✓ (accent)" : v.style === "pills" ? "pill (odd items accent-filled, even outlined)" : "pill";
   const events: PlanEvent[] = [
     ...(v.eyebrow || v.headline ? [ev(ctx, 0, `${v.eyebrow ? `eyebrow "${v.eyebrow}" ` : ""}${v.headline ? `headline "${v.headline}"` : ""}`)] : []),
-    ...v.items.map((it, i) => ev(ctx, items[i], `item ${i + 1} ${marker} "${it.text}"`, "enters", { motion: `fade in and rise 16px over ${ms(ctx.enter)}`, sfx: { name: "tick" } })),
+    ...v.items.map((it, i) => ev(ctx, items[i], `item ${i + 1} ${marker} "${it.text}"`, "enters", { motion: `fade in and rise 16px over ${ms(ctx.enter)}`, sfx: { name: v.style === "pills" ? "pop" : "tick" } })),
   ];
   if (v.style === "strike" && strikeAt < NEVER) {
     v.items.forEach((it, i) => events.push({ at: strikeAt + i * f(T.strikeStep), layer: `item "${it.text}"`, action: "struck through in error colour, fades to 45%", motion: `line 0→100% over ${ms(f(T.strike))}`, until: strikeAt + i * f(T.strikeStep) + f(T.strike) }));
@@ -377,7 +390,8 @@ export const planCta = (v: CtaVisual, ctx: PlanCtx, hasCta: boolean) => {
   if (hasCta) {
     events.push({ at: Math.max(0, at - f(TIME.cta.riserLead)), layer: "audio", action: "riser builds toward the CTA card", sfx: { name: "riser" } });
     events.push(ev(ctx, at, "CTA card: kicker, title, chips, accent button, sub line", "enters", { sfx: { name: "impact", volume: 0.22 } }));
-    events.push({ at, layer: "CTA card", action: "ding", sfx: { name: "ding", volume: 0.28 } });
+    const sound = (v.sound ?? "ding") as SoundName;
+    events.push({ at, layer: "CTA card", action: sound, sfx: { name: sound, volume: v.sound ? undefined : 0.28 } });
   }
   if (v.footer) events.push(ev(ctx, footerAt, `footer "${v.footer}"`));
   return { at, footerAt, events };
@@ -429,6 +443,10 @@ export const planShell = (scene: SceneSpec, ctx: PlanCtx, duration: number, firs
     { at: 0, layer: "scene", action: "cut in", sfx: { name: "whoosh", volume: first ? 0.25 : undefined } },
     { at: f(TIME.sceneHit), layer: "audio", action: "soft low hit", sfx: { name: "impact", volume: 0.22 } },
   ];
+  for (const s of scene.sfx ?? []) {
+    const at = Math.max(0, ctx.cue(s.cue, 0) + f(s.offset ?? 0));
+    events.push({ at, layer: "audio", action: `${s.name}${s.cue ? ` on "${s.cue}"` : ""}${s.offset ? ` (${s.offset > 0 ? "+" : ""}${s.offset} s)` : ""}`, sfx: { name: s.name as SoundName, volume: s.volume } });
+  }
   if (scene.note) events.push(ev(ctx, noteAt, `note card "${scene.note.label ?? "Watch out"}": "${scene.note.text}"`, "enters", { sfx: { name: "pop" } }));
   events.push({ at: fadeOut, layer: "whole scene", action: "fades out", motion: `opacity 1→0 over ${ms(f(TIME.sceneFadeOut))}`, until: duration });
   return { noteAt, fadeOut, events };
