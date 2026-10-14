@@ -24,6 +24,8 @@ export const TIME = {
   tiles: { first: 0.27, step: 0.33, source: 0.2, text: 0.33, chips: 0.53 },
   timeline: { first: 0.2, step: 0.33, lineDelay: 0.13, line: 0.47, chip: 0.33 },
   bars: { first: 0.27, step: 0.33, grow: 0.6, text: 0.33 },
+  split: { total: 0.27, split: 0.6, grow: 0.36, fade: 0.5, fadeLength: 0.4, text: 0.33 },
+  months: { first: 0.27, step: 0.6, cell: 0.12, grow: 0.36, source: 0.2, text: 0.33 },
   flow: { tools: 0.13, toolStep: 0.27, first: 0.2, firstAfterTools: 0.67, step: 0.33, linkLead: 0.2, link: 0.33, split: 0.47, splitStep: 0.2, break: 0.33, results: 0.33, resultStep: 0.27, chip: 0.53 },
   chat: { panel: 0.2, sponsored: 1.0, highlight: 0.2, chip: 0.67 },
   journey: { first: 0.27, step: 0.47, press: 0.27, chat: 0.27 },

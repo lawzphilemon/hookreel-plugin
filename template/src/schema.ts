@@ -81,6 +81,8 @@ export type Visual =
   | TilesVisual
   | TimelineVisual
   | BarsVisual
+  | MonthsVisual
+  | SplitVisual
   | FlowVisual
   | ChatVisual
   | JourneyVisual
@@ -143,6 +145,33 @@ export type BarsVisual = {
   type: "bars";
   headline?: Rich;
   items: { label: string; value: string; ratio: number; cue?: Cue; hot?: boolean }[]; // ratio 0–1, relative height
+  text?: { text: Rich; cue?: Cue };
+};
+
+// A grid of months (waiting periods, staged benefits). Each group lights its months one by one
+// from its cue; `fill` is how much of each cell turns accent (0 = track colour, 1 = solid accent).
+export type MonthsVisual = {
+  type: "months";
+  headline?: Rich;
+  columns?: number; // cells per row, default 6
+  groups: { from: number; to: number; label: string; cell?: string; fill: number; cue?: Cue }[]; // months are 1-based and inclusive; label goes in the legend, cell (short) inside each cell
+  source?: string;
+  text?: { text: Rich; cue?: Cue };
+};
+
+// One amount as a wide bar that splits into equal blocks; the first `keep` blocks stay accent,
+// the rest fade to the track colour ("Rp100 juta -> 4 x Rp25 juta, only one is paid").
+export type SplitVisual = {
+  type: "split";
+  headline?: Rich;
+  total: { value: string; label?: string; cue?: Cue }; // the whole amount above the bar
+  parts: number; // equal blocks
+  part: string; // text inside each block, e.g. "Rp25 jt"
+  keep: number; // blocks that stay accent, counted from the left
+  keepLabel: string; // legend for the kept blocks
+  restLabel: string; // legend for the faded blocks
+  cue?: Cue; // when the bar splits
+  fadeCue?: Cue; // when the rest fades
   text?: { text: Rich; cue?: Cue };
 };
 

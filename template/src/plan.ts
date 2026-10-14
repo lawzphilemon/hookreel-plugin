@@ -13,6 +13,8 @@ import type {
   JourneyVisual,
   ListVisual,
   LogoVisual,
+  MonthsVisual,
+  SplitVisual,
   RankingVisual,
   SceneSpec,
   StatVisual,
@@ -148,6 +150,56 @@ export const planBars = (v: BarsVisual, ctx: PlanCtx) => {
     ...(v.text ? [ev(ctx, textAt, `text "${v.text.text}"`)] : []),
   ];
   return { bars, textAt, events };
+};
+
+export const planMonths = (v: MonthsVisual, ctx: PlanCtx) => {
+  const { cue } = ctx;
+  const T = TIME.months;
+  const groups = v.groups.map((g, i) => cue(g.cue, f(T.first) + i * f(T.step)));
+  // cellAt[m - 1] = frame month m lights up
+  const cellAt: number[] = [];
+  v.groups.forEach((g, i) => {
+    for (let m = g.from; m <= g.to; m++) cellAt[m - 1] = groups[i] + (m - g.from) * f(T.cell);
+  });
+  const done = Math.max(...v.groups.map((g, i) => groups[i] + (g.to - g.from) * f(T.cell)));
+  const sourceAt = done + f(T.source);
+  const textAt = v.text ? cue(v.text.cue, done + f(T.text)) : NEVER;
+  const events: PlanEvent[] = [
+    ...(v.headline ? [ev(ctx, 0, `headline "${v.headline}"`)] : []),
+    { at: 0, layer: `month grid 1–${cellAt.length} (cells at 25% opacity)`, action: "is drawn", until: 0 },
+    ...v.groups.map((g, i) => {
+      const end = groups[i] + (g.to - g.from) * f(T.cell) + f(T.grow);
+      const fill = g.fill >= 1 ? "solid accent" : g.fill > 0 ? `accent fill ${Math.round(g.fill * 100)}% from the bottom` : "track colour";
+      return {
+        at: groups[i],
+        layer: `months ${g.from}–${g.to} (${fill}${g.cell ? `, "${g.cell}" in each cell` : ""}) + legend "${g.label}"`,
+        action: "light up one by one",
+        motion: `each cell opacity 0.25→1 and fill 0→${g.fill} over ${ms(f(T.grow))}, ${ms(f(T.cell))} apart, ${EASE.name}`,
+        until: end,
+        sfx: g.fill >= 1 ? { name: "impact" as const, volume: 0.32 } : { name: "tick" as const },
+      };
+    }),
+    ...(v.source ? [ev(ctx, sourceAt, `source "${v.source}"`)] : []),
+    ...(v.text ? [ev(ctx, textAt, `text "${v.text.text}"`)] : []),
+  ];
+  return { groups, cellAt, sourceAt, textAt, events };
+};
+
+export const planSplit = (v: SplitVisual, ctx: PlanCtx) => {
+  const { cue } = ctx;
+  const T = TIME.split;
+  const totalAt = cue(v.total.cue, f(T.total));
+  const splitAt = cue(v.cue, totalAt + f(T.split));
+  const fadeAt = cue(v.fadeCue, splitAt + f(T.fade));
+  const textAt = v.text ? cue(v.text.cue, fadeAt + f(T.text)) : NEVER;
+  const events: PlanEvent[] = [
+    ...(v.headline ? [ev(ctx, 0, `headline "${v.headline}"`)] : []),
+    ev(ctx, totalAt, `amount "${v.total.value}"${v.total.label ? ` with label "${v.total.label}"` : ""} + one solid accent bar`),
+    { at: splitAt, layer: `bar → ${v.parts} blocks "${v.part}"`, action: "splits", motion: `gaps 0→16px, inner corners 0→20px, block text fades in, over ${ms(f(T.grow))}, ${EASE.name}`, until: splitAt + f(T.grow), sfx: { name: "tick" } },
+    { at: fadeAt, layer: `blocks ${v.keep + 1}–${v.parts} + legend "${v.keepLabel}" / "${v.restLabel}"`, action: `fade from accent to track (blocks 1–${v.keep} stay accent)`, motion: `colour accent→track over ${ms(f(T.fadeLength))}, ${EASE.name}`, until: fadeAt + f(T.fadeLength), sfx: { name: "impact", volume: 0.32 } },
+    ...(v.text ? [ev(ctx, textAt, `text "${v.text.text}"`)] : []),
+  ];
+  return { totalAt, splitAt, fadeAt, textAt, events };
 };
 
 // ---------------------------------------------------------------- flow
@@ -356,6 +408,8 @@ export const planVisual = (v: Visual, ctx: PlanCtx, hasCta: boolean): { events: 
     case "tiles": return planTiles(v, ctx);
     case "timeline": return planTimeline(v, ctx);
     case "bars": return planBars(v, ctx);
+    case "months": return planMonths(v, ctx);
+    case "split": return planSplit(v, ctx);
     case "flow": return planFlow(v, ctx);
     case "chat": return planChat(v, ctx);
     case "journey": return planJourney(v, ctx);
