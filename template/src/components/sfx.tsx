@@ -6,13 +6,18 @@ import type { PlanEvent } from "../plan.ts";
 
 export type { SfxLevel, SoundName };
 export const SfxLevelContext = createContext<SfxLevel>("medium");
+// A scene's `mute`: true silences all its sound effects, a list silences only those names.
+// Muted sounds stay in the plan (and the storyboard) but do not play.
+export const SceneMuteContext = createContext<boolean | string[]>(false);
 
 // Plays a sound at frame `at` of the current scene. `length` cuts it short (used for typing).
 // A brand's own recordings (public/sfx/brand/, written by `npm run sounds`) replace the synthesised ones.
 export const Sfx: React.FC<{ name: SoundName; at: number; length?: number; volume?: number; pitch?: number }> = ({ name, at, length, volume, pitch }) => {
   const level = useContext(SfxLevelContext);
+  const mute = useContext(SceneMuteContext);
+  const muted = mute === true || (Array.isArray(mute) && mute.includes(name));
   const v = sfxVolume(name, level, volume);
-  if (v === null || v <= 0 || at > 1e8) return null;
+  if (muted || v === null || v <= 0 || at > 1e8) return null;
   const file = pitch === undefined ? name : `${name}-${pitch}`;
   const own = getStaticFiles().some((s) => s.name === `sfx/brand/${file}.wav`);
   return (

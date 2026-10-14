@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "HOOKREEL short video pipeline plugin for Claude Code",
-    "version": "0.3.2"
+    "version": "0.3.3"
   },
   "plugins": [
     {
       "name": "hookreel",
       "source": "./",
       "description": "Interview-to-video pipeline for short vertical videos for any brand: interview and project CLAUDE.md, fact gate, WTF Hook 999 story, reviewed script and frame-exact storyboard, and a data-driven 60 fps Remotion template.",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "author": {
         "name": "Lawrence Philemon"
       },

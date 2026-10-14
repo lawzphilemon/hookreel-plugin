@@ -3,7 +3,7 @@ import { Audio } from "@remotion/media";
 import { AbsoluteFill, interpolate, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { BRAND, C, sans } from "./brand";
 import { BackgroundMusic } from "./components/music";
-import { PlanSfx, SfxLevelContext } from "./components/sfx";
+import { PlanSfx, SceneMuteContext, SfxLevelContext } from "./components/sfx";
 import { Note } from "./components/ui";
 import type { SceneSpec, VideoSpec } from "./schema";
 import { f, TIME } from "./motion.ts";
@@ -117,7 +117,9 @@ export const Reel: React.FC<ReelProps> = ({ videoId, timings }) => {
             return (
               <Series.Sequence key={scene.id} name={scene.id} durationInFrames={t.duration}>
                 <SceneContext.Provider value={{ vo: scene.vo, voFrames: t.voFrames, duration: t.duration, words: t.words }}>
-                  <SceneShell scene={scene} video={video} first={i === 0} captions={video.captions !== false} />
+                  <SceneMuteContext.Provider value={scene.mute === true ? true : [...(video.audio?.mute ?? []), ...(Array.isArray(scene.mute) ? scene.mute : [])]}>
+                    <SceneShell scene={scene} video={video} first={i === 0} captions={video.captions !== false} />
+                  </SceneMuteContext.Provider>
                   {t.voSrc ? <Audio src={staticFile(t.voSrc)} from={LEAD_IN} /> : null}
                 </SceneContext.Provider>
               </Series.Sequence>

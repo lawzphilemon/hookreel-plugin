@@ -1,7 +1,8 @@
 // Usage: node scripts/prepare-vo.mjs <video id> <full recording> [start-end,start-end,...]
 //
 // Turns one voiceover take for a whole reel into per-scene clips:
-//   1. loudness-normalises the take (-16 LUFS, peaks at -3 dBTP to leave room for music and SFX),
+//   1. loudness-normalises the take (-16 LUFS, peaks at -3 dBTP to leave room for music and SFX) and
+//      removes rumble and mic thumps below 90 Hz (phone recordings pop on "p", "b", "k"),
 //   2. transcribes it with Whisper (local) and lines the words up with the script,
 //   3. cuts at the pause nearest each scene boundary (or at the ranges you pass, in seconds),
 //   4. writes public/vo/<reel>/<scene>.wav plus <scene>.words.json for word-accurate cues and captions.
@@ -72,9 +73,44 @@ const silences = (file) => {
   return out;
 };
 
+// 4th-order high-pass (two RBJ biquads, Q 0.707) on a 16-bit PCM WAV, in place. Remotion's bundled
+// ffmpeg has no highpass filter, so it is done here.
+const highpass = (file, hz = 90) => {
+  const buf = fs.readFileSync(file);
+  let at = 12, channels = 1, rate = 48000, bits = 16, data = null;
+  while (at < buf.length - 8) {
+    const id = buf.toString("ascii", at, at + 4);
+    const size = buf.readUInt32LE(at + 4);
+    if (id === "fmt ") { channels = buf.readUInt16LE(at + 10); rate = buf.readUInt32LE(at + 12); bits = buf.readUInt16LE(at + 22); }
+    if (id === "data") { data = { start: at + 8, size: Math.min(size, buf.length - at - 8) }; break; }
+    at += 8 + size + (size % 2);
+  }
+  if (!data || bits !== 16) return console.warn(`  high-pass skipped (${bits}-bit audio)`);
+  const w = (2 * Math.PI * hz) / rate, alpha = Math.sin(w) / (2 * Math.SQRT1_2), cos = Math.cos(w), a0 = 1 + alpha;
+  const b = [(1 + cos) / 2 / a0, -(1 + cos) / a0, (1 + cos) / 2 / a0], a = [(-2 * cos) / a0, (1 - alpha) / a0];
+  const n = data.size / 2 / channels;
+  for (let c = 0; c < channels; c++) {
+    const st = [[0, 0, 0, 0], [0, 0, 0, 0]]; // x1 x2 y1 y2 per stage
+    for (let i = 0; i < n; i++) {
+      const pos = data.start + (i * channels + c) * 2;
+      let x = buf.readInt16LE(pos);
+      for (const s of st) {
+        const y = b[0] * x + b[1] * s[0] + b[2] * s[1] - a[0] * s[2] - a[1] * s[3];
+        s[1] = s[0]; s[0] = x; s[3] = s[2]; s[2] = y; x = y;
+      }
+      buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(x))), pos);
+    }
+  }
+  fs.writeFileSync(file, buf);
+};
+
 fs.mkdirSync("out", { recursive: true });
+// High-pass first, then normalise, so the -3 dBTP peak limit holds on the filtered voice.
+const filtered = path.join("out", `${reelId}-highpassed.wav`);
+ffmpeg(`-i "${input}" -ar 48000 -c:a pcm_s16le "${filtered}"`);
+highpass(filtered);
 const normalised = path.join("out", `${reelId}-normalised.wav`);
-ffmpeg(`-i "${input}" -af loudnorm=I=-16:TP=-3:LRA=11 -ar 48000 "${normalised}"`);
+ffmpeg(`-i "${filtered}" -af loudnorm=I=-16:TP=-3:LRA=11 -ar 48000 "${normalised}"`);
 const total = duration(normalised);
 
 let segments;
