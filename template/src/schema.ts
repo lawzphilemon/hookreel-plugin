@@ -60,6 +60,7 @@ export type VideoSpec = {
   audio?: {
     music?: MusicSpec | null;
     sfx?: "off" | "subtle" | "medium" | "dramatic"; // default "medium"
+    mute?: string[]; // sound effects silenced in every scene, e.g. ["impact"]
   };
   cta?: CtaSpec;
   scenes: SceneSpec[];
@@ -79,6 +80,7 @@ export type SceneSpec = {
   visual: Visual;
   note?: { label?: string; text: Rich; cue?: Cue }; // "Watch out" style card under the visual
   sfx?: { name: string; cue?: Cue; offset?: number; volume?: number }[]; // extra sounds on cues; offset in seconds (negative = before the cue, e.g. a riser)
+  mute?: boolean | string[]; // true = no sound effects in this scene; a list = only those sounds are silenced, e.g. ["impact", "drop"] (voiceover and music still play)
 };
 
 export type Visual =

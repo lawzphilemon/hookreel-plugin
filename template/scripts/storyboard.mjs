@@ -101,6 +101,8 @@ video.scenes.forEach((scene, i) => {
     const sound = e.sfx ? (() => {
       const v = sfxVolume(e.sfx.name, level, e.sfx.volume);
       const n = `${e.sfx.name}${e.sfx.pitch !== undefined ? ` +${e.sfx.pitch}` : ""}`;
+      if (scene.mute === true || (Array.isArray(scene.mute) && scene.mute.includes(e.sfx.name))) return `${n} (muted in this scene)`;
+      if ((video.audio?.mute ?? []).includes(e.sfx.name)) return `${n} (muted in this video)`;
       return v === null ? `${n} (muted at ${level})` : `${n} ${v.toFixed(2)}${e.sfx.length ? `, ${s(e.sfx.length)} s` : ""}`;
     })() : "";
     lines.push(`| ${s(start + e.at)} | ${start + e.at} | ${e.at} | ${clean(e.layer)} | ${clean(e.action)} | ${clean(e.motion ?? "")} | ${e.until !== undefined ? s(start + e.until) : ""} | ${sound} |`);

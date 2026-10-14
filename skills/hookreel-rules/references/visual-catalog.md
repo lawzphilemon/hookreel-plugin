@@ -23,7 +23,7 @@ Text fields accept `backticks` for inline code. Every `cue` is an exact phrase f
 | `swap` | Two visuals in one scene, crossfading at a cue (ranking → stat) | `first`, `second`, `at` |
 | `cta` | The closing card built from `video.cta` | `headline`, `cue`, `footer` |
 
-Scene-level `note`: a "Watch out" card under the visual (`label`, `text`, `cue`).
+Scene-level `note`: a "Watch out" card under the visual (`label`, `text`, `cue`). Scene-level `sfx`: extra sounds on cues (`name`, `cue`, `offset` in seconds, `volume`). Scene-level `mute`: `true` silences every sound effect in that scene, a list such as `["impact", "drop"]` silences only those (voice and music still play). Video-level `audio.mute` (a list) silences those sounds in every scene.
 
 ## Choosing
 
