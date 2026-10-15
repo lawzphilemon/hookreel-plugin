@@ -127,7 +127,8 @@ export const Reel: React.FC<ReelProps> = ({ videoId, timings }) => {
           })}
         </Series>
         <Header eyebrow={video.eyebrow} />
-        {video.audio?.music && durationInFrames > 0 ? <BackgroundMusic timings={timings} music={video.audio.music} /> : null}
+        {/* no music in one-frame stills */}
+        {video.audio?.music && durationInFrames > 1 ? <BackgroundMusic timings={timings} music={video.audio.music} /> : null}
       </AbsoluteFill>
     </SfxLevelContext.Provider>
   );

@@ -2,7 +2,7 @@
 
 Project code: **[CODE]** · folder `hookreel-output/[CODE]_[slug]/` · videos `[CODE]-…` · reopen with `/hookreel:resume [CODE]`.
 
-Rules of play for this video project. This file is imported by the folder's `CLAUDE.md` so it loads automatically. Read this file before every hookreel stage and follow it over any default. Written by `/hookreel:brief`, extended by every later stage. Last updated: [date] by [stage].
+Rules of play for this video project. This file is imported by the folder's `CLAUDE.md` so it loads automatically. Read this file before every hookreel stage and follow it over any default. Written by `/hookreel:brief`, extended by every later stage. Last updated: [date] by [stage]. Rules only, one line each; the reasons and history behind them live in `DECISIONS.md`.
 
 ## 1. Fixed rules (every video for this brand)
 

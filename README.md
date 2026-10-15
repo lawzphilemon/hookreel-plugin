@@ -27,13 +27,15 @@ The storyboard and video stages need Node.js 22.18 or newer.
 | `/hookreel:story` | WTF Hook 999: three hooks per video (Gain, Pain, Curiosity), beat sheets; keeps your own storyline if you give one | `03-story.md` |
 | `/hookreel:script` | Exact voiceover per scene, visuals, cue phrases, checked against the bans. **Published for you to read and approve.** Once approved, writes the recording guide: how to record, pronunciation, lines per scene, recording status. | `04-script.md`, `VOICEOVER_<CODE>.md` |
 | `/hookreel:storyboard` | Perfectionist-grade storyboard per video: composition, every movement, every sound effect, captions and words, in seconds and frames (60 fps, frame = f(t)), second by second. Computed by the same code that renders. **Published for you to read and approve.** | `05-storyboard-<id>.md` |
-| `/hookreel:build` | Releases the approved draft into the brand's Remotion studio, writes the studio's `CLAUDE_<CODE>.md`, validates, checks every scene visually, and writes a standalone Remotion prompt built on frame = f(t) | `hookreel-studio/<brand>/`, `06-remotion-prompt.md` |
+| `/hookreel:build` | Releases the approved draft into the brand's Remotion studio, writes the studio's `CLAUDE_<CODE>.md`, validates, checks every scene visually; on request, writes a standalone Remotion prompt built on frame = f(t) | `hookreel-studio/<brand>/` (+ `06-remotion-prompt.md` on request) |
 | `/hookreel:voice` | One recorded take per video: normalised, transcribed locally, cut per scene, visuals and captions synced to the spoken words, storyboard regenerated as recorded, mix checked | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
 | `/hookreel:qa` | Layout, sync, sources, stale facts, audio, licences and every ban; MP4 render | `07-qa-<id>.md`, `out/<id>.mp4` |
 | `/hookreel:publish` | Three cover variants scored with the creator-os hook rubric, rendered as stills with a profile-grid (3:4) preview; the post caption with creator-os (a second hook in the first two lines, value, the video's CTA, hashtags) plus sources, disclaimers and music credit, checked against every ban | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` |
 | `/hookreel:resume <CODE>` | Reopens a project by its code: loads its rulebook, shows every stage and video, routes edits, and marks later stages for re-approval | — |
 
 Nothing goes into Remotion before the script and the storyboard are approved.
+
+**Token budget.** Built to run on plans with limited tokens: each stage reads its state from files, so you can start a new session between stage groups (`/hookreel:resume <CODE>`); review pages are generated from the markdown instead of typed out; hook templates load one type at a time; the humanizer runs once on the final text; the standalone Remotion prompt is written only on request.
 
 The plugin bundles the **WTF Hook 999** skills (`wtf-hook-999`, `-generator`, `-auditor`, `-optimizer`, from [lawzphilemon/wtf-hook-999](https://github.com/lawzphilemon/wtf-hook-999), MIT): `/hookreel:story` builds the hooks with them, and they work on their own for any hook. No separate install needed.
 

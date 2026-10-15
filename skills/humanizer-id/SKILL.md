@@ -2,8 +2,9 @@
 name: humanizer_id
 version: "1.0"
 description: |
-  Filter pasif untuk semua output artikel Bahasa Indonesia. Hapus pola tulisan AI
-  secara otomatis sebelum output dikirim — tidak perlu diinvoke manual.
+  Pass terakhir untuk teks Bahasa Indonesia yang akan dipublikasikan (caption, script,
+  artikel, copy). Hapus pola tulisan AI sekali, sebelum teks final diserahkan; tidak
+  perlu dijalankan di setiap balasan chat.
 
   30 pola mencakup: kosakata AI khas Indonesia, merupakan overuse, kalimat pasif
   berlebihan, frasa pengisi, register salah, struktur tiga poin wajib, atribusi
@@ -11,15 +12,15 @@ description: |
   tidak ada konteks lokal, definisi KBBI di pembuka, paragraf seragam, dan contoh
   terlalu umum.
 
-  Gunakan setiap kali menulis atau mengedit artikel Bahasa Indonesia — SEO content,
-  blog, media sosial, artikel informatif, atau copy marketing. Aktifkan juga saat
+  Gunakan saat memfinalkan teks Bahasa Indonesia untuk dipublikasikan — SEO content,
+  blog, caption media sosial, artikel informatif, atau copy marketing. Aktifkan juga saat
   user minta humanize, parafrase biar ga kelihatan AI, atau tulisan yang terdengar
   natural dalam Bahasa Indonesia.
 ---
 
 # Humanizer ID v1.0
 
-Filter pasif. Berlaku di SEMUA output berbahasa Indonesia. Scan 30 pola di bawah
+Pass terakhir untuk teks Bahasa Indonesia yang akan dipublikasikan. Scan 30 pola di bawah
 dan perbaiki sebelum output dikirim. Proses ini tidak perlu diumumkan.
 
 **Tentukan register terlebih dahulu:**

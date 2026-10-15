@@ -1,6 +1,7 @@
 import { ALL_FORMATS, Input, UrlSource } from "mediabunny";
 import { CalculateMetadataFunction, Composition, staticFile, Still } from "remotion";
 import { Cover, CoverProps } from "./Cover";
+import { Sheet, SHEET, SheetProps } from "./Sheet";
 import { FPS } from "./brand";
 import { Reel, ReelProps } from "./Reel";
 import { VIDEOS, VO_FILES } from "./videos.generated";
@@ -18,9 +19,9 @@ const voiceover = async (videoId: string, sceneId: string) => {
   return { path: entry.src, seconds, heard };
 };
 
-const calculateMetadata: CalculateMetadataFunction<ReelProps> = async ({ props }) => {
-  const reel = VIDEOS.find((v) => v.id === props.videoId);
-  if (!reel) throw new Error(`No video "${props.videoId}" in videos/. Run npm run register.`);
+const timingsFor = async (videoId: string) => {
+  const reel = VIDEOS.find((v) => v.id === videoId);
+  if (!reel) throw new Error(`No video "${videoId}" in videos/. Run npm run register.`);
   const timings = await Promise.all(
     reel.scenes.map(async (scene) => {
       const vo = await voiceover(reel.id, scene.id);
@@ -28,6 +29,11 @@ const calculateMetadata: CalculateMetadataFunction<ReelProps> = async ({ props }
       return toTiming(vo.seconds, vo.path, vo.heard ? scriptWordTimes(scene.vo, vo.heard, vo.seconds) : null);
     }),
   );
+  return { reel, timings };
+};
+
+const calculateMetadata: CalculateMetadataFunction<ReelProps> = async ({ props }) => {
+  const { reel, timings } = await timingsFor(props.videoId);
   return {
     durationInFrames: timings.reduce((sum, t) => sum + t.duration, 0),
     props: { ...props, timings },
@@ -35,10 +41,42 @@ const calculateMetadata: CalculateMetadataFunction<ReelProps> = async ({ props }
   };
 };
 
+// Contact sheet: every scene 0.5 s before its end, SHEET.cols per row. A composition as long as the
+// video (not a one-frame Still), so the frozen scenes inside it are within its timeline.
+const sheetMetadata: CalculateMetadataFunction<SheetProps> = async ({ props }) => {
+  const { reel, timings } = await timingsFor(props.videoId);
+  let start = 0;
+  const frames = timings.map((t) => {
+    const frame = start + t.duration - Math.round(0.5 * FPS);
+    start += t.duration;
+    return frame;
+  });
+  const thumbHeight = Math.round(((reel.height ?? 1920) * SHEET.thumb) / (reel.width ?? 1080));
+  return {
+    durationInFrames: start,
+    width: SHEET.thumb * SHEET.cols,
+    height: Math.ceil(frames.length / SHEET.cols) * (thumbHeight + SHEET.label),
+    props: { ...props, timings, frames },
+  };
+};
+
 // One composition per videos/<id>.json (registered by scripts/register-videos.mjs), plus one still
-// per cover variant: <id>-cover-1, <id>-cover-2, …
+// per cover variant (<id>-cover-1, <id>-cover-2, …) and a contact sheet (<id>-sheet).
 export const RemotionRoot: React.FC = () => (
   <>
+    {VIDEOS.map((video) => (
+      <Composition
+        key={`${video.id}-sheet`}
+        id={`${video.id}-sheet`}
+        component={Sheet}
+        width={1080}
+        height={1920}
+        fps={FPS}
+        durationInFrames={1}
+        defaultProps={{ videoId: video.id } as SheetProps}
+        calculateMetadata={sheetMetadata}
+      />
+    ))}
     {VIDEOS.flatMap((video) =>
       (video.cover ?? []).map((_, i) => (
         <Still

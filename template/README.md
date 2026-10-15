@@ -13,6 +13,7 @@ npm run vo -- <id> "<recording>"   # one take per video → per-scene clips + wo
 npm run align -- <id>              # where each script word is spoken
 npm run render -- <id> out/<id>.mp4
 npm run cover -- <id>              # cover variants → out/<id>-cover-<n>.png + 3:4 grid preview
+npx remotion still <id>-sheet out/stills/<id>-sheet.png   # every scene on one contact sheet
 ```
 
 Recordings (`public/vo/`) and music (`public/music/`) are git-ignored on purpose.

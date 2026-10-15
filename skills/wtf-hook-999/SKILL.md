@@ -5,12 +5,12 @@ description: Sistem pembuatan hook (kalimat pembuka konten) berbasis framework A
 
 # 999 WTF Hook — Akademi Creator Framework
 
-Sistem hook 3 lapis: **fondasi neuroscience** → **15 tipe hook** (formula + target emosi) → **999 template siap pakai**. Skill ini adalah orchestrator ringkas; detail lengkap tiap tipe ada di `references/templates.md`.
+Sistem hook 3 lapis: **fondasi neuroscience** → **15 tipe hook** (formula + target emosi) → **999 template siap pakai**. Skill ini adalah orchestrator ringkas; detail lengkap tiap tipe ada di `references/templates/` (satu file per tipe; daftarnya di `references/templates.md`).
 
 ## Kapan pakai apa
 
 - User kasih topik/insight/data mentah, minta hook → jalankan **Alur Kerja** di bawah.
-- User sudah tahu mau tipe hook tertentu ("bikin hook Confession buat...") → langsung lompat ke tipe itu di `references/templates.md`.
+- User sudah tahu mau tipe hook tertentu ("bikin hook Confession buat...") → langsung baca file tipe itu di `references/templates/`.
 - User minta banyak variasi dari 1 topik → generate lintas 3 pilar emosi (Gain/Pain/Curiosity) dari 1–2 tipe yang paling relevan, jangan random dari semua 15 tipe sekaligus.
 - User minta audit hook yang sudah ada → cocokkan ke salah satu dari 15 tipe di Quick Reference Matrix, nilai apakah formula-nya kepakai penuh, kasih versi upgrade.
 
@@ -54,7 +54,7 @@ Sistem hook 3 lapis: **fondasi neuroscience** → **15 tipe hook** (formula + ta
 | 14 | IDENTITY CRISIS | Kamu pikir kamu [X Positif], padahal [Y Negatif] | Reflektif, Insecure |
 | 15 | DOMINO EFFECT | 1 [Aksi Kecil] yang trigger [Efek Berantai Besar] | Motivated, Takut |
 
-Setiap tipe punya subformula GAIN/PAIN/CURIOSITY dengan 4–5 variasi kalimat siap pakai masing-masing (total 999 contoh). Baca `references/templates.md`, cari section tipe yang relevan (nama tipe = header), lalu pilih variasi yang paling cocok sama insting dan pilar emosi yang mau disentuh.
+Setiap tipe punya subformula GAIN/PAIN/CURIOSITY dengan 4–5 variasi kalimat siap pakai masing-masing (total 999 contoh). Baca hanya file tipe yang relevan di `references/templates/` (mis. `02-crazy-math.md`; daftar lengkap di `references/templates.md`), jangan baca semua tipe sekaligus, lalu pilih variasi yang paling cocok sama insting dan pilar emosi yang mau disentuh.
 
 ## Alur Kerja
 
@@ -65,7 +65,7 @@ Setiap tipe punya subformula GAIN/PAIN/CURIOSITY dengan 4–5 variasi kalimat si
    - Mau reveal sesuatu yang tersembunyi/dirahasiakan → FORBIDDEN TRUTH, SYSTEM GLITCH
    - Mau cerita personal/vulnerable → CONFESSION
    - Mau tunjukkan efek berantai dari 1 hal kecil → DOMINO EFFECT
-3. **Baca section tipe terpilih di `references/templates.md`**, ambil 2–4 variasi formula yang cocok.
+3. **Baca file tipe terpilih di `references/templates/`**, ambil 2–4 variasi formula yang cocok.
 4. **Isi formula dengan konteks user** (niche, angka, nama produk/kondisi) — jangan biarkan placeholder `[bracket]` kosong di output final.
 5. **Berikan hook lintas pilar emosi** kalau user minta variasi (mis. 1 versi GAIN, 1 PAIN, 1 CURIOSITY dari tipe yang sama) — ini defaultnya kalau user gak spesifik minta berapa banyak.
 6. **Cek voice rules** kalau hook ini untuk personal brand Lawrence (Instagram/Threads insurance) atau LinkedIn — lowercase-first, nol tanda seru, hindari forbidden words, jangan claim guarantee medis. Kalau untuk konten klien digital marketing, pakai brand voice klien (bukan voice Lawrence).

@@ -37,7 +37,7 @@ Regenerate the storyboard from the recording, so it is exact to the frame:
 npm run storyboard -- <id>
 ```
 
-Copy `storyboard/<id>.md` to `<project>/05-storyboard-<id>.recorded.md`, keep the director's layer from the approved storyboard on top of each scene, and report how much each scene moved against the plan (start and length in seconds). If a scene now runs long enough to push content past its fade-out, or a cue lands on the wrong word, fix it before going on.
+The director's layer is merged in from `director/<id>.json`. Copy `storyboard/<id>.md` to `<project>/05-storyboard-<id>.recorded.md`. Report how much each scene moved against the plan (start and length in seconds) from a diff against the approved storyboard, not by reading both files whole. On a re-cut of the same take, compare with the previous recorded storyboard the same way. If a scene now runs long enough to push content past its fade-out, or a cue lands on the wrong word, fix it before going on.
 
 ## Step 4 — Mix check
 
