@@ -65,7 +65,7 @@ A complete example brand and video: `examples/gwenchana-chatgpt-ads/`.
 - **Evidence first.** No number on screen without a source label; estimates say so.
 - **The brand's voice, not ours.** Everything about tone, claims and look comes from the context profile.
 - **Revise on paper, then on one scene.** Hooks, beats and the script are approved before anything is built; the look is approved on one rendered prototype scene.
-- **Fresh every time.** Each video's motion is invented from your reference reels, never a fixed template.
+- **Fresh every time, same rules for every brand.** Each video's motion is invented from your reference reels and the motion library (`skills/hookreel-rules/references/motion-library.md`), set in one font library (Open Sans, Rubik, Instrument Serif); only a 3D character is brand-specific.
 - **No surprise licences.** Sound effects are synthesised; music and recordings stay out of public repositories.
 
 ## License

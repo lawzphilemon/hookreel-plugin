@@ -99,9 +99,15 @@ A cue is the word or phrase, copied exactly from the scene's voiceover, on which
 
 ## Custom motion (the default look)
 
-Every video is **new motion design built from the user's reference reels** (listed in `CLAUDE_<CODE>.md`; ask for them if missing), written per beat in `src/proto/<id>/` with `src/proto/kit.tsx`. Never the template's infographic-slide look: cards stacked top-left, a header and logo on every scene, one layout held for 10–17 s.
+**Creative mandate.** Every video is **new motion design built from all of the user's reference reels and the motion library**, written per beat in `src/proto/<id>/` with `src/proto/kit.tsx`. Never the template's infographic-slide look: cards stacked top-left, a header and logo on every scene, one layout held for 10–17 s. Something fresh every time.
 
-What reference reels of this kind usually share; use it as the base, then invent beyond it:
+**Same for every brand.** The mandate, the motion library and the font library apply to every brand identically; there are no brand-specific variants of the look. Only a 3D character is brand-specific: opt-in per brand, from that brand's own character sheet, and a person's own character images never go into a public repository.
+
+**Before designing any scene, read** `references/motion-library.md` in full (the user's core reference moves, the Instagram motion library, the font library) and the user's reference reels for this video (listed in `CLAUDE_<CODE>.md`; ask for them if missing).
+
+**Fonts:** the font library in `src/proto/kit.tsx` (`FONT`): Open Sans 800 for headlines and big numbers, Rubik 500–700 for supporting text, labels and UI mockups, Instrument Serif italic for the accent on the key word.
+
+What the references share; use it as the base, then invent beyond it:
 - One idea per screen; beats on the spoken words, about 1.5–3 s each.
 - Centred type with mixed sizes and weights; an italic serif (or another contrast face) for the key word.
 - Lots of empty space; paper grain or a soft drifting glow; colour changes between scenes (wipes, circle reveals, pushes).
@@ -114,10 +120,13 @@ Rules:
 - Gradients, glow, several colours and a background change per scene are allowed when the references call for them. A header or logo on every scene is not required. Burned-in captions are optional (only when the user asks).
 - Recreated UI mockups, not screenshots, unless the brief allows screenshots.
 - The brand's own bans in `CLAUDE_<CODE>.md` still apply (for example no frightening visuals).
+- Style and process rules that are dropped for good: the template layouts and visual catalog as the default, one accent per scene, a single fixed background colour, no gradients or glow, a header on every scene, burned-in captions, the storyboard approval as a blocker. Do not bring them back unless the user asks.
+- Rules that stay, because they protect licensed and regulated users: true numbers with source labels, the illustration label on hypotheticals, no guaranteed outcomes or claim promises, the required disclaimers, licensed or synthesised sound only (see Evidence and Audio).
+- Beat timing: beats come from character-aligned word times (`npm run words`, built on the Whisper fragments); the template's word aligner can be 0.3–1.1 s early. Every beat gets time to finish its animation.
 
 Safe area for 1080×1920: keep text inside x 80–1000 and above y ≈ 1500; the platform UI covers the bottom ~420 px and the right edge. Key words large (headlines at least 84 px), supporting text at least 32 px, source lines at least 26 px.
 
-**Template look (only on request).** The data-driven template stays available when the user explicitly asks for it: `videos/<id>.json` visuals, `references/visual-catalog.md`, `references/motion-infographic-refs.md`, the `clean` and `playful` styles, `npm run storyboard`.
+**Template look (only on request).** The data-driven template stays available when the user explicitly asks for it: `videos/<id>.json` visuals, `references/visual-catalog.md`, the `clean` and `playful` styles, `npm run storyboard`.
 
 ## Audio
 

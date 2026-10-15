@@ -2,7 +2,7 @@
 
 Remotion project for short vertical videos, made by `/hookreel:build`.
 
-- **Custom motion (default):** every video gets its own per-beat scenes in `src/proto/<id>/`, invented from the user's reference reels, built on `src/proto/kit.tsx` (focus-in words, grain, glow, sounds, voiceover clips, source lines, spoken-word times, `protoReel`). Registered in `src/Root.tsx` as `<id>-motion`.
+- **Custom motion (default):** every video gets its own per-beat scenes in `src/proto/<id>/`, invented from the user's reference reels and the plugin's motion library, built on `src/proto/kit.tsx` (font library `FONT`: Open Sans 800, Rubik 500–700, Instrument Serif italic; focus-in words, grain, glow, sounds, voiceover clips, source lines, spoken-word times, `protoReel`). Registered in `src/Root.tsx` as `<id>-motion`.
 - `brand.json`: colours (semantic tokens, 6-digit hex), Google Fonts by name, logo, radius, entrance timing.
 - `videos/<id>.json`: scenes with their voiceover lines (drives `npm run vo` and `npm run words`). The template's data-driven visuals (`src/schema.ts`, composition `<id>`) are used only when the template look is chosen.
 

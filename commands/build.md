@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob
 
 # HKR-6 — Build
 
-**Mission:** From the approved script to a video that looks like nothing the template has made before. Every video gets **its own motion design, invented per beat from the user's reference reels**, never the template's infographic-slide look (cards stacked top-left, header and logo on every scene, one layout held for 10–17 s). Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill (section **Custom motion**).
+**Mission:** From the approved script to a video that looks like nothing the template has made before. Every video gets **its own motion design, invented per beat from the user's reference reels**, never the template's infographic-slide look (cards stacked top-left, header and logo on every scene, one layout held for 10–17 s). Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill (section **Custom motion**: the creative mandate, the dropped style rules and the rules that stay). The mandate, the motion library and the font library are the same for every brand. The only brand-specific visual is a 3D character: opt-in per brand, from that brand's own character sheet; character images of a real person never go into a public repository.
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
@@ -25,7 +25,7 @@ One studio per brand: `hookreel-studio/<brand-slug>/` in the working directory.
 
 ## Step 2 — Release the script
 
-- `brand.json`: colours, fonts and logo from the context profile, following `src/schema.ts` (if the studio already has a different `brand.json` for the same brand, show the difference and ask before replacing it).
+- `brand.json`: colours, fonts (used by the template look; custom scenes use the kit's font library) and logo from the context profile, following `src/schema.ts` (if the studio already has a different `brand.json` for the same brand, show the difference and ask before replacing it).
 - `videos/<id>.json`: one scene per script scene with its `vo` copied exactly, `language`, and a plain `headline` visual per scene. This file drives `npm run vo` and `npm run words`; the template composition `<id>` is only a timing preview.
 - Logo in `public/brand/` if the video uses it. Music (if any): normalise it into the project:
 
@@ -37,22 +37,22 @@ Run `npm run check` and fix every error.
 
 ## Step 3 — Study the references
 
-The user's reference reels are the source of the look. Find them in `CLAUDE_<CODE>.md` (brief question 16); if none are listed, ask for them before designing anything (screen recordings or files of reels they like; links are fine if you can open them). Look at **all** of them, not just one:
+**First read `references/motion-library.md` of the `hookreel-rules` skill in full** (the core reference moves, the Instagram motion library, the font library). It is the same for every brand. Then the user's reference reels for this video, which are the source of the look. Find them in `CLAUDE_<CODE>.md` (brief question 16); if none are listed, ask for them before designing anything (screen recordings or files of reels they like; links are fine if you can open them). Look at **all** of them, not just one:
 
 ```bash
 npx remotion ffmpeg -hide_banner -loglevel error -i "<reference>" -vf "fps=2,scale=270:-1,tile=6x4" out/refs/<n>-%02d.png
 ```
 
-Write down what they share and what each does that the others do not: pacing (how long one idea stays), type (sizes, weights, the italic or serif word), background (paper, grain, glow, colour per scene), transitions (wipes, circle reveals, push), props (receipts, stamps, calendars, toggles, notifications, chat boxes, dials, counters, progress rings), and how elements enter, act and leave. Never copy their assets, brands or sounds.
+Write down what the reels and the library share and what each does that the others do not: pacing (how long one idea stays), type (sizes, weights, the italic or serif word), background (paper, grain, glow, colour per scene), transitions (wipes, circle reveals, push), props (receipts, stamps, calendars, toggles, notifications, chat boxes, dials, counters, progress rings), and how elements enter, act and leave. Never copy their assets, brands or sounds.
 
-Then write `<project>/06-motion-<id>.md`, one block per beat (about every 1.5–3 s of speech): the spoken words, the one idea on screen, the props and how they move, the transition out, and the sound. **Invent beyond the references**: a new idea per beat, different from the previous video for this brand (read the other `src/proto/*/` folders and do not repeat their scenes). Propose bold ideas; the user can pull them back.
+Then write `<project>/06-motion-<id>.md`, one block per beat (about every 1.5–3 s of speech): the spoken words, the one idea on screen, the library move or reel it starts from and how this version differs, the props and how they move, the transition out, and the sound. **Invent beyond the references**: a new idea per beat, different from the previous video for this brand (read the other `src/proto/*/` folders and do not repeat their scenes). Propose bold ideas; the user can pull them back.
 
 ## Step 4 — Prototype one scene (approval gate)
 
 Build the hook scene first, in `src/proto/<id>/`:
 
 1. Word times: `npm run words -- <id>` after recording, or `npm run words -- <id> --estimate` before (2.5 words per second; rerun after `/hookreel:voice`).
-2. `src/proto/<id>/scenes.tsx` with the scene components, using `src/proto/kit.tsx`: `useT`, `prog`, `mix`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `SourceLine`, `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`. Everything else (props, layouts, transitions) is written new for this video.
+2. `src/proto/<id>/scenes.tsx` with the scene components, using `src/proto/kit.tsx`: the font library `FONT` (`display` Open Sans 800, `sans` Rubik 500–700, `serif` Instrument Serif italic; the same for every brand), `useT`, `prog`, `mix`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `SourceLine`, `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`. Everything else (props, layouts, transitions) is written new for this video.
 3. `src/proto/<id>/Reel.tsx`: `export const REEL = protoReel(WORDS, [["<scene id>", Scene], …])`, and register it in `src/Root.tsx`:
 
 ```tsx

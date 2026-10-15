@@ -1,18 +1,26 @@
 // Kit for custom motion scenes (the default look): every video gets its own per-beat motion in
-// src/proto/<video id>/, built from the user's reference reels. This file holds only the shared
-// pieces: time helpers, focus-in words, grain, glow, sound effects, voiceover clips, source lines,
+// src/proto/<video id>/, built from the user's reference reels and the motion library
+// (hookreel-rules references/motion-library.md). This file holds only the shared pieces: the font
+// library, time helpers, focus-in words, grain, glow, sound effects, voiceover clips, source lines,
 // spoken-word times and the reel wrapper. Every value is a function of the frame.
 import React from "react";
 import { AbsoluteFill, Easing, interpolate, Sequence, Series, staticFile, useCurrentFrame } from "remotion";
 import { Audio } from "@remotion/media";
+import { loadFont as loadOpenSans } from "@remotion/google-fonts/OpenSans";
+import { loadFont as loadRubik } from "@remotion/google-fonts/Rubik";
 import { loadFont as loadSerif } from "@remotion/google-fonts/InstrumentSerif";
-import { C, display, FPS, sans } from "../brand";
+import { C, FPS } from "../brand";
 import { TIME } from "../motion.ts";
 
-export { C, display, sans };
-// An italic serif for the key word; swap the font per video if the references call for another.
-const { fontFamily: serifFamily } = loadSerif("italic", { weights: ["400"], subsets: ["latin"] });
-export const serif = `${serifFamily}, serif`;
+export { C };
+
+// Font library, the same for every brand: Open Sans 800 for headlines and big numbers, Rubik
+// 500–700 for supporting text, labels and UI mockups, Instrument Serif italic for the key word.
+const openSans = loadOpenSans("normal", { weights: ["800"], subsets: ["latin"] }).fontFamily;
+const rubik = loadRubik("normal", { weights: ["500", "600", "700"], subsets: ["latin"] }).fontFamily;
+const instrument = loadSerif("italic", { weights: ["400"], subsets: ["latin"] }).fontFamily;
+export const FONT = { display: `${openSans}, sans-serif`, sans: `${rubik}, sans-serif`, serif: `${instrument}, serif` };
+export const { display, sans, serif } = FONT;
 
 export const EASE = Easing.bezier(0.16, 1, 0.3, 1);
 export const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
