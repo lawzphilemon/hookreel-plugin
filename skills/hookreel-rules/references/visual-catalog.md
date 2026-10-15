@@ -20,6 +20,7 @@ Text fields accept `backticks` for inline code. Every `cue` is an exact phrase f
 | `ui` | A recreated software screen for a how-to step | `window`, `step`, `rows` (field, check, toggle, row with status change, code, path breadcrumb), `button`, `after` |
 | `list` | Dash list, checklist, or a list that gets crossed out with the real answer revealed | `style` (dash, check, strike), `items`, `strikeCue`, `answer` |
 | `logo` | "We do this ourselves" — the brand mark with a statement | `headline`, `chip` |
+| `character` | An AI-generated 3D cartoon character, mascot or illustrated scene that speaks or reacts (style `playful`, any brand may use it) | `src` (file in `public/`, image or muted looping clip), `layout` (card, full), `headline`, `bubble.text/cue`, `chips`, `credit` |
 | `swap` | Two visuals in one scene, crossfading at a cue (ranking → stat) | `first`, `second`, `at` |
 | `cta` | The closing card built from `video.cta` | `headline`, `cue`, `footer` |
 
@@ -32,6 +33,7 @@ Scene-level `note`: a "Watch out" card under the visual (`label`, `text`, `cue`)
 - How something works → `flow` or `journey`.
 - A step in a tool → `ui`.
 - Blame, myths, wrong assumptions → `list` with `style: "strike"`.
+- A feeling, a reaction or a "talking" object (an apple explaining sugar) → `character`; `layout: "full"` for a scene that should fill the frame.
 - Keep one idea per scene. If a scene needs two, use `swap` or split the scene.
 
 ## Layout specs (for the storyboard's Composition blocks)
@@ -67,3 +69,4 @@ All sizes in px on the 1080×1920 frame, taken from the template's components. C
 - logo: 460 px wide, then the headline.
 - cta: headline, then a `surface` card (padding 36): kicker 28 / 600 `muted`, title 56, chips 28, accent button pill 40, sub line 32 / 500; footer 38 / 600 `muted`.
 - note: `surface` card, padding 24 × 32, eyebrow 30 `accent`, text 38 / 500.
+- character: card = headline, then the speech bubble (`panel` card, radius from brand, 46 px / 700 `panelText`, tail bottom-left), then the character filling the height left (object-fit contain, floats ±14 px in `playful`), chips last. Full = the image covers the whole 1080×1920 frame with a slow push 1 → 1.06, a `bg` scrim at the top 24% and from 58% down so the header and captions stay readable; headline (92 px, soft shadow), bubble and chips stack in the content area on top.

@@ -92,11 +92,16 @@ A cue is a phrase copied exactly from the scene's voiceover, marking when an ele
 
 ## Visuals
 
-Pick from the catalog in `references/visual-catalog.md`; one visual per scene, `swap` for two in sequence, optional `note` card. Recreated UI mockups, not screenshots, unless the brief allows screenshots. One accent colour, used for the thing that matters in the scene.
+Pick from the catalog in `references/visual-catalog.md`; one visual per scene, `swap` for two in sequence, optional `note` card. Recreated UI mockups, not screenshots, unless the brief allows screenshots. One accent colour, used for the thing that matters in the scene. For composition and motion ideas, `references/motion-infographic-refs.md` lists real Instagram motion-infographic reels mapped to catalog types (ideas only; never copy their assets).
 
 Safe area for 1080×1920: content between y ≈ 330 and y ≈ 1300, sides 80 px; captions sit at y ≈ 1340; the platform UI covers the bottom ~420 px and the right edge. Headlines at least 84 px, supporting text at least 32 px.
 
-Motion: fade-and-rise entrances (about 360 ms, ease-out), no bounce, no looping, no story-style progress bar.
+Motion has two styles, set in `brand.json` `style` (asked in the brief, recorded in `CLAUDE_<CODE>.md`):
+
+- **clean** (default): fade-and-rise entrances (about 360 ms, ease-out), no bounce, no looping.
+- **playful**: pop entrances (a spring with a small overshoot, the bounce) and elements that keep floating gently (a loop), made for `character` visuals: AI-generated 3D cartoon characters, mascots, illustrated scenes. Still one idea per scene, still readable: the character carries the emotion, the text stays short.
+
+Both styles: no story-style progress bar, every motion a function of the frame.
 
 Storyboards are perfectionist-grade: every element's place, size, colour token, moment, movement and sound, in seconds and frames, plus a second-by-second table.
 

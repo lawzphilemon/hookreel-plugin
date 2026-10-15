@@ -1,12 +1,13 @@
 import React from "react";
+import { Video } from "@remotion/media";
 import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { BRAND, C, display, logoFilter, RADIUS, sans } from "../brand";
 import { PlanSfx } from "../components/sfx";
-import { Appear, Chips, Eyebrow, Headline, Pill, Rich, Stack } from "../components/ui";
+import { Appear, Chips, Eyebrow, Headline, Pill, Rich, Stack, useEnter } from "../components/ui";
 import { f, TIME } from "../motion.ts";
-import { planCta, planHeadline, planList, planLogo } from "../plan.ts";
-import type { CtaSpec, CtaVisual, HeadlineVisual, ListVisual, LogoVisual } from "../schema";
-import { usePlanCtx } from "../timing";
+import { planCharacter, planCta, planHeadline, planList, planLogo } from "../plan.ts";
+import type { CharacterVisual, CtaSpec, CtaVisual, HeadlineVisual, ListVisual, LogoVisual } from "../schema";
+import { usePlanCtx, useScene } from "../timing";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
@@ -169,6 +170,72 @@ export const Cta: React.FC<{ v: CtaVisual; cta?: CtaSpec }> = ({ v, cta }) => {
           <div style={{ fontFamily: sans, fontSize: 38, fontWeight: 600, color: C.muted }}>{v.footer}</div>
         </Appear>
       ) : null}
+    </Stack>
+  );
+};
+
+// An image, or a muted looping clip, from public/.
+const Media: React.FC<{ src: string; fit: "contain" | "cover"; style?: React.CSSProperties }> = ({ src, fit, style }) =>
+  /\.(mp4|webm|mov)$/i.test(src) ? (
+    <Video src={staticFile(src)} muted loop objectFit={fit} style={{ width: "100%", height: "100%", ...style }} />
+  ) : (
+    <Img src={staticFile(src)} style={{ width: "100%", height: "100%", objectFit: fit, ...style }} />
+  );
+
+const Bubble: React.FC<{ at: number; text: string }> = ({ at, text }) => (
+  <Appear at={at} dy={16} style={{ alignSelf: "flex-start", maxWidth: 820 }}>
+    <div style={{ position: "relative", background: C.panel, color: C.panelText, borderRadius: RADIUS.card, padding: "26px 34px", fontFamily: sans, fontSize: 46, fontWeight: 700, lineHeight: 1.2 }}>
+      <Rich text={text} onPanel />
+      <div style={{ position: "absolute", left: 70, bottom: -22, width: 0, height: 0, borderLeft: "22px solid transparent", borderRight: "22px solid transparent", borderTop: `24px solid ${C.panel}` }} />
+    </div>
+  </Appear>
+);
+
+// Character (AI 3D cartoon, mascot, illustration). Card: stands in the content area and floats.
+// Full: fills the whole 1080×1920 frame behind header and captions, with scrims so both stay readable.
+export const Character: React.FC<{ v: CharacterVisual }> = ({ v }) => {
+  const p = planCharacter(v, usePlanCtx());
+  const frame = useCurrentFrame();
+  const { duration } = useScene();
+  const fade = useEnter(p.at);
+  if (v.layout === "full") {
+    const push = 1 + (TIME.character.push * frame) / Math.max(1, duration);
+    return (
+      <div style={{ position: "relative", height: "100%" }}>
+        <PlanSfx events={p.events} />
+        {/* The content area starts at x 80, y 330 (see Reel.tsx); step out of it to cover the frame. */}
+        <div style={{ position: "absolute", left: -80, top: -330, width: 1080, height: 1920, overflow: "hidden", opacity: fade }}>
+          <Media src={v.src} fit="cover" style={{ scale: String(push) }} />
+          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, ${C.bg}e6 0%, ${C.bg}00 24%, ${C.bg}00 58%, ${C.bg}f2 82%)` }} />
+        </div>
+        <Stack gap={36} style={{ position: "relative" }}>
+          {v.headline ? (
+            <Appear>
+              <div style={{ textShadow: `0 4px 24px ${C.bg}` }}>
+                <Headline text={v.headline} size={92} />
+              </div>
+            </Appear>
+          ) : null}
+          {v.bubble ? <Bubble at={p.bubbleAt} text={v.bubble.text} /> : null}
+          {v.chips ? <Chips items={v.chips.items} at={p.chipsAt} /> : null}
+        </Stack>
+      </div>
+    );
+  }
+  return (
+    <Stack gap={36} style={{ height: "100%" }}>
+      <PlanSfx events={p.events} />
+      {v.headline ? (
+        <Appear>
+          <Headline text={v.headline} size={88} />
+        </Appear>
+      ) : null}
+      {v.bubble ? <Bubble at={p.bubbleAt} text={v.bubble.text} /> : null}
+      {/* Absolute media takes only the height left over, so chips stay inside the safe area. */}
+      <Appear at={p.at} amp={TIME.float.characterAmp} style={{ flex: 1, minHeight: 0, position: "relative" }}>
+        <Media src={v.src} fit="contain" style={{ position: "absolute", inset: 0 }} />
+      </Appear>
+      {v.chips ? <Chips items={v.chips.items} at={p.chipsAt} /> : null}
     </Stack>
   );
 };

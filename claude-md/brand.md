@@ -18,7 +18,7 @@ Rules for building project **[CODE]** in this studio, written by `/hookreel:buil
 - 60 fps. Every time in seconds, frame = f(t) = round(t × 60) (`src/motion.ts`). Never hard-code frame counts.
 - Every animated property is a function of the frame via `interpolate` with clamped input and the brand ease-out. No CSS transitions or keyframe animations.
 - Timing and sounds come from `src/plan.ts` only; components read their times from the planners, and `npm run storyboard` prints the same plan.
-- Entrances fade + rise, no bounce, no loops, no story-style progress bar. Safe area y 330–1300, captions at y 1340.
+- Style: [clean | playful]. clean = entrances fade + rise, no bounce, no loops; playful = pop entrances with overshoot, elements float, `character` visuals (AI 3D cartoon, mascot) from `public/characters/`. No story-style progress bar either way. Safe area y 330–1300, captions at y 1340.
 
 ## Sound
 - Voiceover -16 LUFS / -3 dBTP via `npm run vo`. Sound effects synthesised (`npm run sfx`). Music ducked, licence noted. Final mix true peak ≤ -0.5 dBTP.

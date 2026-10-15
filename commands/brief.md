@@ -46,7 +46,8 @@ Ask in **four rounds**, one message per round, numbered questions, with a recomm
 13. Voiceover: recorded by you or a team member (one take per video), or none? (recorded by you)
 14. Background music: a track you have the rights to use, or none for now? Note its source and licence.
 15. Sound effects: off, subtle, medium or dramatic? (medium)
-16. Visual assets and dislikes: logo file, product screenshots allowed or recreated mockups only, and anything you do not want to see (for example a story-style progress bar, emoji, stock photos).
+16. Visual style: **clean** (infographics, fade-and-rise, nothing loops) or **playful** (AI-generated 3D cartoon characters or a mascot, bouncy pop entrances, gently floating elements)? For playful: who or what is the character, and which AI image or video tool will you use (you need the rights to its output)? (clean)
+17. Visual assets and dislikes: logo file, product screenshots allowed or recreated mockups only, and anything you do not want to see (for example a story-style progress bar, emoji, stock photos).
 
 ## Step 3 — Project code, folder and brief
 

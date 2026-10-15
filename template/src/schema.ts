@@ -31,9 +31,11 @@ export type Brand = {
   fonts: { sans: string; mono: string; display?: string }; // Google Fonts family names; display (optional) for headlines and big numbers, defaults to sans
   labels?: { source?: string }; // on-screen words in the voiceover language, e.g. { "source": "Sumber" }; default "Source"
   radius?: { card?: number; pill?: number };
+  style?: "clean" | "playful"; // clean (default) = fade + rise, nothing loops; playful = pop entrances with overshoot, floating elements, made for character visuals (AI 3D cartoon, mascots)
   motion?: {
-    entranceMs?: number; // entrance length; easing is always ease-out, no bounce
-    entrance?: "rise" | "focus"; // focus = fade in from a blur instead of rising; default rise
+    entranceMs?: number; // entrance length (the fade; a pop's spring settles in TIME.pop.settle)
+    entrance?: "rise" | "focus" | "pop"; // focus = fade in from a blur; pop = spring in with a small overshoot (bounce); default from style
+    idle?: "still" | "float"; // float = elements bob gently after they land (loops); default from style
     text?: "block" | "kinetic"; // kinetic = headlines enter word by word; default block
     camera?: "still" | "push"; // push = the visual drifts slowly closer over each scene; default still
   };
@@ -109,6 +111,7 @@ export type Visual =
   | UiVisual
   | ListVisual
   | LogoVisual
+  | CharacterVisual
   | SwapVisual
   | CtaVisual;
 
@@ -265,6 +268,20 @@ export type LogoVisual = {
   headline: Rich;
   cue?: Cue;
   chip?: string;
+};
+
+// An illustrated or AI-generated character (3D cartoon, mascot) or scene from public/. Card: the
+// character stands in the content area and floats; full: the image fills the whole frame behind
+// the header and captions, with a slow push.
+export type CharacterVisual = {
+  type: "character";
+  src: string; // file in public/, e.g. "characters/apel-senang.png" (transparent PNG/WebP for card), or a muted looping .mp4/.webm
+  layout?: "card" | "full"; // default card
+  headline?: Rich;
+  cue?: Cue; // when the character enters
+  bubble?: { text: Rich; cue?: Cue }; // speech bubble from the character
+  chips?: { items: string[]; cue?: Cue };
+  credit?: string; // tool or artist that made it (for the post caption and the AI label); not shown on screen
 };
 
 export type SwapVisual = {

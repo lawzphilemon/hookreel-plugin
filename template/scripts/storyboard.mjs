@@ -16,7 +16,7 @@ import fs from "fs";
 import path from "path";
 import { scriptWordTimes, splitWords } from "../src/align.ts";
 import { captionChunks, charToFrame, estimateSeconds, LEAD_IN, makeCue, toTiming } from "../src/cue.ts";
-import { f, FPS, sfxVolume, TIME } from "../src/motion.ts";
+import { f, FPS, sfxVolume, styleMotion, TIME } from "../src/motion.ts";
 import { planShell, planVisual } from "../src/plan.ts";
 
 const args = process.argv.slice(2);
@@ -39,6 +39,7 @@ const directorPath = opt("director") ?? path.join(path.dirname(videoPath), "..",
 const director = fs.existsSync(directorPath) ? JSON.parse(fs.readFileSync(directorPath, "utf8")) : null;
 const text = (x) => (Array.isArray(x) ? x.join("\n") : (x ?? ""));
 const enter = f((brand.motion?.entranceMs ?? 360) / 1000);
+const motion = styleMotion(brand.style, brand.motion);
 const level = video.audio?.sfx ?? "medium";
 
 // Duration of a PCM WAV from its header.
@@ -79,7 +80,8 @@ lines.push(`# Storyboard · ${video.title} (\`${video.id}\`)`, "");
 lines.push(`- Status: **${status}**`);
 lines.push(`- Format: ${video.width ?? 1080}×${video.height ?? 1920}, **${FPS} fps**, frame = round(t × ${FPS})`);
 lines.push(`- Length: ${s(total)} s = ${total} frames · ${video.scenes.length} scenes`);
-lines.push(`- Entrance: ${Math.round((enter / FPS) * 1000)} ms, fade + rise ${TIME.rise}px, ease-out, no bounce, no loops`);
+const entranceText = { rise: `fade + rise ${TIME.rise}px, ease-out`, focus: `fade in from a ${TIME.focus.blur}px blur + rise ${TIME.rise / 2}px, ease-out`, pop: `pop: spring scale ${TIME.pop.scale}→1 with a small overshoot (bounce), settles in ≈${TIME.pop.settle} s` }[motion.entrance];
+lines.push(`- Style: ${brand.style ?? "clean"} · Entrance: ${Math.round((enter / FPS) * 1000)} ms, ${entranceText} · ${motion.idle === "float" ? `elements float ±${TIME.float.amp}px (characters ±${TIME.float.characterAmp}px) every ${TIME.float.period} s, looping` : "nothing loops"}`);
 lines.push(`- Sound effects: ${level} · Music: ${video.audio?.music ? `${video.audio.music.src} from ${video.audio.music.startAt ?? 0}s, ducked under the voice (${video.audio.music.underVoice ?? TIME.music.underVoice}) and up in pauses (${video.audio.music.inPauses ?? TIME.music.inPauses}), fade in ${TIME.music.fadeIn}s, fade out ${TIME.music.fadeOut}s` : "none"}`);
 const capStyle = [brand.captions?.align === "center" ? "centred at the bottom" : "left-aligned", brand.captions?.reveal === "word" ? "each word appears as it is spoken" : "one line at a time"].join(", ");
 lines.push(`- Captions: ${video.captions === false ? "off" : `on, from the voiceover text, at y≈1340, ${capStyle}`}`, "");
@@ -90,7 +92,7 @@ let start = 0;
 video.scenes.forEach((scene, i) => {
   const timing = timings[i];
   const ctx = { vo: scene.vo, voFrames: timing.voFrames, duration: timing.duration, words: timing.words };
-  const planCtx = { cue: makeCue(ctx), enter };
+  const planCtx = { cue: makeCue(ctx), enter, ...motion };
   const events = [...planShell(scene, planCtx, timing.duration, i === 0).events, ...planVisual(scene.visual, planCtx, Boolean(video.cta)).events];
 
   // Spoken words and caption lines, as events too.
