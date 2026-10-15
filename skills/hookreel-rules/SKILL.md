@@ -21,12 +21,26 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | story | `03-story.md` (hooks + beat sheets, uses WTF Hook 999) |
 | script | `04-script.md`, published for review, `Status: approved`; then `VOICEOVER_<CODE>.md` (recording guide) |
 | storyboard | `draft/brand.json`, `draft/videos/<id>.json`, `05-storyboard-<id>.md`, published for review, `Status: approved` |
-| build | `hookreel-studio/<brand>/` (brand.json, videos/, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `06-remotion-prompt.md` |
+| build | `hookreel-studio/<brand>/` (brand.json, videos/, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `06-remotion-prompt.md` (only on request) |
 | voice | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
 | qa | `07-qa-<id>.md`, `out/<id>.mp4` |
 | publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` |
 
 Each stage reads the previous files and updates `project.json` and `PROJECTS.md`, so the pipeline resumes after a restart.
+
+## Token budget
+
+Many users run this on plans with a limited token budget. Save tokens without cutting output:
+- **One session per stage group.** Every stage reads its state from files (`project.json`, `CLAUDE_<CODE>.md`, the stage outputs), not from chat history, so a fresh session loses nothing. Suggest a new session (`/hookreel:resume <CODE>`) after the storyboard is approved, after build, and after QA.
+- **Generate review pages, never type them.** `scripts/review-page.mjs` in this skill folder turns a stage's markdown into the HTML page to publish (`--cards` for the script). Edit the markdown, regenerate the page.
+- **Read only the hook type you need.** WTF Hook templates are one file per type in `references/templates/` of the `wtf-hook-999` skill; never read all 15.
+- **The humanizer runs once**, on the final caption or text, not on every reply.
+- **`06-remotion-prompt.md` only on request.**
+- **Edit in place.** Change only the lines that change (video JSON, script, reports, director file); write a whole file only when it is created.
+- **Compare, do not re-read.** After a storyboard or voiceover is regenerated, diff it against the previous version and read only what changed.
+- **History at the bottom.** Stage files open with their status line and their content; version notes go in a `## Changes` section at the end (or in `DECISIONS.md`), so later stages read the content first.
+- **One picture for layout.** `npx remotion still <id>-sheet out/stills/<id>-sheet.png` renders every scene 0.5 s before its end on one image. Render a single full still only for a scene that looks wrong.
+- **Filter command output.** Renders with `--log=error`; long logs through `tail` or `grep` for the lines that matter (errors, totals, loudness).
 
 ## Project codes
 
@@ -38,6 +52,8 @@ Each stage reads the previous files and updates `project.json` and `PROJECTS.md`
 ## The project CLAUDE.md is the rulebook
 
 Every project has `<project>/CLAUDE_<CODE>.md` (imported by the folder's `CLAUDE.md`) with three sections: **fixed rules** (brand voice, look, motion and time, sound, evidence), **rules for this video** (topic, pain, audience, storyline, CTA, approvals) and **bans** (claims, words and phrases, visuals, sound, process). Read it before every stage; it overrides defaults and framework examples. Bans are concrete items, never "avoid being generic". Every stage that learns a new rule or ban writes it there.
+
+The rulebook is loaded into every session, so it holds **rules only**, one line each, without the story of how they came about. Who decided what and why, dates, rejected options and version history go to `<project>/DECISIONS.md` (append-only, read only when a rule is questioned).
 
 ## Review gates
 

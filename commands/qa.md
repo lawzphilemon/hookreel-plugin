@@ -14,7 +14,7 @@ allowed-tools: Read, Write, Bash
 
 Go through every item and report pass or fail with evidence:
 
-1. **Layout:** a still near the end of every scene, compared with the storyboard's Composition block; content ends above the caption zone; nothing overlaps; text fits its box.
+1. **Layout:** the contact sheet (`npx remotion still <id>-sheet out/stills/<id>-sheet.png --log=error`), every scene 0.5 s before its end, compared with the storyboard's Composition block; content ends above the caption zone; nothing overlaps; text fits its box.
 2. **Sync:** `npm run align -- <id>` and the recorded storyboard; every cue lands on its word (allow about 0.3 s); the render's length in frames equals the recorded storyboard's.
 3. **Sources:** every number on screen has its source label, matching `02-facts.md`.
 4. **Stale facts:** if `02-facts.md` lists claims that go stale and the check date is older than about 30 days, recheck them before rendering.
@@ -36,4 +36,4 @@ Save the checklist with its evidence as `<project>/07-qa-<id>.md`. Update `<proj
 
 Send the user the MP4.
 
-End: "Watch it once more. When it is right, run /hookreel:publish for the cover and the caption."
+End: "Watch it once more. When it is right, start a new session for the cover and the caption: /hookreel:resume <CODE>, then /hookreel:publish."

@@ -1,6 +1,11 @@
 // Usage:
 //   node scripts/storyboard.mjs <video id>                       (inside a studio)
-//   node scripts/storyboard.mjs --video <file.json> [--brand <brand.json>] [--vo <dir>] [--out <file.md>]
+//   node scripts/storyboard.mjs --video <file.json> [--brand <brand.json>] [--vo <dir>] [--out <file.md>] [--director <file.json>]
+//
+// The director's layer (video header, and per scene Intent / Composition / Transition) lives in
+// director/<id>.json next to the videos/ folder and is merged in on every run, so a revision only
+// edits the scenes that changed: { "header": "…", "scenes": { "<scene id>": { "intent", "composition", "transition" } } }.
+// Any text may be a string or an array of lines.
 //
 // Writes a frame-exact storyboard from the same planners the render uses (src/plan.ts), so what
 // it says is what the video does: every element, movement, sound effect, caption and spoken
@@ -30,6 +35,9 @@ const brandPath = opt("brand") ?? "brand.json";
 const brand = fs.existsSync(brandPath) ? JSON.parse(fs.readFileSync(brandPath, "utf8")) : {};
 const voDir = opt("vo") ?? path.join("public", "vo", video.id);
 const outPath = opt("out") ?? path.join("storyboard", `${video.id}.md`);
+const directorPath = opt("director") ?? path.join(path.dirname(videoPath), "..", "director", `${video.id}.json`);
+const director = fs.existsSync(directorPath) ? JSON.parse(fs.readFileSync(directorPath, "utf8")) : null;
+const text = (x) => (Array.isArray(x) ? x.join("\n") : (x ?? ""));
 const enter = f((brand.motion?.entranceMs ?? 360) / 1000);
 const level = video.audio?.sfx ?? "medium";
 
@@ -75,6 +83,7 @@ lines.push(`- Entrance: ${Math.round((enter / FPS) * 1000)} ms, fade + rise ${TI
 lines.push(`- Sound effects: ${level} · Music: ${video.audio?.music ? `${video.audio.music.src} from ${video.audio.music.startAt ?? 0}s, ducked under the voice (${video.audio.music.underVoice ?? TIME.music.underVoice}) and up in pauses (${video.audio.music.inPauses ?? TIME.music.inPauses}), fade in ${TIME.music.fadeIn}s, fade out ${TIME.music.fadeOut}s` : "none"}`);
 const capStyle = [brand.captions?.align === "center" ? "centred at the bottom" : "left-aligned", brand.captions?.reveal === "word" ? "each word appears as it is spoken" : "one line at a time"].join(", ");
 lines.push(`- Captions: ${video.captions === false ? "off" : `on, from the voiceover text, at y≈1340, ${capStyle}`}`, "");
+if (director?.header) lines.push("## Video header (director)", "", text(director.header), "");
 lines.push("Times: **t** = seconds from the start of the video, **F** = frame from the start of the video, **f** = frame inside the scene.", "");
 
 let start = 0;
@@ -92,6 +101,8 @@ video.scenes.forEach((scene, i) => {
   events.sort((a, b) => a.at - b.at);
 
   lines.push(`## Scene ${i + 1} · \`${scene.id}\` · ${scene.visual.type}`, "");
+  const d = director?.scenes?.[scene.id];
+  if (d) lines.push(`**Intent:** ${text(d.intent)}`, "", "**Composition:**", text(d.composition), "", `**Transition in and out:** ${text(d.transition)}`, "");
   lines.push(`- From **${s(start)} s** to **${s(start + timing.duration)} s** (F ${start}–${start + timing.duration}, ${s(timing.duration)} s)`);
   lines.push(`- Voiceover from f ${LEAD_IN} (${s(start + LEAD_IN)} s), ${s(timing.voFrames)} s long: "${scene.vo}"`, "");
   lines.push("| t (s) | F | f | Layer | What happens | Movement | Ends (t) | Sound (final volume) |");
@@ -127,4 +138,6 @@ video.scenes.forEach((scene, i) => {
 
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, lines.join("\n"));
-console.log(`${status}\n${outPath}: ${video.scenes.length} scenes, ${s(total)} s, ${total} frames at ${FPS} fps`);
+const missing = director ? video.scenes.filter((sc) => !director.scenes?.[sc.id]).map((sc) => sc.id) : [];
+if (missing.length) console.warn(`director's layer missing for: ${missing.join(", ")}`);
+console.log(`${status}${director ? " · director's layer merged" : ""}\n${outPath}: ${video.scenes.length} scenes, ${s(total)} s, ${total} frames at ${FPS} fps`);

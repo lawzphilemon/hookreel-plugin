@@ -41,13 +41,20 @@ Never edit the generated tables by hand: change the draft JSON and regenerate, s
 
 ## Step 3 — Director's layer
 
-Insert, right under each `## Scene` heading of the generated file, three blocks written by you:
+Write it as data in `<project>/draft/director/<id>.json`; the generator merges it into the storyboard on every run (right under each `## Scene` heading, and the header at the top), so a revision edits only the scenes that changed:
+
+```json
+{ "header": ["- **Length:** …", "- **Sound effects:** …"],
+  "scenes": { "<scene id>": { "intent": "…", "composition": ["- Headline …", "- Bars …"], "transition": "…" } } }
+```
+
+Per scene:
 
 - **Intent:** what the viewer must feel or understand by the end of the scene, in one or two sentences, tied to its beat in `03-story.md`.
 - **Composition:** every element on screen at the end of the scene, top to bottom: what it is, its zone and approximate y range, size in px and weight, colour token, alignment, and its exact text. Use the layout specs; name the accent element and confirm it is the only accent.
 - **Transition in and out:** how the scene arrives (cut with whoosh, soft low hit) and leaves (fade over 0.2 s), and anything that carries over (header, captions, music state).
 
-Then add a **Video header** at the top: total length, fps and frame = f(t), sound effect intensity, music plan with where it ducks, caption style, and the list of bans from `CLAUDE_<CODE>.md` that the storyboard was checked against.
+The **header**: total length, fps and frame = f(t), sound effect intensity, music plan with where it ducks, caption style, and the list of bans from `CLAUDE_<CODE>.md` that the storyboard was checked against.
 
 ## Step 4 — Check
 
@@ -60,13 +67,19 @@ Before publishing, confirm and report:
 
 ## Step 5 — Publish for review (mandatory)
 
-Publish each storyboard where the user can read and comment on it (a hosted page or document if the host offers one, otherwise the file), and ask for approval or changes. For changes: edit the draft JSON or the director's layer, regenerate, republish. Only an explicit approval counts.
+Generate the review page, do not write it by hand:
+
+```bash
+node <hookreel-rules skill folder>/scripts/review-page.mjs <project>/05-storyboard-<id>.md --title "Storyboard <short topic>"
+```
+
+Publish it where the user can read and comment on it (a hosted page if the host offers one, otherwise the file), and ask for approval or changes. For changes: edit the draft JSON or the director's layer, edit only the affected scenes in the draft JSON or the director file, regenerate the storyboard and the page, and diff the new storyboard against the previous one to report what moved; republish. Only an explicit approval counts.
 
 On approval, put `Status: approved — [date]` as the first line of each `05-storyboard-<id>.md` and fill **Storyboard approved on** in `CLAUDE_<CODE>.md`.
 
 Update `<project>/project.json` (`stages.storyboard`) and the Status column in `hookreel-output/PROJECTS.md`.
 
-End: "Storyboard approved. Run /hookreel:build."
+End: "Storyboard approved. To save tokens, start a new session for production: /hookreel:resume <CODE>, then /hookreel:build."
 
 ## Rules
 - No Remotion JSON in a studio until both the script and the storyboard are approved.

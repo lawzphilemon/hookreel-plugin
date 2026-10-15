@@ -1,6 +1,6 @@
 ---
 name: build
-description: Release the approved draft into the brand's Remotion studio (brand.json, videos/<id>.json, the studio CLAUDE_<CODE>.md), validate, check every scene visually, and write the standalone Remotion prompt built on frame = f(t) at 60 fps
+description: Release the approved draft into the brand's Remotion studio (brand.json, videos/<id>.json, the studio CLAUDE_<CODE>.md), validate, check every scene visually; on request, write a standalone Remotion prompt built on frame = f(t) at 60 fps
 allowed-tools: Read, Write, Edit, Bash, Glob
 ---
 
@@ -28,7 +28,7 @@ One studio per brand: `hookreel-studio/<brand-slug>/` in the working directory.
 ## Step 2 — Release the draft
 
 - Copy `<project>/draft/brand.json` to the studio's `brand.json` (if the studio already has a different `brand.json` for the same brand, show the difference and ask before replacing it).
-- Copy each approved `draft/videos/<id>.json` to the studio's `videos/`.
+- Copy each approved `draft/videos/<id>.json` to the studio's `videos/`, and `draft/director/<id>.json` to the studio's `director/` (the storyboard's director layer, merged in by `npm run storyboard`).
 - Music in a music folder shared by the brand is fine; recordings stay per video in `public/vo/<id>/` (the id carries the project code).
 - Logo: copy the file into `public/brand/` and make sure `logo` points to it.
 - Music (if any): normalise it into the project and point `audio.music.src` at the result:
@@ -57,17 +57,17 @@ Update `<project>/project.json` (`stages.build`, `studio`) and the Status column
 
 ## Step 4 — Validate and look
 
-In the studio: `npm run check` and `npx tsc --noEmit`; fix every error. Then render one still near the end of each scene (end frame from the storyboard minus about 0.5 s × 60):
+In the studio: `npm run check` and `npx tsc --noEmit`; fix every error. Then render the contact sheet, every scene 0.5 s before its end on one image:
 
 ```bash
-npx remotion still <id> out/stills/<id>-<frame>.png --frame=<frame> --scale=0.5
+npx remotion still <id>-sheet out/stills/<id>-sheet.png --log=error
 ```
 
-Read every still against the storyboard's Composition block: same elements, same order, inside y 330–1300 (y 165–650 in the half-scale still), nothing overlapping, sources visible. Fix and repeat until clean. Also run `npm run storyboard -- <id>` and confirm its timeline matches the approved storyboard.
+Read it against each scene's Composition block: same elements, same order, inside y 330–1300 (y 165–650 in the half-scale still), nothing overlapping, sources visible. For a scene that looks wrong, render that frame alone (`npx remotion still <id> out/stills/<id>-<frame>.png --frame=<frame> --scale=0.5`). Fix and repeat until clean. Also run `npm run storyboard -- <id>` and confirm its timeline matches the approved storyboard.
 
-## Step 5 — Remotion prompt (frame = f(t))
+## Step 5 — Remotion prompt (only when asked)
 
-Write `<project>/06-remotion-prompt.md`, a self-contained prompt that would let any developer or model rebuild the video in a fresh Remotion project. It must state, in this order:
+Skip this step unless the user asks for a standalone prompt, for example to rebuild the video outside this template. The studio already holds everything needed to re-render, and the prompt costs a long write. When asked, write `<project>/06-remotion-prompt.md`, a self-contained prompt that would let any developer or model rebuild the video in a fresh Remotion project. It must state, in this order:
 
 1. **Time model.** `fps = 60`. Every time is given in seconds `t` and converted with `frame = f(t) = round(t × 60)`. Scene-local frame `f_s = F − F_sceneStart`. No frame number is hard-coded anywhere; durations live in one constants table in seconds.
 2. **Animation law.** Every animated property is a pure function of the current frame: `value(F) = from + (to − from) · ease(clamp((F − F0) / D, 0, 1))` with `ease = cubic-bezier(0.16, 1, 0.3, 1)`, implemented with `interpolate()` and clamped extrapolation. No CSS transitions, no keyframe animations, no `setTimeout`, no state that depends on wall-clock time. No bounce, no overshoot, no loops.
@@ -81,4 +81,4 @@ Write `<project>/06-remotion-prompt.md`, a self-contained prompt that would let 
 
 Start the studio (`npm run dev`, or the host's preview tool), list the compositions with their estimated lengths, and remind the user that times become exact after recording.
 
-End: "Play it in Studio. When the voiceover is recorded, run /hookreel:voice."
+End: "Play it in Studio. When the voiceover is recorded, start a new session: /hookreel:resume <CODE>, then /hookreel:voice."

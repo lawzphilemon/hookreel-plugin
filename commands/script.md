@@ -33,8 +33,10 @@ Before showing anything, check the whole script against `CLAUDE_<CODE>.md` and r
 - No claim outside the allowed list; every number has a source label.
 - The CTA matches the exact wording.
 - Length: about 2.5 words per second plus one second per scene, against the target length. If it runs long, propose specific cuts.
+- **Hook audit:** run `wtf-hook-999-auditor` on scene 1 as written (not the story draft). Credibility and payoff at least 3, weighted score at least 4; otherwise apply its recommended rewrite (within the allowed claims) and audit again.
+- **Read-aloud pass:** read every line as the narrator will say it (the `hookreel-rules` voiceover rules): no sentence over about 15 words, no list read as a list, no colon or parenthesis that cannot be spoken, connectors where a listener would lose the thread. Rewrite what fails.
 
-Fix every hit before publishing.
+Fix every hit before publishing, and add the results (hook score, cuts made, rules checked) as a short **Checks** section at the end of `04-script.md`, so the user reviews a script that has already passed them.
 
 ## Step 5 — Publish for review (mandatory)
 
@@ -47,7 +49,13 @@ Save `<project>/04-script.md`, per video:
 
 The recording guide is a separate file, `VOICEOVER_<CODE>.md` (Step 6), so the person recording never has to read the script tables.
 
-Then **publish** it for reading: if the host can publish a page or document the user can open and comment on, publish the script there and give the link; otherwise send the file. Present it as a script to read, not as a table dump: per scene, the spoken line first, then what is on screen.
+Then **publish** it for reading. Generate the page, do not write it by hand:
+
+```bash
+node <hookreel-rules skill folder>/scripts/review-page.mjs <project>/04-script.md --cards --title "Script <short topic>"
+```
+
+`--cards` shows each scene as a card with the spoken line first, then what is on screen. If the host can publish a page the user can open and comment on, publish that HTML file and give the link; otherwise send it. On every revision, edit `04-script.md` and regenerate the page.
 
 Ask the user to read it and reply with approval or changes. Apply changes and republish until they approve. Only an explicit approval counts; silence or "looks fine so far" does not.
 

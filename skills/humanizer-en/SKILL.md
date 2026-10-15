@@ -2,8 +2,9 @@
 name: humanizer_en
 version: "2.0"
 description: |
-  Remove AI writing patterns from English text. Runs passively on ALL output —
-  articles, posts, emails, scripts — without being invoked. Updated April 2026
+  Remove AI writing patterns from English text, as a final pass on text that will be
+  published (articles, posts, emails, scripts, captions), once before delivery, not on
+  every chat reply. Updated April 2026
   against Wikipedia WikiProject AI Cleanup (Aug 2025), TechCrunch, and Pangram Labs.
 
   32 patterns: inflated significance, promotional language, superficial -ing analyses,
@@ -12,14 +13,14 @@ description: |
   clauses (NEW), in-today's openers (NEW), absence of friction (NEW), and
   unlock/empower/elevate title pattern (NEW).
 
-  Use this skill whenever writing or editing English articles, blog posts, SEO content,
-  marketing copy, LinkedIn posts, or any long-form English output. Also use when the
+  Use this skill when finalizing English articles, blog posts, SEO content, captions,
+  marketing copy, LinkedIn posts, or any long-form English text for publication. Also use when the
   user asks to humanize, rewrite, or de-AI any English text.
 ---
 
 # Humanizer EN v2.0
 
-Passive writing filter. Apply to ALL English output. Scan against the 32 patterns
+Final-pass writing filter for English text that will be published. Scan against the 32 patterns
 below and fix violations before delivery. Do not announce this process.
 
 If user explicitly says "humanize this" — run the Full Rewrite Process at the bottom.
