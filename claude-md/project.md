@@ -14,28 +14,29 @@ Rules of play for this video project. This file is imported by the folder's `CLA
 - Language: [voiceover language and any terms kept in another language]
 
 ### Look
-- Background, text, accent: [hex values and how the accent is rationed]
+- Brand colours: [hex values]
 - Typeface: [Google Fonts name], weights [..]; code in [mono font]
-- Logo: [file, treatment on the background]
-- Signature elements that must appear: [e.g. citron eyebrow labels, one accent per scene, em-dash lists]
+- Logo: [file, where it appears, e.g. end card only]
+- Signature elements that must appear: [e.g. citron eyebrow labels, em-dash lists, or none]
+- Reference reels (the source of the look): [files or links, and what to take from each]
 
 ### Motion and time
 - 1080×1920, **60 fps**, every time written in seconds and converted with **frame = f(t) = round(t × 60)**.
 - Every animated property is a function of the current frame (interpolate with clamped input, ease-out cubic-bezier(0.16, 1, 0.3, 1)). No CSS transitions or keyframe animations.
-- Style: [clean | playful].
-  - clean: entrances fade + rise [28] px over [360] ms. No bounce, no spring overshoot, no looping animation.
-  - playful: entrances pop (spring, small overshoot), elements float gently (loop); characters [describe the character sheet, AI tool used, files in public/characters/].
-- No story-style progress bar.
-- Safe area: content y 330–1300, sides 80 px, captions at y 1340.
+- Look: [custom motion (default) | template clean | template playful]. Custom motion = new motion design per video, invented per beat from all the reference reels (`hookreel-rules` → Custom motion), built in the studio's `src/proto/<id>/`; never the template's infographic slides unless chosen here.
+- Beats land on the spoken words (`src/proto/<id>/words.json`), and each beat finishes its animation before the next.
+- Safe area: text inside x 80–1000 and above y 1500 (platform UI).
 
 ### Sound
 - Voiceover: [who], one take per video, -16 LUFS, peaks -3 dBTP.
-- Sound effects: [off | subtle | medium | dramatic], synthesised, no meme sounds.
+- Sound effects: [off | subtle | medium | dramatic], synthesised or with a commercial licence note, no meme sounds.
 - Music: [track + licence, or none]; ducked under the voice.
 - Final mix: -16 to -17 LUFS integrated, true peak at or below -0.5 dBTP.
 
 ### Evidence
 - Every number on screen carries its source label; estimates say "estimate".
+- Hypothetical amounts and examples carry the label "[Illustration | Ilustrasi | …]".
+- Required disclaimers on the end card: [exact text, or none].
 - Dates, not relative time.
 
 ## 2. Rules for this video
@@ -49,7 +50,8 @@ Rules of play for this video project. This file is imported by the folder's `CLA
 - Proof allowed: [own experience | client, named? results?]
 - Approved hook per video: [filled by /hookreel:story]
 - Script approved on: [filled by /hookreel:script]
-- Storyboard approved on: [filled by /hookreel:storyboard]
+- Prototype approved on: [filled by /hookreel:build: date and file of the approved prototype scene]
+- Storyboard approved on: [only if one was requested]
 
 ## 3. Bans
 
@@ -65,11 +67,11 @@ Rules of play for this video project. This file is imported by the folder's `CLA
 
 ### Visuals
 - [from the brief's dislikes, e.g. story-style progress bar]
-- Stock photos, stock icon packs, emoji as decoration, decorative gradients, drop-shadowed 3D text, more than one accent colour per scene, real screenshots unless allowed: [keep or remove per brand]
+- Stock photos, stock icon packs, emoji as decoration, real screenshots unless allowed: [keep or remove per brand]
 
 ### Sound
-- Meme or viral sound effects, ripped music without a licence note, music louder than the voice.
+- Meme or viral sound effects, sounds lifted from songs, films, cartoons or games, ripped music without a licence note, music louder than the voice.
 
 ### Process
-- No JSON for Remotion before the script is published and approved, and the storyboard is published and approved.
+- Nothing is built before the script is published and approved; no scene beyond the prototype before the prototype is approved.
 - No new claim, number or scene after approval without asking.

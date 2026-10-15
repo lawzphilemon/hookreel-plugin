@@ -2,7 +2,7 @@
 
 Scraped 2026-10-15 from Instagram keyword search ("motion infographic", "infographic animation", "animated infographic", "data visualization animation", "infografis animasi", "explainer motion graphics"); 141 videos checked, a frame of each candidate viewed. Views and likes as of that date. Use these for **ideas on composition and motion only**: never copy a creator's artwork, footage, music or wording, and never name or tag them in a client video.
 
-Read this when a scene's visual feels flat in `/hookreel:script` or `/hookreel:storyboard`. Each entry says which catalog type it maps to and the one move worth borrowing.
+Read this for extra ideas when designing beats in `/hookreel:build` (the user's own reference reels come first). Each entry says which catalog type it maps to and the one move worth borrowing.
 
 ## Data and numbers
 

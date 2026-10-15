@@ -17,7 +17,7 @@ Read `creator-os` `references/hook-frameworks.md` (Simplify Method, 8 Human Desi
 2. one big number (`big`) with a short headline,
 3. an open loop the video pays off.
 
-Rules: headline at most about 10 words, one message, one emotion; accent words marked `*like this*`, one accent colour; every number carries `source`; no claim, number or word the script did not already approve (the facts gate still holds); the brand's bans apply.
+Rules: headline at most about 10 words, one message, one emotion; accent words marked `*like this*`; every number carries `source`; no claim, number or word the script did not already approve (the facts gate still holds); the brand's bans apply.
 
 Score each with the creator-os rubric (Pattern, Relevansi, Janji, Spesifik, Ringkas, 0–2 each). Below 8, fix the weakest criterion before rendering.
 
