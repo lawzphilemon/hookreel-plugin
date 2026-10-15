@@ -42,7 +42,23 @@ export const TIME = {
   kinetic: { wordStep: 0.06 }, // headline words, one after another
   focus: { blur: 14 }, // px of blur a focus entrance starts from (not seconds)
   camera: { push: 0.025 }, // scale gained over a scene (not seconds)
+  // Style "playful": pop entrance = a spring from `scale` to 1 with a small overshoot, settling in
+  // about `settle` seconds; float = every element bobs `amp` px up and down once per `period` seconds.
+  pop: { damping: 10, stiffness: 160, mass: 0.7, scale: 0.6, settle: 0.7 },
+  float: { period: 2.4, amp: 6, characterAmp: 14 },
+  character: { at: 0.13, bubble: 0.6, chips: 0.67, push: 0.06 },
 } as const;
+
+export type Entrance = "rise" | "focus" | "pop";
+export type Idle = "still" | "float";
+
+// Brand style presets. "clean" (default): fade + rise, nothing loops. "playful": pop entrances with
+// overshoot, elements float, made for illustrated or AI-generated 3D cartoon characters.
+// Explicit brand.motion.entrance / motion.idle values win over the preset.
+export const styleMotion = (style?: string, motion?: { entrance?: Entrance; idle?: Idle }) => ({
+  entrance: motion?.entrance ?? (style === "playful" ? "pop" : "rise"),
+  idle: motion?.idle ?? (style === "playful" ? "float" : "still"),
+});
 
 // Sound effects (synthesised by scripts/make-sfx.mjs). Base volumes sit under a voiceover
 // normalised to -16 LUFS with -3 dBTP peaks.

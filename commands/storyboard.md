@@ -16,7 +16,7 @@ The storyboard is written for a perfectionist: nothing is left to "and then it a
 
 Write the draft that the storyboard is computed from, inside the project folder (this is not the studio, and not yet the released JSON):
 
-- `<project>/draft/brand.json` from the context profile, following the template's `src/schema.ts` (semantic colour tokens as 6-digit hex, Google Fonts names, logo path, `motion.entranceMs`).
+- `<project>/draft/brand.json` from the context profile, following the template's `src/schema.ts` (semantic colour tokens as 6-digit hex, Google Fonts names, logo path, `motion.entranceMs`, and `style` from the brief: `clean` or `playful`).
 - `<project>/draft/videos/<id>.json` per video from the approved script: `vo` copied exactly, the visual and its cues, `cta`, `language`, `audio.sfx`, `audio.music`.
 
 Validate the draft from its folder:

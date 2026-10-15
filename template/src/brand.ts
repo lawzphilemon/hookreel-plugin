@@ -2,7 +2,7 @@ import { getAvailableFonts } from "@remotion/google-fonts";
 import { continueRender, delayRender, Easing } from "remotion";
 import brandJson from "../brand.json";
 import type { Brand } from "./schema";
-import { EASE, f } from "./motion.ts";
+import { EASE, f, styleMotion } from "./motion.ts";
 
 // Everything visual comes from brand.json, written by /hookreel:build from the context profile.
 export const BRAND = brandJson as Brand;
@@ -12,6 +12,7 @@ export const RADIUS = { card: BRAND.radius?.card ?? 28, pill: BRAND.radius?.pill
 export { FPS } from "./motion.ts";
 export const ENTER = f((BRAND.motion?.entranceMs ?? 360) / 1000);
 export const easeOut = Easing.bezier(...EASE.bezier);
+export const MOTION = styleMotion(BRAND.style, BRAND.motion);
 
 export const sans = `"${BRAND.fonts.sans}", sans-serif`;
 export const mono = `"${BRAND.fonts.mono}", monospace`;

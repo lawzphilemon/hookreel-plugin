@@ -3,7 +3,7 @@ import { interpolate, useCurrentFrame } from "remotion";
 import type { CtaSpec, SwapVisual, Visual } from "../schema";
 import { planSwap } from "../plan.ts";
 import { usePlanCtx } from "../timing";
-import { Cta, HeadlineScene, List, Logo } from "./basic";
+import { Character, Cta, HeadlineScene, List, Logo } from "./basic";
 import { Bars, Months, Ranking, Split, Stat, Tiles, Timeline } from "./data";
 import { Flow, Journey } from "./flow";
 import { Chat, Ui } from "./mock";
@@ -61,6 +61,8 @@ export const VisualView: React.FC<{ v: Visual; cta?: CtaSpec }> = ({ v, cta }) =
       return <List v={v} />;
     case "logo":
       return <Logo v={v} />;
+    case "character":
+      return <Character v={v} />;
     case "swap":
       return <Swap v={v} cta={cta} />;
     case "cta":

@@ -3,9 +3,10 @@
 // every sound effect. The render plays exactly these sounds; scripts/storyboard.mjs prints them.
 // Plain TypeScript: no React, no Remotion.
 import type { CueFn } from "./cue.ts";
-import { EASE, f, TIME, type SoundName } from "./motion.ts";
+import { EASE, f, TIME, type Entrance, type Idle, type SoundName } from "./motion.ts";
 import type {
   BarsVisual,
+  CharacterVisual,
   ChatVisual,
   CtaVisual,
   FlowVisual,
@@ -37,16 +38,22 @@ export type PlanEvent = {
   sfx?: { name: SoundName; volume?: number; length?: number; pitch?: number }; // pitch: semitones above the base note
 };
 
-export type PlanCtx = { cue: CueFn; enter: number /* entrance length in frames */ };
+export type PlanCtx = { cue: CueFn; enter: number /* entrance length in frames */; entrance?: Entrance; idle?: Idle };
 
 const ms = (frames: number) => `${Math.round((frames / f(1)) * 1000)} ms`;
-const appear = (ctx: PlanCtx) => `fade 0→1 and rise ${TIME.rise}px→0 over ${ms(ctx.enter)}, ${EASE.name}`;
+const floats = (ctx: PlanCtx, amp: number = TIME.float.amp) => (ctx.idle === "float" ? `; then floats ±${amp}px every ${TIME.float.period} s (loops)` : "");
+const appear = (ctx: PlanCtx) =>
+  (ctx.entrance === "pop"
+    ? `pops in: fade 0→1 over ${ms(ctx.enter)}, spring scale ${TIME.pop.scale}→1 and rise ${TIME.rise}px→0 with a small overshoot, settles in ≈${TIME.pop.settle} s`
+    : ctx.entrance === "focus"
+      ? `fade 0→1 from a ${TIME.focus.blur}px blur and rise ${TIME.rise / 2}px→0 over ${ms(ctx.enter)}, ${EASE.name}`
+      : `fade 0→1 and rise ${TIME.rise}px→0 over ${ms(ctx.enter)}, ${EASE.name}`) + floats(ctx);
 const ev = (ctx: PlanCtx, at: number, layer: string, action = "enters", extra: Partial<PlanEvent> = {}): PlanEvent => ({
   at,
   layer,
   action,
   motion: appear(ctx),
-  until: at + ctx.enter,
+  until: at + (ctx.entrance === "pop" ? Math.max(ctx.enter, f(TIME.pop.settle)) : ctx.enter),
   ...extra,
 });
 const highlight = (ctx: PlanCtx, at: number, layer: string): PlanEvent => ({
@@ -397,6 +404,23 @@ export const planCta = (v: CtaVisual, ctx: PlanCtx, hasCta: boolean) => {
   return { at, footerAt, events };
 };
 
+export const planCharacter = (v: CharacterVisual, ctx: PlanCtx) => {
+  const { cue } = ctx;
+  const T = TIME.character;
+  const at = cue(v.cue, f(T.at));
+  const bubbleAt = v.bubble ? cue(v.bubble.cue, at + f(T.bubble)) : NEVER;
+  const chipsAt = v.chips ? cue(v.chips.cue, (v.bubble ? bubbleAt : at) + f(T.chips)) : NEVER;
+  const events: PlanEvent[] = [
+    ...(v.headline ? [ev(ctx, 0, `headline "${v.headline}"`)] : []),
+    v.layout === "full"
+      ? { at, layer: `full-frame image ${v.src} (behind header and captions, scrim top and bottom)`, action: "fades in", motion: `opacity 0→1 over ${ms(ctx.enter)}, slow push 1→${1 + T.push} across the scene`, until: at + ctx.enter, sfx: { name: "whoosh" as const, volume: 0.25 } }
+      : ev(ctx, at, `character ${v.src}`, "enters", { motion: appear({ ...ctx, idle: undefined }) + floats(ctx, TIME.float.characterAmp), sfx: { name: "pop" } }),
+    ...(v.bubble ? [ev(ctx, bubbleAt, `speech bubble "${v.bubble.text}"`, "enters", { sfx: { name: "pop", volume: 0.3 } })] : []),
+    ...(v.chips ? chips(ctx, v.chips.items, chipsAt) : []),
+  ];
+  return { at, bubbleAt, chipsAt, events };
+};
+
 // ---------------------------------------------------------------- dispatch
 
 export const planSwap = (v: SwapVisual, ctx: PlanCtx, hasCta: boolean) => {
@@ -430,6 +454,7 @@ export const planVisual = (v: Visual, ctx: PlanCtx, hasCta: boolean): { events: 
     case "ui": return planUi(v, ctx);
     case "list": return planList(v, ctx);
     case "logo": return planLogo(v, ctx);
+    case "character": return planCharacter(v, ctx);
     case "swap": return planSwap(v, ctx, hasCta);
     case "cta": return planCta(v, ctx, hasCta);
   }

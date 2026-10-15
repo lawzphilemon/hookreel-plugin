@@ -19,7 +19,7 @@ Go through every item and report pass or fail with evidence:
 3. **Sources:** every number on screen has its source label, matching `02-facts.md`.
 4. **Stale facts:** if `02-facts.md` lists claims that go stale and the check date is older than about 30 days, recheck them before rendering.
 5. **Audio:** true peak at or below -0.5 dBTP, integrated about -16 to -17 LUFS, voice clearly above the music everywhere.
-6. **Licences:** music source and licence noted; credit line ready if required. Recordings and licensed tracks are not committed to a public repository.
+6. **Licences:** music source and licence noted; credit line ready if required. Recordings and licensed tracks are not committed to a public repository. AI-generated characters or scenes: the tool is noted in `credit`, its terms allow commercial use, and the post will carry the platform's AI label (Instagram "AI info", TikTok "AI-generated") when the platform requires it.
 7. **Rules:** every ban in `CLAUDE_<CODE>.md` checked one by one (claims, words, visuals, sound); fixed rules respected (60 fps, frame = f(t), motion, safe area).
 
 Fix what fails before rendering.

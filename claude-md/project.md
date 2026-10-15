@@ -22,7 +22,10 @@ Rules of play for this video project. This file is imported by the folder's `CLA
 ### Motion and time
 - 1080×1920, **60 fps**, every time written in seconds and converted with **frame = f(t) = round(t × 60)**.
 - Every animated property is a function of the current frame (interpolate with clamped input, ease-out cubic-bezier(0.16, 1, 0.3, 1)). No CSS transitions or keyframe animations.
-- Entrances: fade + rise [28] px over [360] ms. No bounce, no spring overshoot, no looping animation, no story-style progress bar.
+- Style: [clean | playful].
+  - clean: entrances fade + rise [28] px over [360] ms. No bounce, no spring overshoot, no looping animation.
+  - playful: entrances pop (spring, small overshoot), elements float gently (loop); characters [describe the character sheet, AI tool used, files in public/characters/].
+- No story-style progress bar.
 - Safe area: content y 330–1300, sides 80 px, captions at y 1340.
 
 ### Sound

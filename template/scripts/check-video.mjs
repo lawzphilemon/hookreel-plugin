@@ -52,6 +52,10 @@ for (const file of files) {
       if (!scene.vo.includes(c.phrase)) errors.push(`${tag} ${scene.id}: ${c.where} "${c.phrase}" is not in the vo`);
     }
     if (scene.visual?.type === "cta" && !video.cta) errors.push(`${tag} ${scene.id}: a cta visual needs video.cta`);
+    // Character files, also inside a swap.
+    for (const v of [scene.visual, scene.visual?.first, scene.visual?.second]) {
+      if (v?.type === "character" && checkFiles && !fs.existsSync(path.join("public", v.src))) errors.push(`${tag} ${scene.id}: character not found: public/${v.src}`);
+    }
   }
   const seconds = Math.round(words / 2.5 + (video.scenes?.length ?? 0));
   if (seconds > 90) warnings.push(`${tag}: about ${seconds}s at a normal pace; most Reels land under 90s`);

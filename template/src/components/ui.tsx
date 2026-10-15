@@ -1,6 +1,6 @@
 import React from "react";
-import { interpolate, useCurrentFrame } from "remotion";
-import { BRAND, C, display, ENTER, easeOut, mono, RADIUS, sans } from "../brand";
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { BRAND, C, display, ENTER, easeOut, mono, MOTION, RADIUS, sans } from "../brand";
 import { f, FPS, TIME } from "../motion.ts";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -11,23 +11,57 @@ export const useEnter = (at: number, length = ENTER) => {
   return interpolate(frame, [at, at + length], [0, 1], { ...clamp, easing: easeOut });
 };
 
-const FOCUS = BRAND.motion?.entrance === "focus";
+const FOCUS = MOTION.entrance === "focus";
+const POP = MOTION.entrance === "pop";
+const FLOAT = MOTION.idle === "float";
 const KINETIC = BRAND.motion?.text === "kinetic";
 
 // The entrance time of the nearest Appear, so kinetic headlines can start their words from it.
 const AppearAt = React.createContext(0);
 
-// Fade + short rise (or, with motion.entrance "focus", fade in from a blur). Nothing bounces or loops.
-export const Appear: React.FC<{ at?: number; dy?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
+// Pop entrance (style "playful"): a spring 0→1 that overshoots slightly. Pure function of the frame.
+export const usePop = (at: number) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const { damping, stiffness, mass } = TIME.pop;
+  return spring({ frame: Math.max(0, frame - at), fps, config: { damping, stiffness, mass } });
+};
+
+// Idle float (style "playful"): px offset of a gentle bob that starts once the element is in.
+export const useFloat = (at: number, amp: number = TIME.float.amp) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (!FLOAT || frame < at) return 0;
+  const ramp = Math.min(1, (frame - at) / ENTER);
+  return ramp * amp * Math.sin((2 * Math.PI * (frame - at)) / (TIME.float.period * fps));
+};
+
+// Fade + short rise; motion.entrance "focus" fades in from a blur, "pop" springs in with a small
+// overshoot; motion.idle "float" keeps it bobbing afterwards. Defaults come from brand.style.
+export const Appear: React.FC<{ at?: number; dy?: number; amp?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
   at = 0,
   dy = TIME.rise,
+  amp,
   style,
   children,
 }) => {
   const p = useEnter(at);
+  const s = usePop(at);
+  const bob = useFloat(at, amp);
+  const y = POP ? (1 - s) * dy : (1 - p) * (FOCUS ? dy / 2 : dy);
   return (
     <AppearAt.Provider value={at}>
-      <div style={{ opacity: p, translate: `0px ${(1 - p) * (FOCUS ? dy / 2 : dy)}px`, filter: FOCUS && p < 1 ? `blur(${(1 - p) * TIME.focus.blur}px)` : undefined, ...style }}>{children}</div>
+      <div
+        style={{
+          opacity: p,
+          translate: `0px ${y + bob}px`,
+          scale: POP ? String(TIME.pop.scale + (1 - TIME.pop.scale) * s) : undefined,
+          filter: FOCUS && p < 1 ? `blur(${(1 - p) * TIME.focus.blur}px)` : undefined,
+          ...style,
+        }}
+      >
+        {children}
+      </div>
     </AppearAt.Provider>
   );
 };
