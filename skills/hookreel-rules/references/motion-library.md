@@ -91,7 +91,20 @@ Keep busy character scenes readable: one idea per scene, a scrim behind any text
 
 - Trending licensed songs as the bed (e.g. the colour-flood concept above): use the brand's licensed or synthesised audio only.
 
-## C. Font library (every brand)
+## C. Transition set
+
+No background or camera holds longer than about 5 s. Change it with a transition, a different one each time, and log it in `moves.json`. The kit's `Transition` covers five; invent more in the same way (a function of the frame, revealing the next stage over the current one).
+
+| Transition | Kit | What it does | Good for |
+|---|---|---|---|
+| Circle wipe | `kind="circle"` (`x`, `y` = origin) | The next stage grows out of a point, often the word or prop just spoken | A turn in the story ("but…"); revealing from a prop |
+| Colour flood | `kind="flood"` (`color`) | A brand colour sweeps up over the frame, then uncovers the next stage | Resetting the stage between ideas |
+| Swipe | `kind="swipe"` | The next stage slides in from the right like a phone screen | UI and step-by-step beats |
+| Zoom-through | `kind="zoom"` | The next stage grows from a small rounded card to full frame | Going "into" a phone, card or detail |
+| Mask reveal | `kind="mask"` | A soft diagonal wipe | Calm changes, editorial scenes |
+| Camera move (in the scene) | `transform` on a wrapper | Push in, pan across a wide layout, rotate a few degrees | Holding one stage longer while still moving the camera |
+
+## D. Font library (every brand)
 
 The same three Google Fonts for every brand's creative motion, loaded by `src/proto/kit.tsx` through `@remotion/google-fonts`:
 

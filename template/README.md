@@ -12,11 +12,15 @@ npm run check        # cues, colours, files
 npm run dev          # Remotion Studio
 npm run vo -- <id> "<recording>"   # one take per video → per-scene clips + heard fragments
 npm run words -- <id>              # src/proto/<id>/words.json, character-aligned (--estimate before recording)
+npm run sweep -- <id>              # 6 frames per scene at quarter scale on one image, safe area in red
+npm run fresh -- <id>              # freshness log src/proto/<id>/moves.json: no repeats, no hold over ~5 s
+npm run contrast -- "#text" "#bg" 28   # WCAG ratio per text colour pair (4.5:1 below 84 px, 3:1 above)
 npx remotion render <id>-motion out/<id>.mp4
+npm run preview -- <id>            # out/<id>-preview.mp4 (crf 27) + out/<id>-ig-test.mp4 (Instagram-like)
 npx remotion render <id>-motion out/<id>-mix.wav --codec=wav && npm run loudness -- out/<id>-mix.wav
 npm run cover -- <id>              # cover variants → out/<id>-cover-<n>.png + 3:4 grid preview
 ```
 
-`node scripts/word-times.mjs --self-test` and `node scripts/loudness.mjs --self-test` check the two scripts.
+`word-times.mjs`, `loudness.mjs`, `fresh-check.mjs` and `contrast.mjs` each take `--self-test`.
 
 Recordings (`public/vo/`) and music (`public/music/`) are git-ignored on purpose.

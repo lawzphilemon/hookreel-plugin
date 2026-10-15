@@ -122,7 +122,7 @@ So the project can be recalled by its code later (`/hookreel:resume <CODE>`):
   "studio": "hookreel-studio/<brand-slug>",
   "videos": ["HKR-261012-7QF3-teaser"],
   "created": "2026-10-12",
-  "stages": { "brief": "confirmed", "facts": null, "story": null, "script": null, "storyboard": null, "prototype": null, "build": null, "voice": {}, "qa": {} }
+  "stages": { "brief": "confirmed", "facts": null, "story": null, "script": null, "storyboard": null, "prototype": null, "build": null, "voice": {}, "qa": {}, "critique": {} }
 }
 ```
 

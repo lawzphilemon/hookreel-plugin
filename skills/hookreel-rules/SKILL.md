@@ -10,7 +10,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 ## Pipeline and files
 
 ```text
-/hookreel:brief → facts → story → script [publish + approve] → build [prototype scene: render + approve, then every scene] → voice → qa → publish
+/hookreel:brief → facts → story → script [publish + approve] → build [prototype scene: render + approve, then every scene] → voice → qa [+ self-critique] → publish
 /hookreel:storyboard      (optional, on request: a timed plan, not a gate)
 /hookreel:resume <CODE>   (reopen any project later)
 ```
@@ -22,10 +22,10 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | story | `03-story.md` (hooks + beat sheets, uses WTF Hook 999) |
 | script | `04-script.md`, published for review, `Status: approved`; then `VOICEOVER_<CODE>.md` (recording guide) |
 | storyboard (optional) | `draft/brand.json`, `draft/videos/<id>.json`, `05-storyboard-<id>.md` |
-| build | `06-motion-<id>.md` (beat ideas from the references), `hookreel-studio/<brand>/` (brand.json, videos/, `src/proto/<id>/` scenes + `words.json`, composition `<id>-motion`, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `out/<id>-proto.mp4` approved, `06-remotion-prompt.md` (only on request) |
+| build | `06-motion-<id>.md` (beat ideas from the references), `hookreel-studio/<brand>/` (brand.json, videos/, `src/proto/<id>/` scenes + `words.json` + `moves.json` (freshness log), compositions `<id>-motion` and `<id>-sweep`, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `out/<id>-proto.mp4` approved, `06-remotion-prompt.md` (only on request) |
 | voice | `public/vo/<id>/`, `src/proto/<id>/words.json` re-timed on the recording |
-| qa | `07-qa-<id>.md`, `out/<id>.mp4` |
-| publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` |
+| qa | `07-qa-<id>.md`, `out/<id>.mp4`, `out/<id>-preview.mp4`, then the mandatory **`07b-critique-<id>.md`** (the video, the workflow, plugin updates) |
+| publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` (only after `07b-critique-<id>.md` exists) |
 
 Each stage reads the previous files and updates `project.json` and `PROJECTS.md`, so the pipeline resumes after a restart.
 
@@ -103,7 +103,7 @@ A cue is the word or phrase, copied exactly from the scene's voiceover, on which
 
 **Same for every brand.** The mandate, the motion library and the font library apply to every brand identically; there are no brand-specific variants of the look. Only a 3D character is brand-specific: opt-in per brand, from that brand's own character sheet, and a person's own character images never go into a public repository.
 
-**Before designing any scene, read** `references/motion-library.md` in full (the user's core reference moves, the Instagram motion library, the font library) and the user's reference reels for this video (listed in `CLAUDE_<CODE>.md`; ask for them if missing).
+**Before designing any scene, read** `references/motion-library.md` in full (the user's core reference moves, the Instagram motion library, the transition set, the font library) and the user's reference reels for this video (listed in `CLAUDE_<CODE>.md`; ask for them if missing).
 
 **Fonts:** the font library in `src/proto/kit.tsx` (`FONT`): Open Sans 800 for headlines and big numbers, Rubik 500–700 for supporting text, labels and UI mockups, Instrument Serif italic for the accent on the key word.
 
@@ -115,8 +115,11 @@ What the references share; use it as the base, then invent beyond it:
 - Elements enter, act and leave; nothing just appears and sits.
 
 Rules:
+- **Always fresh (mandatory).** Every video's result is fresh: never reuse a previous video's scene designs as they are. Each video logs its moves and transitions in `src/proto/<id>/moves.json`; `npm run fresh` fails on a move or transition repeated inside the video and warns on repeats from the brand's last 3 videos. Propose bold ideas.
+- **No long holds.** No background or camera holds longer than about 5 s: change it with a transition (circle wipe, colour flood, swipe, zoom-through, mask reveal; `Transition` in the kit), a different one each time.
 - Study all the references, not one; never copy their assets, brands or sounds.
-- New ideas per beat for every video; do not reuse the previous video's scenes for the same brand. Propose bold ideas.
+- Text contrast at least 4.5:1 below 84 px and 3:1 above (`npm run contrast`).
+- Kinetic captions (`KineticCaption`) are an option styled into the motion, for muted viewing; otherwise remind the user to turn on the platform's auto-captions.
 - Gradients, glow, several colours and a background change per scene are allowed when the references call for them. A header or logo on every scene is not required. Burned-in captions are optional (only when the user asks).
 - Recreated UI mockups, not screenshots, unless the brief allows screenshots.
 - The brand's own bans in `CLAUDE_<CODE>.md` still apply (for example no frightening visuals).
@@ -134,6 +137,10 @@ Safe area for 1080×1920: keep text inside x 80–1000 and above y ≈ 1500; the
 - Music: optional, rights cleared, normalised into the project, ducked about 13 dB under the voice and 8 dB in pauses.
 - Sound effects: synthesised in the project (`npm run sfx`, no licence needed) or files with a commercial licence note; intensity `off | subtle | medium | dramatic`. Never meme sounds or sounds lifted from songs, films, cartoons or games.
 - Final mix: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP, measured with `npm run loudness -- <file.wav>` (Remotion's ffmpeg has no ebur128 filter).
+
+## Self-critique (mandatory)
+
+Right after a video is finished (after QA and render, before the cover and caption), write `<project>/07b-critique-<id>.md`: an honest critique of the video with evidence, then an evaluation of the workflow that produced it, then a **Plugin: must update** table. When a new way of working gave a better outcome than the plugin's current way, tell the user the plugin must be updated and offer to do it. `/hookreel:publish` does not start without this file.
 
 ## Don'ts
 
