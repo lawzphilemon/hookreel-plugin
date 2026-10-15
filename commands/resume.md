@@ -21,19 +21,19 @@ If `PROJECTS.md` is missing or out of date, rebuild it from the `project.json` f
 
 ## Step 2 — Load it
 
-Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, `VOICEOVER_<CODE>.md`, the storyboards, and the studio's `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports the studio's coded file; restore the import line if it is missing.
+Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, `VOICEOVER_<CODE>.md`, `06-motion-<id>.md`, any storyboards, and the studio's `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports the studio's coded file; restore the import line if it is missing.
 
 ## Step 3 — Show where it stands
 
 ```text
 Project <CODE> · <slug> · <brand> · created <date>
 | Stage | Status | Date | File |
-| brief / facts / story / script / storyboard / build | confirmed · approved · needs re-approval · not started | … | … |
-| Video | Built | Voiceover | Storyboard | QA | MP4 |
-| <CODE>-teaser | yes | recorded <date> | approved / recorded | pass / — | out/<CODE>-teaser.mp4 |
+| brief / facts / story / script / build | confirmed · approved · needs re-approval · not started | … | … |
+| Video | Prototype | Built | Voiceover | QA | Critique | MP4 |
+| <CODE>-teaser | approved <date> | yes | recorded <date> | pass / — | written / — | out/<CODE>-teaser.mp4 |
 ```
 
-Flag anything stale: facts older than about 30 days in `02-facts.md`, a draft JSON newer than its approved storyboard, a studio video file that differs from the approved draft.
+Flag anything stale: facts older than about 30 days in `02-facts.md`, a `words.json` still estimated after recording, a studio `videos/<id>.json` whose lines differ from the approved script.
 
 ## Step 4 — Continue or edit
 
@@ -41,15 +41,15 @@ Ask what the user wants, then route:
 
 | Change | Do | Then |
 |---|---|---|
-| A rule or ban | Edit `CLAUDE_<CODE>.md` (and the studio's coded file for brand-level rules) | Re-check the script and storyboard against it |
+| A rule or ban | Edit `CLAUDE_<CODE>.md` (and the studio's coded file for brand-level rules) | Re-check the script and the built scenes against it |
 | Facts | `/hookreel:facts` | Everything after it needs re-approval |
-| Hook or beats | `/hookreel:story` | Script and storyboard need re-approval |
-| A line, a visual, a cue | Edit `04-script.md` | Republish the script for approval, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then regenerate the storyboard |
-| Timing, layout or sound only | Edit the draft JSON | Regenerate and republish the storyboard |
+| Hook or beats | `/hookreel:story` | Script and build need re-approval |
+| A line or a beat idea | Edit `04-script.md` | Republish the script for approval, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then update `videos/<id>.json`, `npm run words` and the affected scenes |
+| Motion, layout or sound only | Edit the scenes in the studio's `src/proto/<id>/` | Render the changed scene and send it |
 | New voiceover take | `/hookreel:voice` | QA again |
 | Cover or caption | `/hookreel:publish` | — |
 
-**Cascade rule:** editing a stage marks every later stage `needs re-approval` in `project.json` and `PROJECTS.md` (files are kept, approvals are not). Nothing reaches the studio again until the script and storyboard are re-approved.
+**Cascade rule:** editing a stage marks every later stage `needs re-approval` in `project.json` and `PROJECTS.md` (files are kept, approvals are not). Nothing is built again until the script is re-approved.
 
 Never create a new project code for an existing project; a new code is only for a new project.
 

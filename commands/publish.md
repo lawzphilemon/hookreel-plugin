@@ -10,6 +10,10 @@ allowed-tools: Read, Write, Edit, Bash
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
+## Step 0 — Gate
+
+Stop unless `<project>/07-qa-<id>.md` passed and **`<project>/07b-critique-<id>.md` exists** (the self-critique written by `/hookreel:qa` Step 4). If the critique is missing, write it first, following `/hookreel:qa` Step 4; no cover or caption before it.
+
 ## Step 1 — Cover variants
 
 Read `creator-os` `references/hook-frameworks.md` (Simplify Method, 8 Human Desire Triggers, rubric in §12). Write three cover variants for each video, each a different mechanism, for example:
@@ -17,7 +21,7 @@ Read `creator-os` `references/hook-frameworks.md` (Simplify Method, 8 Human Desi
 2. one big number (`big`) with a short headline,
 3. an open loop the video pays off.
 
-Rules: headline at most about 10 words, one message, one emotion; accent words marked `*like this*`, one accent colour; every number carries `source`; no claim, number or word the script did not already approve (the facts gate still holds); the brand's bans apply.
+Rules: headline at most about 10 words, one message, one emotion; accent words marked `*like this*`; every number carries `source`; no claim, number or word the script did not already approve (the facts gate still holds); the brand's bans apply.
 
 Score each with the creator-os rubric (Pattern, Relevansi, Janji, Spesifik, Ringkas, 0–2 each). Below 8, fix the weakest criterion before rendering.
 

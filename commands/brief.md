@@ -46,7 +46,7 @@ Ask in **four rounds**, one message per round, numbered questions, with a recomm
 13. Voiceover: recorded by you or a team member (one take per video), or none? (recorded by you)
 14. Background music: a track you have the rights to use, or none for now? Note its source and licence.
 15. Sound effects: off, subtle, medium or dramatic? (medium)
-16. Visual style: **clean** (infographics, fade-and-rise, nothing loops) or **playful** (AI-generated 3D cartoon characters or a mascot, bouncy pop entrances, gently floating elements)? For playful: who or what is the character, and which AI image or video tool will you use (you need the rights to its output)? (clean)
+16. Reference reels: send the reels whose look you want (screen recordings or video files; links if they can be opened). Every video gets new motion design invented from all of them, never a fixed template. What do you like in each (pacing, type, props, transitions)? If you have none, I will propose a direction from a few public examples for you to pick from. (Only if you explicitly want the template's infographic slides instead, say so: clean, or playful with AI-generated 3D cartoon characters.)
 17. Visual assets and dislikes: logo file, product screenshots allowed or recreated mockups only, and anything you do not want to see (for example a story-style progress bar, emoji, stock photos).
 
 ## Step 3 — Project code, folder and brief
@@ -83,6 +83,7 @@ CTA: [exact action] → [what they get]
 Voiceover: [who, one take per video | none]
 Music: [file and licence | none]
 SFX: [off | subtle | medium | dramatic]
+Reference reels: [files or links, and what to take from each] · Look: [custom motion (default) | template clean | template playful]
 Visual assets: [logo path, screenshots allowed?] · Dislikes: [list]
 Open questions: [anything still unknown]
 ```
@@ -121,7 +122,7 @@ So the project can be recalled by its code later (`/hookreel:resume <CODE>`):
   "studio": "hookreel-studio/<brand-slug>",
   "videos": ["HKR-261012-7QF3-teaser"],
   "created": "2026-10-12",
-  "stages": { "brief": "confirmed", "facts": null, "story": null, "script": null, "storyboard": null, "build": null, "voice": {}, "qa": {} }
+  "stages": { "brief": "confirmed", "facts": null, "story": null, "script": null, "storyboard": null, "prototype": null, "build": null, "voice": {}, "qa": {}, "critique": {} }
 }
 ```
 

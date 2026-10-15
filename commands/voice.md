@@ -1,6 +1,6 @@
 ---
 name: voice
-description: Put a recorded voiceover take into a video — normalise, transcribe, cut per scene at the pauses, sync visuals and captions to the spoken words — then check the mix for clipping
+description: Put a recorded voiceover take into a video — normalise, transcribe, cut per scene at the pauses, re-time every beat on the spoken words (character-aligned) — then check the mix loudness and peaks
 allowed-tools: Read, Write, Bash
 ---
 
@@ -27,11 +27,17 @@ Read the printed `heard:` line for every scene against its script line:
 - Misheard words ("Google Tech Manager") are fine: transcripts only drive timing; captions use the script.
 - The speaker changed a line: either update `vo` in `videos/<id>.json` (and any cue that no longer matches), or ask for a retake of that line.
 
-Then `npm run align -- <id>` and confirm the cue words land where they are spoken.
+Then write the word times the custom scenes run on:
 
-## Step 3 — Storyboard as recorded
+```bash
+npm run words -- <id>
+```
 
-Regenerate the storyboard from the recording, so it is exact to the frame:
+It aligns each script word to the Whisper fragments character by character (so "K" + "laim" still gives "Klaim" its time, and "900 juta rupiah" still finds "Rp900 juta") and writes `src/proto/<id>/words.json`, replacing any `--estimate` version. Read the printed times against the recording for the beat words; every scene re-times itself through `wordsOf()`. Then check each beat still has time to finish its animation before the next one (scenes may now be shorter or longer than estimated) and adjust the scenes that are too tight.
+
+## Step 3 — Storyboard as recorded (only if a storyboard was made)
+
+Skip unless the project has an approved `05-storyboard-<id>.md`. Regenerate it from the recording, so it is exact to the frame:
 
 ```bash
 npm run storyboard -- <id>
@@ -44,9 +50,11 @@ The director's layer is merged in from `director/<id>.json`. Copy `storyboard/<i
 Render the audio alone and measure it:
 
 ```bash
-npx remotion render <id> out/<id>-mix.wav --codec=wav
-npx remotion ffmpeg -hide_banner -i out/<id>-mix.wav -af loudnorm=print_format=summary -f null -
+npx remotion render <id>-motion out/<id>-mix.wav --codec=wav --log=error
+npm run loudness -- out/<id>-mix.wav
 ```
+
+(`<id>-motion` is the custom composition; use `<id>` only for a template-look video. `npm run loudness` measures BS.1770 integrated loudness and peaks in plain Node, because Remotion's ffmpeg has no ebur128 filter.)
 
 Update `<project>/project.json` (`stages.voice.<id>`), `PROJECTS.md`, and the Status table in `<project>/VOICEOVER_<CODE>.md` (recorded, date, file).
 

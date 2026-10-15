@@ -2,7 +2,7 @@
 
 Claude Code plugin that turns an interview into a finished short vertical video (Instagram Reels, TikTok, YouTube Shorts) for **any brand**, driven by that brand's context profile.
 
-Interview → verified facts → a story built with the WTF Hook 999 framework → voiceover script → a Remotion video with infographics, recreated UI mockups, burned-in captions, word-accurate voiceover sync, synthesised sound effects and music ducking.
+Interview → verified facts → a story built with the WTF Hook 999 framework → voiceover script → a Remotion video with **new motion design for every video**, invented per beat from your reference reels (approved on a rendered prototype scene first), beats timed on the spoken words, synthesised sound effects and music ducking.
 
 ## Install
 
@@ -16,7 +16,7 @@ The storyboard and video stages need Node.js 22.18 or newer.
 ## Pipeline
 
 ```text
-/hookreel:brief → /hookreel:facts → /hookreel:story → /hookreel:script → /hookreel:storyboard → /hookreel:build → /hookreel:voice → /hookreel:qa → /hookreel:publish
+/hookreel:brief → /hookreel:facts → /hookreel:story → /hookreel:script → /hookreel:build → /hookreel:voice → /hookreel:qa → /hookreel:publish
 /hookreel:resume <CODE>
 ```
 
@@ -25,15 +25,15 @@ The storyboard and video stages need Node.js 22.18 or newer.
 | `/hookreel:brief` | Interview in four rounds: brand context profile, topic, pain and why, audience awareness, evidence, proof, format, CTA, voice, music, sound effects, visual dislikes. Gives the project a unique code and writes its rulebook **CLAUDE_<CODE>.md**: fixed rules, rules for this video, and concrete bans so nothing comes out generic. | `hookreel-output/<CODE>_<slug>/01-brief.md`, `CLAUDE_<CODE>.md`, `project.json` |
 | `/hookreel:facts` | Every number and claim verified against primary sources, dated, estimates labelled; allowed and forbidden claims | `02-facts.md` |
 | `/hookreel:story` | WTF Hook 999: three hooks per video (Gain, Pain, Curiosity), beat sheets; keeps your own storyline if you give one | `03-story.md` |
-| `/hookreel:script` | Exact voiceover per scene, visuals, cue phrases, checked against the bans. **Published for you to read and approve.** Once approved, writes the recording guide: how to record, pronunciation, lines per scene, recording status. | `04-script.md`, `VOICEOVER_<CODE>.md` |
-| `/hookreel:storyboard` | Perfectionist-grade storyboard per video: composition, every movement, every sound effect, captions and words, in seconds and frames (60 fps, frame = f(t)), second by second. Computed by the same code that renders. **Published for you to read and approve.** | `05-storyboard-<id>.md` |
-| `/hookreel:build` | Releases the approved draft into the brand's Remotion studio, writes the studio's `CLAUDE_<CODE>.md`, validates, checks every scene visually; on request, writes a standalone Remotion prompt built on frame = f(t) | `hookreel-studio/<brand>/` (+ `06-remotion-prompt.md` on request) |
-| `/hookreel:voice` | One recorded take per video: normalised, transcribed locally, cut per scene, visuals and captions synced to the spoken words, storyboard regenerated as recorded, mix checked | `public/vo/<id>/`, `05-storyboard-<id>.recorded.md` |
-| `/hookreel:qa` | Layout, sync, sources, stale facts, audio, licences and every ban; MP4 render | `07-qa-<id>.md`, `out/<id>.mp4` |
+| `/hookreel:script` | Exact voiceover per scene, a sketch of each beat on screen, cue words, checked against the bans. **Published for you to read and approve.** Once approved, writes the recording guide: how to record, pronunciation, lines per scene, recording status. | `04-script.md`, `VOICEOVER_<CODE>.md` |
+| `/hookreel:build` | Studies all your reference reels, designs new motion per beat, renders **one prototype scene for your approval**, then builds every scene in the brand's Remotion studio (`src/proto/<id>/`), checks each beat visually; on request, writes a standalone Remotion prompt built on frame = f(t) | `06-motion-<id>.md`, `hookreel-studio/<brand>/`, `out/<id>-proto.mp4` |
+| `/hookreel:voice` | One recorded take per video: normalised, transcribed locally, cut per scene, every beat re-timed on the spoken words (character-aligned), mix loudness checked | `public/vo/<id>/`, `src/proto/<id>/words.json` |
+| `/hookreel:storyboard` | Optional, on request: frame-exact storyboard of the template look, second by second. Never a gate. | `05-storyboard-<id>.md` |
+| `/hookreel:qa` | Layout sweep, sync, freshness (no repeated moves, no holds over ~5 s), contrast, sources, stale facts, audio, licences and every ban; MP4 render and preview encode; then a **mandatory self-critique** of the video and the workflow, with plugin updates when a better way was found | `07-qa-<id>.md`, `out/<id>.mp4`, `07b-critique-<id>.md` |
 | `/hookreel:publish` | Three cover variants scored with the creator-os hook rubric, rendered as stills with a profile-grid (3:4) preview; the post caption with creator-os (a second hook in the first two lines, value, the video's CTA, hashtags) plus sources, disclaimers and music credit, checked against every ban | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` |
 | `/hookreel:resume <CODE>` | Reopens a project by its code: loads its rulebook, shows every stage and video, routes edits, and marks later stages for re-approval | — |
 
-Nothing goes into Remotion before the script and the storyboard are approved.
+Nothing is built before the script is approved, and no scene beyond the prototype before the prototype is approved.
 
 **Token budget.** Built to run on plans with limited tokens: each stage reads its state from files, so you can start a new session between stage groups (`/hookreel:resume <CODE>`); review pages are generated from the markdown instead of typed out; hook templates load one type at a time; the humanizer runs once on the final text; the standalone Remotion prompt is written only on request.
 
@@ -47,7 +47,9 @@ The plugin also bundles the **creator-os** skill (hook frameworks, 150 hook temp
 
 ## The template
 
-`template/` is a Remotion project where a video is data, not code:
+`template/` is a Remotion project. By default it is **tooling** for custom motion: `src/proto/kit.tsx` (focus-in words, grain, glow, sound effects, voiceover clips, source lines, spoken-word times, `protoReel`), `npm run vo` (voiceover prep), `npm run words` (character-aligned word times, `--estimate` before recording), `npm run sfx` (synthesised sound effects), `npm run loudness` (BS.1770 loudness and peaks in plain Node) and render. Each video's scenes are written new in `src/proto/<id>/`.
+
+When the template look is chosen, a video is data, not code:
 
 - `brand.json`: semantic colour tokens (works on dark and light backgrounds), Google Fonts by name, logo, corner radius, entrance timing.
 - `videos/<id>.json`: scenes, each with its voiceover line, one visual and optional cues. See `template/src/schema.ts`.
@@ -62,8 +64,8 @@ A complete example brand and video: `examples/gwenchana-chatgpt-ads/`.
 
 - **Evidence first.** No number on screen without a source label; estimates say so.
 - **The brand's voice, not ours.** Everything about tone, claims and look comes from the context profile.
-- **Revise on paper.** Hooks, beats, the script and the storyboard are approved before anything is built.
-- **The storyboard is the render.** Both come from the same timing code.
+- **Revise on paper, then on one scene.** Hooks, beats and the script are approved before anything is built; the look is approved on one rendered prototype scene.
+- **Fresh every time, same rules for every brand.** Each video's motion is invented from your reference reels and the motion library (`skills/hookreel-rules/references/motion-library.md`), set in one font library (Open Sans, Rubik, Instrument Serif); only a 3D character is brand-specific.
 - **No surprise licences.** Sound effects are synthesised; music and recordings stay out of public repositories.
 
 ## License

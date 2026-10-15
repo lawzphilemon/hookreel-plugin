@@ -1,12 +1,14 @@
 ---
 name: storyboard
-description: After the script is approved, produce a perfectionist-grade storyboard per video — composition of every element, every movement, every sound effect, captions and spoken words, timed in seconds and frames (60 fps, frame = f(t)), second by second — then publish it for review and approval
+description: Optional, on request — a frame-exact storyboard of the template look per video (every element, movement, sound effect, caption and spoken word, in seconds and frames at 60 fps, frame = f(t)), published for review; never a gate for the build
 allowed-tools: Read, Write, Edit, Bash
 ---
 
 # HKR-5 — Storyboard
 
-**Mission:** Before any Remotion JSON is released, the user sees and approves exactly what will happen on screen and in the ear, to the frame. Requires `04-script.md` with `Status: approved`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill and `references/visual-catalog.md` (including its layout specs).
+**Optional.** Run this only when the user asks for a storyboard or the template look. The default build designs custom motion per beat (`/hookreel:build`) and approves it with a rendered prototype scene instead; a storyboard never blocks the build.
+
+**Mission:** The user sees exactly what the template would put on screen and in the ear, to the frame. Requires `04-script.md` with `Status: approved`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill and `references/visual-catalog.md` (including its layout specs).
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
@@ -51,7 +53,7 @@ Write it as data in `<project>/draft/director/<id>.json`; the generator merges i
 Per scene:
 
 - **Intent:** what the viewer must feel or understand by the end of the scene, in one or two sentences, tied to its beat in `03-story.md`.
-- **Composition:** every element on screen at the end of the scene, top to bottom: what it is, its zone and approximate y range, size in px and weight, colour token, alignment, and its exact text. Use the layout specs; name the accent element and confirm it is the only accent.
+- **Composition:** every element on screen at the end of the scene, top to bottom: what it is, its zone and approximate y range, size in px and weight, colour token, alignment, and its exact text. Use the layout specs; name the accent element(s).
 - **Transition in and out:** how the scene arrives (cut with whoosh, soft low hit) and leaves (fade over 0.2 s), and anything that carries over (header, captions, music state).
 
 The **header**: total length, fps and frame = f(t), sound effect intensity, music plan with where it ducks, caption style, and the list of bans from `CLAUDE_<CODE>.md` that the storyboard was checked against.
@@ -82,6 +84,6 @@ Update `<project>/project.json` (`stages.storyboard`) and the Status column in `
 End: "Storyboard approved. To save tokens, start a new session for production: /hookreel:resume <CODE>, then /hookreel:build."
 
 ## Rules
-- No Remotion JSON in a studio until both the script and the storyboard are approved.
+- The storyboard plans; it never blocks `/hookreel:build`.
 - The generated timeline is the truth; the director's layer explains it, never contradicts it.
 - 60 fps; every time in seconds and frames, frame = round(t × 60).

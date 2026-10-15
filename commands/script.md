@@ -1,12 +1,12 @@
 ---
 name: script
-description: Write the final voiceover per scene, choose a visual for each scene, mark the cue phrases, check everything against the project's bans, then publish the script for the user to read and approve before anything else is built
+description: Write the final voiceover per scene, sketch what the viewer sees on each beat, mark the cue words, check everything against the project's bans, then publish the script for the user to read and approve before anything else is built
 allowed-tools: Read, Write, Edit
 ---
 
 # HKR-4 — Script
 
-**Mission:** Every scene gets its exact spoken line, one visual, and the cue phrases that make the visual land on the word. The script is **published for review and approved** before any storyboard or Remotion JSON exists. Requires confirmed `03-story.md`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill and its `references/visual-catalog.md`.
+**Mission:** Every scene gets its exact spoken line, a sketch of what the viewer sees on each beat, and the cue words that make it land on the word. The script is **published for review and approved** before anything is built. Requires confirmed `03-story.md`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill (Custom motion).
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
@@ -18,13 +18,13 @@ One scene per beat. For each scene write the line exactly as it will be spoken:
 - Brand voice from `CLAUDE_<CODE>.md`; its casing and punctuation rules apply.
 - The CTA scene says the exact action from `CLAUDE_<CODE>.md` ("Type ChatGPT Ads in the comments").
 
-## Step 2 — Visual per scene
+## Step 2 — What the viewer sees
 
-Pick one visual type per scene from the catalog and write its content: headline, labels, values, source labels (from `02-facts.md`, shown next to every number), mockup rows. Use `swap` for two visuals in sequence. A scene may add a `note` card. Respect the visual bans in `CLAUDE_<CODE>.md`.
+Per scene, one short line per beat (about every 1.5–3 s of speech): the one idea on screen, in the spirit of the user's reference reels (for example "the bill slides in, a stamp lands on *covered*"), the exact words shown on screen, and the source label (from `02-facts.md`) next to every number; hypotheticals carry the illustration label. This is a sketch for approval of content, not the final motion: `/hookreel:build` designs the motion from the references. Respect the visual bans in `CLAUDE_<CODE>.md`. Use the template's catalog types (`references/visual-catalog.md`) only when the user asked for the template look.
 
 ## Step 3 — Cues
 
-For every element that should appear on a word, pick a **cue**: a phrase copied exactly from that scene's line (same case, same punctuation), unique within the scene, at the point the element should land. Elements without a cue follow the default order and offsets from the scene start.
+For every beat, name its **cue**: the word (or short phrase) copied exactly from that scene's line on which the beat lands.
 
 ## Step 4 — Check against the rules
 
@@ -44,7 +44,7 @@ Save `<project>/04-script.md`, per video:
 
 ```text
 ## [video id] · [title] · eyebrow: "[small label]" · ~[n]s
-| Scene id | Voiceover (exact) | Visual type | Visual content | Cues → element | Sources on screen |
+| Scene id | Voiceover (exact) | Beats on screen | Cue word → beat | Sources and labels on screen |
 ```
 
 The recording guide is a separate file, `VOICEOVER_<CODE>.md` (Step 6), so the person recording never has to read the script tables.
@@ -69,12 +69,12 @@ Write `<project>/VOICEOVER_<CODE>.md`, the guide for whoever records. Only appro
 
 ```text
 # Voiceover · [project title] · [CODE]
-Approved script: [date]. Read every line exactly as written: captions and cues follow this text.
+Approved script: [date]. Read every line exactly as written: on-screen words and cue timings follow this text.
 
 ## How to record
 - One take per video, lines in order, about half a second of pause between lines. Restart the line, not the take, after a slip.
 - Quiet room, phone or mic a hand's width away, no music. Any format (m4a, mp3, wav).
-- Changing a word? Ask first: the script must be re-approved, because captions and cues use the text.
+- Changing a word? Ask first: the script must be re-approved, because on-screen words and cue timings use the text.
 
 ## After recording
 npm run vo -- <id> "<path to recording>"   (in hookreel-studio/<brand>/, or run /hookreel:voice)
@@ -92,9 +92,9 @@ What it does: [normalise -16 LUFS / -3 dBTP, local Whisper, cut per scene at the
 
 Send the user the file.
 
-End: "Script approved, VOICEOVER_<CODE>.md is ready for recording. Run /hookreel:storyboard."
+End: "Script approved, VOICEOVER_<CODE>.md is ready for recording. Run /hookreel:build: it builds one prototype scene for your approval first (before or after recording)."
 
 ## Rules
-- The voiceover text is also the caption text. What is written is what is said.
+- What is written is what is said; any caption or on-screen quote uses this text.
 - Every cue must be an exact substring of its scene's line.
-- No storyboard and no Remotion JSON until the script is approved.
+- Nothing is built until the script is approved.

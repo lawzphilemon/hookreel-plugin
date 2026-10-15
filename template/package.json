@@ -35,7 +35,13 @@
     "postinstall": "node scripts/make-sfx.mjs && node scripts/prepare-sounds.mjs && node scripts/register-videos.mjs",
     "storyboard": "node --no-warnings scripts/storyboard.mjs",
     "sounds": "node scripts/prepare-sounds.mjs",
-    "cover": "node scripts/render-covers.mjs"
+    "cover": "node scripts/render-covers.mjs",
+    "words": "node scripts/word-times.mjs",
+    "loudness": "node scripts/loudness.mjs",
+    "sweep": "node scripts/sweep.mjs",
+    "fresh": "node scripts/fresh-check.mjs",
+    "contrast": "node scripts/contrast.mjs",
+    "preview": "node scripts/preview.mjs"
   },
   "engines": {
     "node": ">=22.18"
