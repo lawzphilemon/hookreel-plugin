@@ -115,3 +115,105 @@ The same three Google Fonts for every brand's creative motion, loaded by `src/pr
 | Instrument Serif | 400 italic | The accent on the key word | `FONT.serif` |
 
 Mix them in one block: a big Open Sans word, a Rubik line under it, one Instrument Serif italic word as the accent. Use the brand's own fonts only when its rulebook requires them.
+
+## E. Past work
+
+Breakdowns of videos already made with hookreel or plain Remotion, as references for **moves, timing and code**. Truemission and Gwenchana are the plugin author's own brands. Customer stories, claim amounts, client names, voice recordings, music, logos and character images are left out on purpose. Times are scene seconds unless marked; `w("word")` is when that word is spoken (from `words.json`).
+
+Ranked by how useful they are now: E1 is the current default look (custom motion). E2 and E3 are the older template look. Study them for timing and props, but do not rebuild them as layouts. E4 is a footage overlay.
+
+### E1. Truemission · HKR-261015-3A9P-reel-v2: "health insurance is not enough" (custom motion, 2026-10-15)
+
+8 scenes, about 103 s at 60 fps, hard cuts between scenes (each scene opens with its own reveal over the previous scene's colour). Scene lengths: 8.9 / 12.1 / 11.8 / 14.8 / 14.9 / 17.6 / 13.9 / 8.7 s. Built as `src/proto/` (`kit.tsx`, `HookProto.tsx`, `scenes.tsx`, `words.json`), not from template visuals.
+
+**Look.** Cream `#F6EDE6`, ink `#140C0B`, red `#AE0001`, dark scene `#1A1110`, muted `#5E5450`, coral `#FF7A6B` for red text on dark. Open Sans 800 (tight, -0.04 to -0.06em) for the big words and numbers, Rubik 500 for lines and labels, Instrument Serif italic for the accent word. Every scene: a slow radial glow drifting on `sin/cos(t)`, coarse paper grain (reseeded every 8 frames so it survives Instagram compression), camera push 1 → 1.04 over the scene, content lowered 70 px.
+
+**Kit patterns (reuse these):**
+
+```tsx
+// 0 → 1 from `start` over `dur` seconds, brand ease-out
+const prog = (t, start, dur, easing = Easing.bezier(0.16, 1, 0.3, 1)) =>
+  interpolate(t, [start, start + dur], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing });
+// Word: focuses in from an 18 px blur, rises 30 px, scales from 1.25 (or `from`) to 1, over 0.45 s
+// wordsOf(id)("tapi") → scene time of the spoken word; wordsOf(id)("untuk", 1) → its second occurrence
+// Beat: lives from `from` to `to`, then leaves with its own exit
+<Beat exit="swipe" t={t} from={w("tagihan") - 0.25} to={w("tapi") - 0.08}>…</Beat>
+// Shell: scene reveal + glow + colour floods on beat changes + push + grain + voiceover
+<Shell id={id} tone="cream" enter="circle" prev={RED} floods={[w("tagihan") - 0.25, w("tapi") - 0.1]}>
+```
+
+- **Five scene entrances** (`reveal(kind, p)` over 0.45 s as a `clipPath`): `circle` from the centre, `down` (`inset` from the top), `left`, `diag` (a growing triangle `polygon`). Each scene uses a different one from the scene before it.
+- **Colour floods** inside a scene: on each beat change, the alternate shade of the scene colour grows as a `circle()` clip from a rotating origin (bottom centre, top left, right, bottom left, top right) over 0.55 s, and the camera kicks +2.5% for half a second (`sin(prog·π)`). This keeps long scenes from holding one background.
+- **Five beat exits** over 0.3 s, eased in (`bezier(0.5, 0, 0.8, 0.4)`): `blur` (fade + blur + drift up), `zoom` (scale up through the camera), `swipe` (out to the left with a skew), `up`, `drop` (falls and tilts). The moving exits start 0.22 s early so the frame is clear before the next beat's first word.
+- **Line**: one centred, wrapping baseline row at a fixed `top`. Mixing `big()`, `txt()` and `ital()` in one row gives the editorial mixed-size block.
+
+| Scene | What moves, and how | Timing | Code pattern |
+|---|---|---|---|
+| 1 Hook (cream → red) | Three Rubik words focus in one per spoken word. A big number **counts up** in Open Sans 330 px with a red "Rp" raised beside it, and an italic serif unit drops in under it. On "dibayar" the number block lifts 470 px and scales to 0.72. A white receipt card **slides up from below the frame** (y 1980 → 860), rotating 6° → -1.5°. A check circle **draws its tick** on "cashless". Turn: a **red circle wipe opens from the centre** on "Tapi" (`clipPath: circle(wipe·1200px at 540px 960px)`). "Tapi" lands huge (serif 320 px), then steps back to half size as the next line arrives. "pusing" enters letter by letter and keeps **wobbling** (odd and even letters rotate in opposite directions, `sin((t − at)·7)`). Dashed and solid **rings** spin in opposite directions behind it. Drawn **banknotes** fall and turn on "uang". Exit: the whole block blurs out and a giant serif "?" swings in (-25° → 0°, scale 0.5 → 1) inside a circle that draws itself. | 8.95 s. Count-up 0.7 s from the number word; the wipe starts 0.1 s before "tapi" and runs 0.38 s; the question enters 0.12 s after "kenapa" | `count = round(N · prog(t, T.n, 0.7))`; the tick uses `pathLength={1} strokeDasharray={1} strokeDashoffset={1 - p}` |
+| 2 Agitation (cream, circle in) | Beat 1: a three-line editorial block (Rubik / serif / Open Sans) leaves with a zoom. Beat 2: a **receipt with a zigzag torn edge** (`clipPath: polygon(...)` teeth) slides up with a tilt. Its rows fade in 0.12 s apart, amounts drawn as grey bars, never numbers. A red **stamp slams in** (scale 2.4 → 1, rotated -12°, eased in) on "ditanggung", then the receipt is thrown off to the left before "tapi". Beat 3: two rows of **needs pills scroll endlessly** in opposite directions (`((t − at)·200) % 1200`). Beat 4: two cards. One ticks, one has an **iOS toggle switching off** as its label turns red. | 12.1 s; 3 floods | stamp: `scale(mix(p, 2.4, 1))` with `p = prog(t, w, 0.28, bezier(0.5,0,0.75,0))` |
+| 3 Mechanism (cream, down) | An "ILUSTRASI" outline pill stays at the top for the whole scene. "hitung." drops in large and leaves with `drop`. A monthly income figure zooms through. A **12-month grid** card: months turn red one by one, 0.1 s apart, each with a small scale pulse and a tick sound. A yearly total counts up, then **crumbles**: each character falls and spins with a stagger (`d = crumble − i·0.08; translateY(d²·900) rotate(±d·35°)`). Bills slide down from the top. A **red bar keeps running** along a thin track under "jalan". | 11.8 s; 4 floods | per-character transforms on `` `Rp${count}`.split("") `` |
+| 4 Solution (red, diagonal in) | **The gap**: two cream blocks sit apart with a dashed empty slot between them. A white "sakit kritis" piece **drops into the slot** from above (y -300 → 720, 0.7 s), and the dashed outline fades out. An underline wipes in under "ditanggung?" (`scaleX` from the left). A "money in" notification card slides down from the top. Three **outline pills** blur in, one per spoken use, slightly rotated (-2°, 0, 2°), the first one filled white. | 14.8 s; 4 floods | `top: mix(drop, -300, 720)`; underline `transformOrigin: "left"`, `scaleX(p)` |
+| 5 Product (cream, left in) | The product name enters **letter by letter** (60 ms apart), then shrinks into a header (scale 1 → 0.42, moved to the top). A **dot grid of 61** fills red from left to right, 22 ms apart, timed to finish on the number. A **ring fills** 0 → 100% between two spoken words, with the percentage counting inside it. An **age ruler** slides under a fixed needle from 25 to 88 while the age counts up. | 14.9 s; 3 floods | ring progress spans the gap between two words: `prog(t, w("a"), w("b") - w("a"))`; ruler `left: 540 - (age - 20)·40` |
+| 6 Sharia product (ink, circle in) | The question leaves with a zoom. The name block (Open Sans + coral serif) shrinks into a header. Stage labels swap in one **text slot** (up, drop, blur exits). A **track fills in two steps** (to 25%, then to 100%) with the percentage counting under it. A dark card with a **toggle switching off** and a **shield whose tick draws** and gently pulses. | 17.6 s (too long: see lessons); 4 floods | `fill = prog(a)·0.25 + prog(b)·0.75` |
+| 7 Cover (cream, down) | Four illness names **replace each other in one slot** (each blurs up and out as the next is spoken), while matching chips pop into a wrapping row below, plus an outline "dan lainnya" chip. A **90-tick dial** lights up tick by tick while a needle sweeps and the day count climbs. "selagi sehat." in red serif. Ends on a **chat**: a red bubble slides up, then a white bubble with three **typing dots** bobbing on a sine. | 13.9 s; 3 floods | ticks at `a = i/90·2π − π/2`, lit when `i/90 < dial` |
+| 8 CTA (red, diagonal in) | "pusing" wobbles again, now damped to rest (`sin(...)·(1 − settle)`), which echoes the hook. A comment field **types the keyword** letter by letter with a blinking caret (`floor(t·3) % 2`). The send button **squashes** (scale 1 → 0.88 → 1). A DM exchange slides in. Both disclaimers sit at the bottom. | 8.7 s; 2 floods | `typed = word.slice(0, floor(prog(...)·word.length))` |
+
+**Sound.** Synthesised only, subtle, no booms: a whoosh at each scene start; a tick on counts; a check on drawn ticks; a stamp on the stamp; a switch on toggles; pops on chips; a ding on bubbles; a riser into fills; a power-down on the crumble; a resolve chord on the final CTA word. Each sound sits on its word: `<Sfx at={w("dm")} name="resolve" volume={0.26} />`.
+
+**Lessons from its self-critique (apply next time).** The middle drags: scenes 4–6 run 15–18 s against a 75 s script, so write to length and change the background or camera every 4–5 s. Hard cuts between all scenes and one exit style everywhere felt flat: the floods and the five exits above were added for that reason. Red on dark is 2.47:1, so use coral or cream there. Grey source lines at 28 px were 3.36:1, so make them darker. The bottom third (y 1250–1500) was often empty. Fine grain inflated the file to 376 MB and smears on Instagram, so keep it coarse. Scenes 2, 3 and 5 repeated "card slides in + tick + red serif word", so log moves and do not repeat them inside one video.
+
+### E2. Truemission · HKR-261013-TYYC-reel: waiting period 12 → 6 months (template look, 2026-10-14)
+
+8 scenes, planned at 73.2 s, recorded at about 90 s, 60 fps. Built from `videos/<id>.json` with template visuals (bars, swap, months, split, list, headline, cta). This is the look the creative mandate now replaces. Keep the props and the timing ideas, not the layout (header + headline + one card per scene).
+
+**Look.** Cream `#F9F0EC`, black text, muted `#6F6360`, track `#E6D9D3`, red `#AE0001` as the only accent, white cards, grey pills with white text. Open Sans 800 + Rubik. Headlines enter word by word, 0.06 s apart, each from a 14 px blur. Accent words in red with a marker bar that draws in 0.1 s after the word lands, over 0.35 s. Camera push +2.5% per scene. Centred captions of at most 4 words, each word fading in as it is spoken.
+
+| Scene | Visual | What moves | Worth reusing |
+|---|---|---|---|
+| 1 Hook | `bars` | Two horizontal bars, the old period (ratio 1) then the new one (ratio 0.5, red). Each grows on its spoken phrase; a snip sound lands 0.4 s before the second | Comparing two durations as bar lengths, the change in red |
+| 2 Basis | `swap` | A stat card (the regulation, "6 bulan") with a stamp sound, then on "Dan di Prudential," it swaps for a headline with two accent words | A mid-scene swap on a spoken phrase, instead of a new scene |
+| 3 Until now | `months`, calendar | A 12-cell calendar card, all grey: the whole first year is waiting | The calendar as a time container |
+| 4 From December | `months`, calendar + notes | The same calendar, now staged: months 1–6 grey, 7–11 marked 25%, month 12 marked 100%. Each group lights on its phrase, with a rising piano scale as the months light up, then a riser into month 12 and a ding | **Before/after on the same prop across two scenes**: the viewer sees the rule change, not two charts |
+| 5 Illustration | `split` | A total ("Ilustrasi", a round example) as one grey block that **splits into 4 parts** (gaps grow, corners round), then only the first part fades to red. A swatch legend: kept vs not paid | Showing a share as a block that splits, then colouring the share |
+| 6 Unchanged | `swap` → `list` pills | Pills of terms that stay the same, then a swap to the exemption | Pills as a quiet "nothing changes here" list |
+| 7 Products | `headline` + chips | A grid of product chips with one marked as excluded, ticks on each chip | Many names on one card, one excluded |
+| 8 CTA | `cta` | A card with the save-and-send button, a riser into it, then a resolve chord; disclaimers in the footer | |
+
+Sound for this video was a "dramatic" palette with booms muted after review (the author found low hits disturbing). Whooshes start from scene 2; the voice opens the video.
+
+### E3. Gwenchana · ChatGPT Ads reels: teaser + phases 1–3 (template look, 2026-10-12)
+
+Four English reels for a free guide, 30 fps, plain Remotion (`src/reels/*.tsx`, one React component per scene, cues found by phrase in the voiceover). An older generation: one header, one headline and one card stack per scene.
+
+**Look.** Obsidian `#1E1E1E` / `#2F2F2F` / `#3D3D3D`, white, grey `#9A9A9A`, citron `#ECCE22` as a rationed accent, paper `#F4F4F2` for light UI panels. Montserrat 400–800 for everything, JetBrains Mono for event names and code. Every element: fade plus a 28 px rise over 0.36 s (`Appear`), no bounce. A citron outline and tint **switch on** around the thing that matters (`Highlight`, with a click sound).
+
+```tsx
+// cue frame from a phrase in the voiceover (character offset → word time from the transcript)
+const [card, plans] = useCues(["a sponsored card", "Free and Go"]);
+<Appear at={card} dy={16}><Highlight at={card + 6}>…</Highlight></Appear>
+```
+
+| Reel · scene | What moves | Worth reusing |
+|---|---|---|
+| Teaser 1 | A ranking of 7 websites appears 3 frames apart. The non-compared rows **dim to 30%**, and the hero row gets a riser, then an impact, then a highlight. The ranking fades out and a big percentage takes over, with a **100-dot grid filling** 1.6 dots per frame to 38 | Dim everything except the comparison; a dot grid for "1 in 3" |
+| Teaser 2 | A recreated chat UI (never a screenshot): a user bubble, grey answer lines, then a "Sponsored" card **pops in under the answer** and gets highlighted | Recreating a UI with grey bars for text |
+| Teaser 4 | A vertical timeline; each point lights up on its date and the line draws down to it | |
+| Teaser 6 | A **2×2 journey**: ad → page → button → chat. The WhatsApp button **presses** (`scale(1 − 0.06·sin(π·p))` plus a citron outline), and the prefilled message gets highlighted | A four-step funnel as numbered mini-screens |
+| Teaser 7 | Tool pills tick in. Nodes connect with **wires that grow downward**, and one node splits into two | Wires growing between nodes |
+| Phase 1 | "0 campaigns" highlighted in a UI table. **Tap dots** fill on the left while the conversions tile stays at a big "0". A track shows a **red striped gap** (`repeating-linear-gradient(135deg, …)`) labelled "not counted, ever", then white "counted" | Striped fill for lost or uncounted time |
+| Phase 2 | Suspect pills appear one by one, then **get struck through** (a coral line grows across them, opacity drops to 45%). Four link formats are checked one by one against a verdict. A checkbox and a toggle switch on | A strike-through to eliminate wrong answers |
+| Phase 3 | One click shows as **two event rows**, the second tagged "duplicate" in red, then a big citron "×2". Compare bars (reported vs real). Wait tiles. Tag rows, with one paused | Duplicate rows, then the multiplier |
+
+Each reel ends on the same end card (headline, guide, comment keyword, "next" footer).
+
+### E4. Personal · race-day recap (footage overlay, 2026-10)
+
+A 27 s, 720×1280, 30 fps edit of phone footage. It is the one reference here for **graphics over live video**:
+
+- Three trims of one clip in a `TransitionSeries` with 10-frame `fade()` crossfades. Audio fades in and out at each cut (`volume={(f) => interpolate(...)}`).
+- A slow **perceptual-scale push** (1 → 1.07, `output: "perceptual-scale"`) while the key moment is held up to the camera.
+- Intro: a top gradient shade, a pink uppercase kicker, then a two-line Barlow Condensed 800 title rising 40 px. Both fade out before the first cut.
+- A **badge stamps in** (scale 1.8 → 1 with a damped spring, rotated -3°, pink glow).
+- A **frosted stats card** (`backdropFilter: blur(18px)`, translucent dark, 1 px light border) slides up on a spring. Over the same 1.8 s, a route line **draws itself** (`strokeDashoffset` 1 → 0 with a glow) and the stats count up (`toFixed(2)`, m:ss formatting). The card **steps aside** (drops 500 px) while the footage needs the frame, then returns. This uses one `interpolate` with a separate easing per segment.
+
+Fonts: Barlow Condensed 600/800 for numbers and titles, Inter 500/600 for labels. Accent pink `#FF2D87`.

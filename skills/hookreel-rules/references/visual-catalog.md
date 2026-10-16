@@ -2,7 +2,7 @@
 
 **Template look only.** These visual types are used only when the user explicitly asks for the template look; by default `/hookreel:build` designs custom motion per beat from the user's reference reels (`hookreel-rules` → Custom motion).
 
-The exact fields are in the template's `src/schema.ts`. Working examples of every type: `reference/all-visuals.json` (plugin root) and `examples/gwenchana-chatgpt-ads/videos/teaser.json`.
+The exact fields are in the template's `src/schema.ts`. Working examples of every type: `reference/all-visuals.json` (plugin root).
 
 Text fields accept `backticks` for inline code. Every `cue` is an exact phrase from the scene's `vo`.
 
