@@ -58,7 +58,7 @@ When the template look is chosen, a video is data, not code:
 - **60 fps, frame = f(t):** every time is in seconds (`src/motion.ts`); `src/plan.ts` decides when everything happens and which sounds play, for both the render and `npm run storyboard`.
 - `npm run check` validates cues, colours and files; `npm run storyboard -- <id>` prints the frame-exact storyboard; `npm run vo` handles the voiceover; `npm run sfx` regenerates the sound effects.
 
-A complete example brand and video: `examples/gwenchana-chatgpt-ads/`.
+Breakdowns of past videos (scene by scene, with code patterns): `skills/hookreel-rules/references/motion-library.md` → E. Past work.
 
 ## Principles
 
