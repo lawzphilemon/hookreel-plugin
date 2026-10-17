@@ -131,6 +131,32 @@ Safe area for 1080×1920: keep text inside x 80–1000 and above y ≈ 1500; the
 
 **Template look (only on request).** The data-driven template stays available when the user explicitly asks for it: `videos/<id>.json` visuals, `references/visual-catalog.md`, the `clean` and `playful` styles, `npm run storyboard`.
 
+## Ad mode (paid ads only)
+
+Applies only when the brief's **Purpose** is `ad-15` or `ad-30`. Organic videos keep the arcs and lengths above. An ad has one job: stop the scroll, then earn the click. Explaining everything is the landing page's job, not the video's.
+
+**Arcs** (the voiceover rule of about 2.5 words per second still holds):
+
+| Purpose | Audience | Beats | Hard limit |
+|---|---|---|---|
+| `ad-15` | warm: retargeting, knows the brand | Hook → Benefit 1 → Benefit 2 → Benefit 3 → direct CTA | 19 s |
+| `ad-30` | cold: never heard of the brand | Hook → Problem → Failed fix (what they already tried and why it fell short) → Product reveal → Benefit 1 → Benefit 2 → Benefit 3 → low-pressure CTA | 40 s |
+
+- **First 3 seconds decide everything.** The hook works with the sound off: the opening visual and the on-screen words carry it on their own. No logo intro, no greeting, no context-setting before the hook.
+- **Problem lands by about second 8,** short and recognisable ("that's me"), not dramatic.
+- **The reveal is a discovery, not a pitch.** The product arrives as the answer to the problem just named.
+- **The CTA matches the funnel.** Cold audiences get an invitation ("check it first", "compare it yourself"); a direct CTA is for warm audiences only.
+- **Scale by angle, not by structure.** For a new audience segment, rewrite only the hook, the problem and the failed fix; keep every other beat. Offer 2–3 angle variants per ad when the brief targets several segments.
+- **Retention is the cost lever.** Viewers who leave early make delivery more expensive, so: a visual change at least every 3 s (stricter than the 5 s organic rule), kinetic captions on by default (most ad views are muted), no beat that only repeats the previous one.
+- **Scarcity only when true.** "Last day" or "limited slots" only when the brief proves it; otherwise cut it.
+- **Ad-platform policy.** Never assert the viewer's personal attributes ("you're a graduate who…", "your debt…", health conditions); describe the situation instead. No fear-based health claims, no before/after body claims, no guaranteed results. The Evidence rules above still apply word for word.
+
+**Example library (optional, private).** If `~/.hookreel/wtf-ads-library/wtf-ads-500.jsonl` exists (cloned from the user's private library repo; it is never committed to this repository), use it at the story and script stages:
+- Search it with Grep for the brief's niche and product words (the `niche`, `title` and `product_type` fields). Read only the 2–3 closest records, never the whole file.
+- Use `script_30s` for `ad-30` and `script_15s` for `ad-15`. Records marked `"truncated": true` have a 30 s script that stops before its end in the source; use their opening beats only.
+- They show **patterns** (the hook mechanism, how the failed fix is framed, the opening visual in `hook_visual`). Never copy a line, a claim or a number from them; every claim still comes from `02-facts.md`. Many records use hype and fear the brand may ban: the project's `CLAUDE_<CODE>.md` wins.
+- If the file is missing, continue without it and say so in one line.
+
 ## Audio
 
 - Voiceover: one take per video, normalised to -16 LUFS with -3 dBTP peaks by `npm run vo`.

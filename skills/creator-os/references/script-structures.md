@@ -48,7 +48,7 @@ Nilai edukasi murni dulu → di tengah sisipkan pengalaman pribadi yang terhubun
 
 ## 6. Iklan
 **Iklan carousel:** Slide 1 masalah spesifik → slide tengah: agitasi, mekanisme solusi, bukti/testimoni → slide akhir CTA dengan urgensi (yang jujur, bukan palsu). 138–155 kata.
-**Iklan video 30–60 detik:** 0–3 dtk hook visual+audio · 3–15 dtk masalah relatable · 15–45 dtk solusi + bukti singkat · sisa: CTA spesifik.
+**Iklan video:** dua format, jangan lebih panjang. **15 dtk (audiens hangat/retargeting, maks 19 dtk):** hook → 3 manfaat → CTA langsung. **30 dtk (audiens dingin, maks 40 dtk):** hook (0–3 dtk, harus jalan tanpa suara) → masalah (selesai sekitar dtk 8) → solusi yang sudah dicoba dan kenapa gagal → produk muncul sebagai jawaban → 3 manfaat → CTA ringan. Ganti visual tiap ≤3 dtk. Untuk segmen baru, cukup tulis ulang hook, masalah dan solusi yang gagal. Detail: bagian Ad mode di skill `hookreel-rules`.
 **Headline iklan:** 15 variasi = 5 pain point + 5 hasil/transformasi + 5 rasa penasaran, maks 10 kata.
 **Primary text Meta Ads:** 3 variasi — PAS, AIDA, storytelling singkat; maks 150 kata.
 **Retargeting:** akui mereka sudah kenal produk, beri alasan BARU untuk beli sekarang, pakai social proof/urgensi baru.

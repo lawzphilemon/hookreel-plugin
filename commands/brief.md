@@ -39,7 +39,7 @@ Ask in **four rounds**, one message per round, numbered questions, with a recomm
 **Round C — format and call to action**
 9. Platform and language of the voiceover. (Instagram Reels, English)
 10. One video or a series? For a series: how many, and the job of each (for example teaser, then one per step).
-11. Target length per video. (45–75 seconds)
+11. Purpose and length: organic content, or a paid ad? For an ad: 15 s for warm or retargeting audiences, 30 s for cold audiences (see Ad mode in `hookreel-rules`). (organic, 45–75 seconds)
 12. Call to action: the exact action (comment a keyword, link in bio, DM, visit a page) and what the viewer gets.
 
 **Round D — sound and look**
@@ -77,7 +77,7 @@ Sources: [files and links]
 Numbers to show: | Number | Claim | Source as given | Verified? (filled by /facts) |
 Proof: [own | client (named? results allowed?)]
 Must not claim or show: [list]
-Platform: [..] · Language: [..] · Length target: [..s]
+Platform: [..] · Language: [..] · Purpose: [organic | ad-15 | ad-30] · Length target: [..s]
 Format: [single | series of N] · Roles: [teaser, part 1, …]
 CTA: [exact action] → [what they get]
 Voiceover: [who, one take per video | none]
