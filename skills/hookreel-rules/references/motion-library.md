@@ -27,6 +27,44 @@ Moves from the user's own reference reels, described in words only. These set th
 | Keyboard sliding in at an angle | A drawn keyboard enters tilted from below; keys depress as words are "typed" into a field above it. |
 | Warm orange editorial with a compass, an arc of icon nodes, stacked bars with a playhead | A compass needle swings to a heading; icon nodes travel along an arc path; stacked bars grow while a vertical playhead scrubs across them, revealing values as it passes. |
 
+### A2. Style catalogue: 25 motion styles (reference reel, added 2026-10-17)
+
+A 60 s TikTok showcase (@galihry.id, "25 styles, one animator", 16:9, all code-built) that the user keeps as the menu of **whole-scene styles**. Each style gets about 2 s: a title word enters in that style, acts, then a motion-blur whip carries the frame to the next style. Use it to pick a different visual language per beat or per chapter, not as a layout to copy; reframe everything for 1080×1920.
+
+| # | Style | What it does | How to build it |
+|---|---|---|---|
+| 01 | Minimalist | Off-white field, one hairline across; a ring draws, fills to a disc, morphs to a diamond; a small red dot; "Less is more." | One stroked circle (`strokeDashoffset`), then fill and `border-radius` → rotated square; a single accent dot; tiny letter-spaced caps |
+| 02 | Kinetic typography | "WORDS" focuses from blur, "MOVE" slams in rotated and huge, then the lines settle into a stacked block with the key word in yellow | `Word` blur-in, a spring on scale and rotate for the slam, then interpolate to the final stacked layout; one accent colour |
+| 03 | Isometric | Coloured 3D bars rise from an isometric platform one by one, a map pin drops on one bar | CSS `rotateX(60deg) rotateZ(45deg)` grid; bars are boxes whose height springs up, staggered; pin drops with a bounce |
+| 04 | Doodle / hand-drawn | Lined notebook paper; a lightbulb draws itself, rays flicker, an arrow draws, "BIG IDEA" is written letter by letter on a marker swatch, a star doodle | SVG paths revealed by `strokeDashoffset`; wobbly stroke; letters revealed one by one; highlighter rect wipes behind the word |
+| 05 | Comic / pop art | Yellow sunburst with halftone dots; a red "POW" starburst pops, "WHAM" and "ZAP" stickers slap on at angles | Conic-gradient rays, radial-dot halftone; spiky polygon `clip-path`; overshoot spring on scale with a slight rotation |
+| 06 | 3D / CGI | Purple cube floats and turns over a neon perspective grid, a glowing sphere orbits it | CSS 3D cube (6 faces, `preserve-3d`) rotating on frame; grid floor via `perspective` + `rotateX`; orbit with sin/cos |
+| 07 | Swiss / editorial | Huge black "SWISS" slides in blurred, a red circle drops top right, a rule line and small caps metadata ("form follows function", "No. 07 — 2026") | Grotesk heavy type flush left, thick rule, red disc; motion blur via `filter: blur` on the entry only; tight grid |
+| 08 | Glitch | "GLITCH" with RGB split, horizontal slices shifting, coloured bars flashing, "SIGNAL LOST // 0x7F" | Three copies of the text in R/G/B offset; random slice `clip-path` per frame from a seeded `random()`; short bursts, not constant |
+| 09 | Memphis | Cream field, pink circle, teal triangle, squiggle, hatched square, dot grid; outlined-shadow headline bobs | Flat shapes with hard offset shadows; each shape pops on a stagger, then idles with a small sin float |
+| 10 | Infographic / data viz | Navy dashboard: bars grow, a donut fills while its % counts (39 → 75 → 78), a trend line draws, "+248%" pops | Bars `scaleY` staggered, donut `strokeDashoffset` tied to the counter, line path draw; every number needs a source |
+| 11 | Paper cutout / collage | Layered paper hills and a sun, a torn paper label "PAPER WORLD" swings in and settles at an angle | Stacked SVG hills with drop shadows, parallax drift; label rotates on a damped spring like it is pinned |
+| 12 | 2D character | Flat character walks in past trees, stops, waves, speech bubble "Hi there" | Limb rotation with sin for the walk cycle, background scrolls; bubble pops on the word (opt-in rules for characters still apply) |
+| 13 | Liquid | Gradient blob morphs around "LIQUID", small blobs merge in, wave at the bottom | SVG path morph between blob shapes (or `border-radius` animation); gooey filter (`feGaussianBlur` + `feColorMatrix`) |
+| 14 | Flat design | Flat mountains, trees and sun; "FLAT" drops in with a long flat shadow | Simple polygons, no gradients; headline with a stepped shadow; elements pop in back to front |
+| 15 | Corporate | Split frame, white and a blue diagonal; "Built for growth." left, a revenue card counts $0 → $4.8M while its chart draws, a green "+240%" chip | Diagonal `clip-path` panel slides in; card with counter + line chart; chip pops last. Use real, sourced figures only |
+| 16 | Retro / vintage | Sunburst on tan, a round badge "Retro — Est. 1970 — Quality goods" with a ribbon | Rotating conic rays, badge stamped in with overshoot, ribbon unfurls (`scaleX`); grain on top |
+| 17 | Cyberpunk | "NEO-2099" in neon cyan with glow flicker, HUD corner brackets, city skyline, scan lines | Text-shadow glow with seeded flicker, corner brackets draw in, repeating-linear-gradient scan lines |
+| 18 | Abstract / experimental | Rainbow dot rings rotating with polygons inside, a white disc eclipses across | Dots on concentric rings, each ring rotating at its own speed; hue by angle; a big circle slides across as a wipe |
+| 19 | Typographic collage | Words on coloured stickers ("cut", "paste", "loud", "zine", "remix", "bold") slap on at angles, then "COLLAGE" lands big in the centre | Each sticker enters from scale 1.4 + rotation to its spot with a hard spring; final word on top with a shadow |
+| 20 | UI / UX | A phone mockup: a cursor taps toggles (dark mode, notifications, auto sync), presses "Upgrade", a "Payment success" toast appears | Drawn phone; toggles slide on the spoken word; button squash on tap; toast slides in. Recreated UI, never screenshots |
+| 21 | Claymation | Chunky glossy letters "CLAY" drop and bounce one by one, a ball bounces between them | Rounded letters with inner highlight + soft shadow; squash-and-stretch on landing (`scaleY` 0.8 → 1.05 → 1) |
+| 22 | Stop motion | Letter tiles "STOP MOTION" placed on cardboard at a choppy frame rate, a pencil and balls in frame | Hold every pose 3–4 frames (`Math.floor(frame/4)*4`), small random jitter per step; cardboard texture |
+| 23 | Parallax / 2.5D | Night mountains in layers, "DEPTH" sits between layers, moon; camera drifts | 4–5 layers with different `translateX` speeds; text placed between layers so a ridge overlaps it |
+| 24 | Cinematic | "THE LAST FRAME" letter-spaced, a lens flare sweeps across, bokeh, dark teal-orange grade | Wide tracking that tightens, radial flare moving on a line, blurred bokeh circles, vignette |
+| 25 | Mixed media | Halftone paper card with "MIXED" taped on, a 3D cube, "MEDIA" circled in red marker, "paper × 3D × ink" | Combine three looks in one frame: paper texture card, CSS cube, hand-drawn ellipse path drawing around a word |
+
+Frame devices from the same reel, usable on their own:
+- **Counter intro:** a big number counts 01 → 25 with a label under it ("animation styles") and a tiny spec line, on a dark vignette.
+- **Chapter chip:** bottom-left label, a numbered colour square + "Style 07 / 25" + the style name, in a dark pill; it changes with each section. Good for list videos ("3 mistakes", "5 riders").
+- **Whip blur between styles:** the outgoing frame streaks sideways with heavy directional blur and the next style resolves out of it (add to the transition set as a new kind when first built).
+- **Colour-dash recap:** the outro shows one coloured dash per section in a row above the closing line, a visual summary of everything covered.
+
 ## B. Instagram motion library (scraped 2026-10-15)
 
 Scraped from Instagram keyword search ("motion infographic", "infographic animation", "animated infographic", "data visualization animation", "infografis animasi", "explainer motion graphics"); 141 videos checked, a frame of each candidate viewed. Views and likes as of that date. "Move" is what to rebuild as custom motion.
@@ -102,6 +140,7 @@ No background or camera holds longer than about 5 s. Change it with a transition
 | Swipe | `kind="swipe"` | The next stage slides in from the right like a phone screen | UI and step-by-step beats |
 | Zoom-through | `kind="zoom"` | The next stage grows from a small rounded card to full frame | Going "into" a phone, card or detail |
 | Mask reveal | `kind="mask"` | A soft diagonal wipe | Calm changes, editorial scenes |
+| Whip blur (not in kit yet) | new `kind`, see A2 | The frame streaks sideways under heavy directional blur and the next stage resolves out of it | Fast lists, jumping between styles or chapters |
 | Camera move (in the scene) | `transform` on a wrapper | Push in, pan across a wide layout, rotate a few degrees | Holding one stage longer while still moving the camera |
 
 ## D. Font library (every brand)
