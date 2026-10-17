@@ -1,7 +1,7 @@
 ---
 name: story
 description: Build the story with the WTF Hook 999 framework, three hook options across Gain, Pain and Curiosity, then a beat sheet per video that keeps the user's own storyline
-allowed-tools: Read, Write, Skill
+allowed-tools: Read, Write, Skill, Grep
 ---
 
 # HKR-3 — Story
@@ -19,6 +19,8 @@ Use only the **allowed claims** from `02-facts.md`. Apply the brand voice and ha
 ## Step 2 — Structure
 
 **If the user gave a storyline:** keep its beats and their order. Sharpen each beat's angle, merge or split only with the user's consent, and add only what is missing (usually the hook mechanism and the bridge into the CTA).
+
+**If the brief's Purpose is `ad-15` or `ad-30`:** use the ad arc from **Ad mode** in `hookreel-rules` instead of the arcs below, and check the private example library it describes for 2–3 records from the closest niche. In the beat sheet, note which record(s) informed each hook and why (pattern only, never wording). When the brief names several audience segments, add 2–3 angle variants (hook, problem and failed fix rewritten; the rest kept).
 
 **If not:** pick the arc from the audience's awareness in the brief.
 - Unaware: what it is → why it matters here → why now → proof → how it works → what it takes → CTA.

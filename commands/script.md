@@ -34,6 +34,7 @@ Before showing anything, check the whole script against `CLAUDE_<CODE>.md` and r
 - The CTA matches the exact wording.
 - Length: about 2.5 words per second plus one second per scene, against the target length. If it runs long, propose specific cuts.
 - **Hook audit:** run `wtf-hook-999-auditor` on scene 1 as written (not the story draft). Credibility and payoff at least 3, weighted score at least 4; otherwise apply its recommended rewrite (within the allowed claims) and audit again.
+- **Ad mode** (Purpose `ad-15` or `ad-30` only), against **Ad mode** in `hookreel-rules`: total within the hard limit (19 s or 40 s); scene 1 understood with the sound off from its visual and on-screen words; the problem lands by about second 8; a visual change sketched at least every 3 s; CTA matches the funnel (low-pressure for cold, direct for warm); no personal-attribute phrasing, fear-based health claim, guaranteed result or unproven scarcity; no line copied from the example library.
 - **Read-aloud pass:** read every line as the narrator will say it (the `hookreel-rules` voiceover rules): no sentence over about 15 words, no list read as a list, no colon or parenthesis that cannot be spoken, connectors where a listener would lose the thread. Rewrite what fails.
 
 Fix every hit before publishing, and add the results (hook score, cuts made, rules checked) as a short **Checks** section at the end of `04-script.md`, so the user reviews a script that has already passed them.
