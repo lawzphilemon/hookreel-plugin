@@ -41,7 +41,9 @@
     "sweep": "node scripts/sweep.mjs",
     "fresh": "node scripts/fresh-check.mjs",
     "contrast": "node scripts/contrast.mjs",
-    "preview": "node scripts/preview.mjs"
+    "preview": "node scripts/preview.mjs",
+    "trim": "node --no-warnings scripts/trim-pauses.mjs",
+    "retention": "node --no-warnings scripts/retention.mjs"
   },
   "engines": {
     "node": ">=22.18"
