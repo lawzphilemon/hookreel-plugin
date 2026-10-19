@@ -4,6 +4,9 @@
 //     screen from its `at` until its `until` (scene seconds, when its hero leaves); that is where viewers skip.
 //   - a beat without a numeric `until`, or one before its `at`: without it a gap cannot be seen.
 //   - a slow hook: the video's first beat lands later than 1.0 s (something must move in the first second).
+//   - a silent beat: every beat names its sound in `sfx` (a file in public/sfx/ without .wav, or "none"
+//     for a deliberate silence); every transition needs a real sound, and so does at least one beat per
+//     scene. A beat with no `sfx` key at all is an error, so a sound cannot be forgotten.
 //   - a stretched image: an <Img> given both a width and a height without objectFit, drawn at a ratio
 //     other than its file's (read from the PNG, JPEG or WebP header in public/).
 // Warns on an objectFit "cover" that crops more than 10 % of an image (a screenshot loses the rows the
@@ -42,6 +45,20 @@ export const deadAir = (moves, words) => {
     }
     gap(cursor, voiceEnd);
   }
+  return errors;
+};
+
+// moves: moves.json; words: words.json; has(name) → the sound file exists. Returns errors.
+export const sfxAudit = (moves, words, has) => {
+  const errors = [];
+  for (const m of moves) {
+    const at = `${m.scene} "${m.move ?? m.transition}" @${m.at}s`;
+    if (typeof m.sfx !== "string") errors.push(`${at}: needs "sfx" (a sound in public/sfx/, or "none")`);
+    else if (m.sfx !== "none" && !has(m.sfx)) errors.push(`${at}: sfx "${m.sfx}" not found in public/sfx/`);
+    else if (m.transition && m.sfx === "none") errors.push(`${at}: transition "${m.transition}" has no sound; every transition needs one`);
+  }
+  for (const sid of Object.keys(words.scenes))
+    if (!moves.some((m) => m.scene === sid && typeof m.sfx === "string" && m.sfx !== "none")) errors.push(`${sid}: no sound effect in the whole scene`);
   return errors;
 };
 
@@ -114,7 +131,10 @@ const main = (id) => {
   const errors = [], warnings = [];
   const read = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
   if (!fs.existsSync(path.join(dir, "moves.json")) || !fs.existsSync(path.join(dir, "words.json"))) errors.push(`${dir}: moves.json and words.json are needed (npm run words -- ${id})`);
-  else errors.push(...deadAir(read("moves.json"), read("words.json")));
+  else {
+    const has = (name) => ["", "brand/"].some((d) => fs.existsSync(path.join("public", "sfx", `${d}${name}.wav`)));
+    errors.push(...deadAir(read("moves.json"), read("words.json")), ...sfxAudit(read("moves.json"), read("words.json"), has));
+  }
   const sizeOf = (f) => {
     const p = path.join("public", f);
     return fs.existsSync(p) ? imageSize(fs.readFileSync(p)) : null;
@@ -128,7 +148,7 @@ const main = (id) => {
   }
   warnings.forEach((w) => console.log(`warn: ${w}`));
   errors.forEach((e) => console.log(`FAIL: ${e}`));
-  console.log(errors.length ? `${errors.length} retention error(s)` : "retention: every beat has until, no dead air, hook moves in time, no stretched image");
+  console.log(errors.length ? `${errors.length} retention error(s)` : "retention: every beat has until and a sound, no dead air, hook moves in time, no stretched image");
   process.exit(errors.length ? 1 : 0);
 };
 
@@ -144,6 +164,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       air.length === 2 && air[0].includes("2.00–4.00") && air[1].includes("b"),
       slow.length === 1 && slow[0].startsWith("slow hook"),
       open.length === 2 && open.every((e) => e.includes('needs "until"')),
+      sfxAudit([{ scene: "a", at: 0.3, move: "dots", sfx: "pop" }, { scene: "a", at: 1, move: "flood", transition: "flood", sfx: "none" }, { scene: "a", at: 2, move: "ring" }, { scene: "b", at: 0.3, move: "dial", sfx: "none" }, { scene: "b", at: 1, move: "x", sfx: "boing" }], words, (n) => n === "pop").length === 3,
+      sfxAudit([{ scene: "a", at: 0.3, move: "dots", sfx: "pop" }, { scene: "b", at: 0.3, move: "dial", sfx: "none" }], words, () => true).join() === "b: no sound effect in the whole scene",
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 300, height: 300 }} />`, sizeOf)?.error?.startsWith("stretched"),
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 300, height: 300, objectFit: "cover" }} />`, sizeOf)?.warn?.includes("18 %"),
       checkImg(`<Img src={staticFile("esim.png")} style={{ height: 70 }} />`, sizeOf) === null,

@@ -22,7 +22,7 @@ Rules for building project **[CODE]** in this studio, written by `/hookreel:buil
 - Safe area: text inside x 80–1000 and above y 1500.
 
 ## Sound
-- Voiceover -16 LUFS / -3 dBTP via `npm run vo`. Sound effects synthesised (`npm run sfx`) or licence noted. Music ducked, licence noted. Final mix -16 to -17 LUFS, true peak ≤ -0.5 dBTP (`npm run loudness -- out/<id>-mix.wav`).
+- Voiceover -16 LUFS / -3 dBTP via `npm run vo`. Sound effects synthesised (`npm run sfx`) or licence noted. Music synthesised (`npm run music`) or licence noted, ducked under the voice. Final mix -16 to -17 LUFS, true peak ≤ -0.5 dBTP (`npm run loudness -- out/<id>-mix.wav`).
 
 ## Evidence
 - Every number on screen has its source line; hypotheticals carry "[Illustration | Ilustrasi]"; end card disclaimers: [exact text, or none].
