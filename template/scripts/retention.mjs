@@ -1,8 +1,8 @@
 // Usage: node scripts/retention.mjs <video id>   (npm run retention -- <video id>, after npm run words)
 // Retention lint for a custom motion video in src/proto/<id>/. Fails the build on:
 //   - dead air: more than 1.2 s of voice with no beat's hero on screen, from moves.json. A beat is on
-//     screen from its `at` until its optional `until` (scene seconds, when its hero leaves), else until
-//     the next beat of the scene, else the scene's end; that is where viewers skip.
+//     screen from its `at` until its `until` (scene seconds, when its hero leaves); that is where viewers skip.
+//   - a beat without a numeric `until`, or one before its `at`: without it a gap cannot be seen.
 //   - a slow hook: the video's first beat lands later than 1.0 s (something must move in the first second).
 //   - a stretched image: an <Img> given both a width and a height without objectFit, drawn at a ratio
 //     other than its file's (read from the PNG, JPEG or WebP header in public/).
@@ -30,10 +30,16 @@ export const deadAir = (moves, words) => {
     const gap = (from, to) => {
       if (to - from > MAX_GAP) errors.push(`dead air ${(offsets[sid] + from).toFixed(2)}–${(offsets[sid] + to).toFixed(2)} s in ${sid} (${(to - from).toFixed(1)} s of voice with no hero on screen)`);
     };
-    beats.forEach((b, k) => {
+    // A scene with a beat missing "until" reports only that: its gaps would be guesses.
+    const open = beats.filter((b) => typeof b.until !== "number" || b.until < b.at);
+    if (open.length) {
+      open.forEach((b) => errors.push(`${sid} beat "${b.move}" @${b.at}s: needs "until" (scene second its hero leaves, not before "at")`));
+      continue;
+    }
+    for (const b of beats) {
       gap(cursor, Math.min(b.at, voiceEnd));
-      cursor = Math.max(cursor, b.until ?? beats[k + 1]?.at ?? end);
-    });
+      cursor = Math.max(cursor, Math.min(b.until, end));
+    }
     gap(cursor, voiceEnd);
   }
   return errors;
@@ -122,7 +128,7 @@ const main = (id) => {
   }
   warnings.forEach((w) => console.log(`warn: ${w}`));
   errors.forEach((e) => console.log(`FAIL: ${e}`));
-  console.log(errors.length ? `${errors.length} retention error(s)` : "retention: no dead air, hook moves in time, no stretched image");
+  console.log(errors.length ? `${errors.length} retention error(s)` : "retention: every beat has until, no dead air, hook moves in time, no stretched image");
   process.exit(errors.length ? 1 : 0);
 };
 
@@ -130,12 +136,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (process.argv[2] === "--self-test") {
     const words = { scenes: { a: { secs: 5 }, b: { secs: 3 } } };
     // a: beat 2 leaves at 2 s, beat 3 only at 4 s → one gap; b: nothing until 2.5 s → a second gap.
-    const air = deadAir([{ scene: "a", at: 0.3 }, { scene: "a", at: 1.5, until: 2 }, { scene: "a", at: 4 }, { scene: "b", at: 2.5 }], words);
-    const slow = deadAir([{ scene: "a", at: 1.4 }, { scene: "a", at: 2.5 }, { scene: "a", at: 3.6 }, { scene: "b", at: 0.3 }], words);
+    const air = deadAir([{ scene: "a", at: 0.3, until: 1.5 }, { scene: "a", at: 1.5, until: 2 }, { scene: "a", at: 4, until: 6 }, { scene: "b", at: 2.5, until: 4 }], words);
+    const slow = deadAir([{ scene: "a", at: 1.4, until: 2.5 }, { scene: "a", at: 2.5, until: 3.6 }, { scene: "a", at: 3.6, until: 6 }, { scene: "b", at: 0.3, until: 4 }], words);
+    const open = deadAir([{ scene: "a", at: 0.3, move: "dots" }, { scene: "a", at: 1, until: 0.5, move: "ring" }, { scene: "b", at: 0.3, until: 4 }], words);
     const sizeOf = () => ({ w: 540, h: 660 });
     const ok = [
       air.length === 2 && air[0].includes("2.00–4.00") && air[1].includes("b"),
       slow.length === 1 && slow[0].startsWith("slow hook"),
+      open.length === 2 && open.every((e) => e.includes('needs "until"')),
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 300, height: 300 }} />`, sizeOf)?.error?.startsWith("stretched"),
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 300, height: 300, objectFit: "cover" }} />`, sizeOf)?.warn?.includes("18 %"),
       checkImg(`<Img src={staticFile("esim.png")} style={{ height: 70 }} />`, sizeOf) === null,

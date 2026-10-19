@@ -116,7 +116,7 @@ What the references share; use it as the base, then invent beyond it:
 
 Rules:
 - **Always fresh (mandatory).** Every video's result is fresh: never reuse a previous video's scene designs as they are. Each video logs its moves and transitions in `src/proto/<id>/moves.json`; `npm run fresh` fails on a move or transition repeated inside the video and warns on repeats from the brand's last 3 videos. Propose bold ideas.
-- **No dead air, a hook that moves.** Something hero-sized is on screen whenever the voice speaks (no gap over about 1.2 s) and something moves in the first second. `npm run retention` checks both from `moves.json` (`until` marks when a beat's hero leaves), and fails on an image stretched out of its ratio.
+- **No dead air, a hook that moves.** Something hero-sized is on screen whenever the voice speaks (no gap over about 1.2 s) and something moves in the first second. `npm run retention` checks both from `moves.json`, where every beat must carry `until` (the scene second its hero leaves; the lint fails without it), and fails on an image stretched out of its ratio.
 - **No long holds.** No background or camera holds longer than about 5 s: change it with a transition (circle wipe, colour flood, swipe, zoom-through, mask reveal; `Transition` in the kit), a different one each time.
 - Study all the references, not one; never copy their assets, brands or sounds.
 - Text contrast at least 4.5:1 below 84 px and 3:1 above (`npm run contrast`).
