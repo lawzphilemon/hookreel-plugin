@@ -31,7 +31,7 @@ npm run vo -- <video id> "<recording>"
 It normalises the take (-16 LUFS, peaks at -3 dBTP), transcribes it locally with Whisper (English model for `language: "en"`, multilingual otherwise; the first run downloads the model), cuts each scene at the pause nearest its boundary, and writes `public/vo/<id>/<scene>.wav` plus `<scene>.words.json`.
 
 Read the printed `heard:` line for every scene against its script line:
-- A line split across two clips, or words missing at a clip edge: check the pauses around that boundary and rerun with explicit ranges in seconds, `npm run vo -- <id> "<recording>" "1.7-6.9,7.7-14.0,…"`.
+- A line split across two clips, or words missing at a clip edge: check the pauses around that boundary and rerun with explicit ranges in seconds, `npm run vo -- <id> "<recording>" "1.7-6.9,7.7-14.0,…"`. Pick the ranges from `out/<id>-take.json` (the full take's words in absolute seconds, saved by the first run). A clip flagged as over 2× its estimate usually holds a retake or false starts: cut around them the same way.
 - Misheard words ("Google Tech Manager") are fine: transcripts only drive timing; captions use the script.
 - The speaker changed a line: either update `vo` in `videos/<id>.json` (and any cue that no longer matches), or ask for a retake of that line.
 
