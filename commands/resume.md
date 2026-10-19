@@ -49,6 +49,7 @@ Ask what the user wants, then route:
 | Too long or loose pacing | `npm run trim -- "<recording>"` (caps the pauses, no retake), then `/hookreel:voice` on the trimmed file | QA again |
 | New voiceover take | `/hookreel:voice` | QA again |
 | Cover or caption | `/hookreel:publish` | — |
+| A carousel slide (copy or look) | Edit `carousel/<id>/02-copy.md` (re-approve) or `carousel.html` | Re-run `/hookreel:carousel` Step 4 and update `report.md` |
 
 **Cascade rule:** editing a stage marks every later stage `needs re-approval` in `project.json` and `PROJECTS.md` (files are kept, approvals are not). Nothing is built again until the script is re-approved.
 

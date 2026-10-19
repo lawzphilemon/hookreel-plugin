@@ -11,6 +11,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 
 ```text
 /hookreel:brief → facts → story → script [publish + approve] → build [prototype scene: render + approve, then every scene] → voice → qa [+ self-critique] → publish
+/hookreel:carousel        (a photo carousel from a source post: copy approved, then HTML → checked PNGs)
 /hookreel:storyboard      (optional, on request: a timed plan, not a gate)
 /hookreel:resume <CODE>   (reopen any project later)
 ```
@@ -25,6 +26,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | build | `06-motion-<id>.md` (beat ideas from the references), `hookreel-studio/<brand>/` (brand.json, videos/, `src/proto/<id>/` scenes + `words.json` + `moves.json` (freshness log), compositions `<id>-motion` and `<id>-sweep`, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `out/<id>-proto.mp4` approved, `06-remotion-prompt.md` (only on request) |
 | voice | `public/vo/<id>/`, `src/proto/<id>/words.json` re-timed on the recording |
 | qa | `07-qa-<id>.md`, `out/<id>.mp4`, `out/<id>-preview.mp4`, then the mandatory **`07b-critique-<id>.md`** (the video, the workflow, plugin updates) |
+| carousel (any time, own gate) | `<project>/carousel/<id>/`: `01-source.md`, `02-copy.md` (approved), `carousel.html`, `slide-NN.png`, `verification.json` (`scripts/carousel.mjs`), `report.md` |
 | publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` (only after `07b-critique-<id>.md` exists) |
 
 Each stage reads the previous files and updates `project.json` and `PROJECTS.md`, so the pipeline resumes after a restart.
