@@ -4,7 +4,7 @@
 // library, time helpers, focus-in words, grain, glow, sound effects, voiceover clips, source lines,
 // spoken-word times and the reel wrapper. Every value is a function of the frame.
 import React from "react";
-import { AbsoluteFill, Easing, Freeze, interpolate, Sequence, Series, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Easing, Freeze, interpolate, Sequence, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Audio } from "@remotion/media";
 import { loadFont as loadOpenSans } from "@remotion/google-fonts/OpenSans";
 import { loadFont as loadRubik } from "@remotion/google-fonts/Rubik";
@@ -30,6 +30,14 @@ export const useT = () => useCurrentFrame() / FPS;
 // 0 → 1 from `start` over `dur` seconds.
 export const prog = (t: number, start: number, dur: number, easing = EASE) => interpolate(t, [start, start + dur], [0, 1], { ...clamp, easing });
 export const mix = (p: number, a: number, b: number) => a + (b - a) * p;
+// Squash and stretch for something that lands or hits at scene second `at`: scale it by { sx, sy }; it
+// wobbles back to 1 within about 0.33 s.
+export const squash = (t: number, at: number) => {
+  const k = t < at ? 0 : Math.max(0, 1 - (t - at) / 0.33) * Math.cos((t - at) * 27);
+  return { sx: 1 + 0.25 * k, sy: 1 - 0.25 * k };
+};
+// Decaying shake after an impact at scene second `at`: px offset for a translate, gone after 0.45 s.
+export const shake = (t: number, at: number, amp = 14) => (t >= at && t < at + 0.45 ? Math.sin((t - at) * 72) * (1 - (t - at) / 0.45) * amp : 0);
 
 // A word that focuses in from a blur, rising a little.
 export const Word: React.FC<{ t: number; at: number; style?: React.CSSProperties; children: React.ReactNode; dur?: number; from?: number }> = ({ t, at, style, children, dur = 0.45, from = 1.25 }) => {
@@ -98,6 +106,34 @@ export const Vo: React.FC<{ words: Words; id: string }> = ({ words, id }) => (
   </Sequence>
 );
 
+// Background music (from `npm run music -- <video id>` or a licensed file in public/), ducked like the
+// template's BackgroundMusic: TIME.music.underVoice while a phrase is spoken, rising to inPauses between
+// phrases, faded in and out. Pass it to protoReel as `music` rather than placing it in a scene.
+export const Music: React.FC<{ words: Words; src: string }> = ({ words, src }) => {
+  const { fps, durationInFrames } = useVideoConfig();
+  const M = TIME.music;
+  // Phrases on the video timeline (seconds): each word lasts until the next, merged across short breaths.
+  const spans: [number, number][] = [];
+  let at = 0;
+  for (const s of Object.values(words.scenes)) {
+    const starts = s.words.map(([, t]) => at + TIME.leadIn + Number(t));
+    starts.forEach((t, i) => {
+      const end = i + 1 < starts.length ? starts[i + 1] : at + TIME.leadIn + s.secs;
+      const last = spans[spans.length - 1];
+      if (last && t - last[1] < M.mergeGap) last[1] = Math.max(last[1], end);
+      else spans.push([t, end]);
+    });
+    at += s.secs + TIME.leadIn + TIME.tail;
+  }
+  const volume = (f: number) => {
+    const t = f / fps;
+    const gap = spans.reduce((g, [a, b]) => (t >= a && t <= b ? 0 : Math.min(g, t < a ? a - t : t - b)), Infinity);
+    const level = interpolate(gap, [0, M.ramp], [M.underVoice, M.inPauses], clamp);
+    return level * interpolate(f, [0, M.fadeIn * fps, durationInFrames - M.fadeOut * fps, durationInFrames], [0, 1, 1, 0], clamp);
+  };
+  return <Audio src={staticFile(src)} volume={volume} name="Background music" />;
+};
+
 // Transition set: reveals `children` (the next background or camera) over what is underneath, from
 // scene second `at` over `dur`. Pick a different one per scene change and log it in moves.json; no
 // background or camera should hold longer than about 5 s.
@@ -154,16 +190,18 @@ export const KineticCaption: React.FC<{ words: Words; id: string; t: number; top
 };
 
 // The whole video: scenes in order, hard cuts (put transitions inside the scenes with `Transition`).
+// `music`: a file in public/ played under the whole video by `Music`, e.g. "music/<video id>-synth.wav".
 // Register both in Root.tsx:
-//   const REEL = protoReel(WORDS, SCENES);
+//   const REEL = protoReel(WORDS, SCENES, 6, "music/<video id>-synth.wav");
 //   <Composition id="<video id>-motion" component={REEL.component} durationInFrames={REEL.frames} fps={FPS} width={1080} height={1920} />
 //   <Composition id="<video id>-sweep" component={REEL.sweep} durationInFrames={REEL.frames} fps={FPS} {...REEL.sweepSize} />
 // `npm run sweep -- <video id>` renders the sweep: `perScene` frames of every scene at quarter scale on one
 // image, with the safe area drawn (text inside x 80–1000 and above y 1500).
-export const protoReel = (words: Words, scenes: [string, React.FC][], perScene = 6) => {
+export const protoReel = (words: Words, scenes: [string, React.FC][], perScene = 6, music?: string) => {
   const frames = (id: string) => Math.round(sceneSeconds(words, id) * FPS);
   const component: React.FC = () => (
     <AbsoluteFill style={{ background: "#000" }}>
+      {music ? <Music words={words} src={music} /> : null}
       <Series>
         {scenes.map(([id, Scene]) => (
           <Series.Sequence key={id} name={id} durationInFrames={frames(id)}>

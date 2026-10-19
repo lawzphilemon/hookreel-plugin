@@ -44,7 +44,7 @@ Ask in **four rounds**, one message per round, numbered questions, with a recomm
 
 **Round D — sound and look**
 13. Voiceover: recorded by you or a team member (one take per video), or none? (recorded by you)
-14. Background music: a track you have the rights to use, or none for now? Note its source and licence.
+14. Background music: original music synthesised in the studio (`npm run music`; pick a mood: energetic, cheerful, chill or dramatic), a track you have the rights to use (note its source and licence), or none?
 15. Sound effects: off, subtle, medium or dramatic? (medium)
 16. Reference reels: send the reels whose look you want (screen recordings or video files; links if they can be opened). Every video gets new motion design invented from all of them, never a fixed template. What do you like in each (pacing, type, props, transitions)? If you have none, I will propose a direction from a few public examples for you to pick from. (Only if you explicitly want the template's infographic slides instead, say so: clean, or playful with AI-generated 3D cartoon characters.)
 17. Visual assets and dislikes: logo file, product screenshots allowed or recreated mockups only (and who gives permission for each real screenshot or photo of a person), and anything you do not want to see (for example a story-style progress bar, emoji, stock photos).
@@ -81,7 +81,7 @@ Platform: [..] · Language: [..] · Length target: [..s]
 Format: [single | series of N] · Roles: [teaser, part 1, …]
 CTA: [exact action] → [what they get]
 Voiceover: [who, one take per video | none]
-Music: [file and licence | none]
+Music: [synthesised, mood … | file and licence | none]
 SFX: [off | subtle | medium | dramatic]
 Reference reels: [files or links, and what to take from each] · Look: [custom motion (default) | template clean | template playful]
 Visual assets: [logo path, screenshots allowed?] · Dislikes: [list]

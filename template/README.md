@@ -14,8 +14,10 @@ npm run vo -- <id> "<recording>"   # one take per video → per-scene clips + he
 npm run words -- <id>              # src/proto/<id>/words.json, character-aligned (--estimate before recording)
 npm run sweep -- <id>              # 6 frames per scene at quarter scale on one image, safe area in red
 npm run fresh -- <id>              # freshness log src/proto/<id>/moves.json: no repeats, no hold over ~5 s
-npm run retention -- <id>          # no dead air over 1.2 s, first beat within 1 s, no stretched image
+npm run retention -- <id>          # no dead air over 1.2 s, first beat within 1 s, every transition heard, no stretched image
 npm run trim -- "<recording>"      # cap the pauses in a take (0.3 s) before npm run vo, no retake
+npm run music -- <id> --mood chill  # original music from code (energetic, cheerful, chill, dramatic), ducked by the kit's Music
+npm run refcuts -- "<reference>"   # cut rhythm of a reference reel + one frame per shot in out/refs/<name>/
 npm run contrast -- "#text" "#bg" 28   # WCAG ratio per text colour pair (4.5:1 below 84 px, 3:1 above)
 npx remotion render <id>-motion out/<id>.mp4
 npm run preview -- <id>            # out/<id>-preview.mp4 (crf 27) + out/<id>-ig-test.mp4 (Instagram-like)

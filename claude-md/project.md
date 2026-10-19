@@ -30,7 +30,7 @@ Rules of play for this video project. This file is imported by the folder's `CLA
 ### Sound
 - Voiceover: [who], one take per video, -16 LUFS, peaks -3 dBTP.
 - Sound effects: [off | subtle | medium | dramatic], synthesised or with a commercial licence note, no meme sounds.
-- Music: [track + licence, or none]; ducked under the voice.
+- Music: [synthesised (mood …) | track + licence | none]; ducked under the voice.
 - Final mix: -16 to -17 LUFS integrated, true peak at or below -0.5 dBTP.
 
 ### Evidence

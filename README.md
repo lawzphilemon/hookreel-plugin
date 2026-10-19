@@ -47,7 +47,7 @@ The plugin also bundles the **creator-os** skill (hook frameworks, 150 hook temp
 
 ## The template
 
-`template/` is a Remotion project. By default it is **tooling** for custom motion: `src/proto/kit.tsx` (focus-in words, grain, glow, sound effects, voiceover clips, source lines, spoken-word times, `protoReel`), `npm run vo` (voiceover prep), `npm run words` (character-aligned word times, `--estimate` before recording), `npm run sfx` (synthesised sound effects), `npm run loudness` (BS.1770 loudness and peaks in plain Node), `npm run trim` (caps the pauses in a take, no retake), `npm run retention` (fails on dead air, a slow hook and stretched images) and render. Each video's scenes are written new in `src/proto/<id>/`.
+`template/` is a Remotion project. By default it is **tooling** for custom motion: `src/proto/kit.tsx` (focus-in words, grain, glow, sound effects, voiceover clips, source lines, spoken-word times, `protoReel`), `npm run vo` (voiceover prep), `npm run words` (character-aligned word times, `--estimate` before recording), `npm run sfx` (synthesised sound effects), `npm run loudness` (BS.1770 loudness and peaks in plain Node), `npm run trim` (caps the pauses in a take, no retake), `npm run retention` (fails on dead air, a slow hook, a silent transition or scene and stretched images), `npm run music` (original background music synthesised from code, four moods), `npm run refcuts` (cut rhythm of a reference reel) and render. Each video's scenes are written new in `src/proto/<id>/`.
 
 When the template look is chosen, a video is data, not code:
 

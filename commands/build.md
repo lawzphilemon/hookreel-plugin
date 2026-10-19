@@ -27,7 +27,7 @@ One studio per brand: `hookreel-studio/<brand-slug>/` in the working directory.
 
 - `brand.json`: colours, fonts (used by the template look; custom scenes use the kit's font library) and logo from the context profile, following `src/schema.ts` (if the studio already has a different `brand.json` for the same brand, show the difference and ask before replacing it).
 - `videos/<id>.json`: one scene per script scene with its `vo` copied exactly, `language`, and a plain `headline` visual per scene. This file drives `npm run vo` and `npm run words`; the template composition `<id>` is only a timing preview.
-- Logo in `public/brand/` if the video uses it. Music (if any): normalise it into the project:
+- Logo in `public/brand/` if the video uses it. Music: synthesised music is made after the word times (Step 4); a licensed track is normalised into the project:
 
 ```bash
 npx remotion ffmpeg -y -i "<track>" -af loudnorm=I=-16:TP=-1.5:LRA=7 -ar 48000 public/music/<name>.wav
@@ -40,8 +40,10 @@ Run `npm run check` and fix every error.
 **First read `references/motion-library.md` of the `hookreel-rules` skill in full** (the core reference moves, the Instagram motion library, the transition set, the font library). It is the same for every brand. Then the user's reference reels for this video, which are the source of the look. Find them in `CLAUDE_<CODE>.md` (brief question 16); if none are listed, ask for them before designing anything (screen recordings or files of reels they like; links are fine if you can open them). Look at **all** of them, not just one:
 
 ```bash
-npx remotion ffmpeg -hide_banner -loglevel error -i "<reference>" -vf "fps=2,scale=270:-1,tile=6x4" out/refs/<n>-%02d.png
+npm run refcuts -- "<reference>"
 ```
+
+It measures the cut rhythm (shots, cuts per 10 s, median and longest shot; Remotion's ffmpeg has no scene-detect or tile filter, so this is done in Node) and saves one frame per shot in `out/refs/<name>/`. Look at those frames. A slow wipe can hide a cut and a flash can add one, so read the numbers against the frames. Write the median shot length into `06-motion-<id>.md` as the pacing target.
 
 Write down what the reels and the library share and what each does that the others do not: pacing (how long one idea stays), type (sizes, weights, the italic or serif word), background (paper, grain, glow, colour per scene), transitions (wipes, circle reveals, push), props (receipts, stamps, calendars, toggles, notifications, chat boxes, dials, counters, progress rings), and how elements enter, act and leave. Never copy their assets, brands or sounds.
 
@@ -52,16 +54,17 @@ Then write `<project>/06-motion-<id>.md`, one block per beat (about every 1.5–
 Build the hook scene first, in `src/proto/<id>/`:
 
 1. Word times: `npm run words -- <id>` after recording, or `npm run words -- <id> --estimate` before (2.5 words per second; rerun after `/hookreel:voice`).
-2. `src/proto/<id>/scenes.tsx` with the scene components, using `src/proto/kit.tsx`: the font library `FONT` (`display` Open Sans 800, `sans` Rubik 500–700, `serif` Instrument Serif italic; the same for every brand), `useT`, `prog`, `mix`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `SourceLine`, `Transition` (circle, flood, swipe, zoom, mask), `KineticCaption` (optional captions for muted viewing, styled into the motion), `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`. Everything else (props, layouts) is written new for this video.
-3. `src/proto/<id>/moves.json`, the freshness log: one entry per beat, `{ "scene", "at" (scene seconds), "move", "transition" (only where the background or camera changes), "until" (required: scene second the beat's hero leaves the screen) }`, named in plain words ("counter assembled from dots", "colour flood"). Keep it in step with the scenes; `npm run fresh -- <id>` and `npm run retention -- <id>` check it.
-4. `src/proto/<id>/Reel.tsx`: `export const REEL = protoReel(WORDS, [["<scene id>", Scene], …])`, and register the video and its layout sweep in `src/Root.tsx`:
+2. `src/proto/<id>/scenes.tsx` with the scene components, using `src/proto/kit.tsx`: the font library `FONT` (`display` Open Sans 800, `sans` Rubik 500–700, `serif` Instrument Serif italic; the same for every brand), `useT`, `prog`, `mix`, `squash`, `shake`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `Music`, `SourceLine`, `Transition` (circle, flood, swipe, zoom, mask), `KineticCaption` (optional captions for muted viewing, styled into the motion), `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`. Everything else (props, layouts) is written new for this video.
+3. `src/proto/<id>/moves.json`, the freshness log: one entry per beat, `{ "scene", "at" (scene seconds), "move", "transition" (only where the background or camera changes), "until" (required: scene second the beat's hero leaves the screen), "sfx" (required: the sound on that beat, a file name in `public/sfx/` without `.wav`, or `"none"`; every transition needs a real one) }`, named in plain words ("counter assembled from dots", "colour flood"). Keep it in step with the scenes; `npm run fresh -- <id>` and `npm run retention -- <id>` check it.
+4. Music (if the brief chose synthesised music): `npm run music -- <id> --mood <mood>` writes `public/music/<id>-synth.wav` (about -14 LUFS, the length of the video, a riser into the last scene). Pass it as `protoReel`'s fourth argument; the kit's `Music` ducks it under the voice. Rerun it whenever the word times change.
+5. `src/proto/<id>/Reel.tsx`: `export const REEL = protoReel(WORDS, [["<scene id>", Scene], …], 6, "music/<id>-synth.wav")` (leave the music out if there is none), and register the video and its layout sweep in `src/Root.tsx`:
 
 ```tsx
 <Composition id="<id>-motion" component={REEL.component} durationInFrames={REEL.frames} fps={FPS} width={1080} height={1920} />
 <Composition id="<id>-sweep" component={REEL.sweep} durationInFrames={REEL.frames} fps={FPS} {...REEL.sweepSize} />
 ```
 
-5. Render only the prototype scene (`--frames=0-<last frame of the scene>`) and send it:
+6. Render only the prototype scene (`--frames=0-<last frame of the scene>`) and send it:
 
 ```bash
 npx remotion render <id>-motion out/<id>-proto.mp4 --frames=0-<n> --log=error
@@ -79,7 +82,7 @@ Build the remaining scenes in the approved look, with a new idea per beat (rules
 
 ## Step 6 — Validate and look
 
-`npx tsc --noEmit`, `npm run lint`, `npm run fresh -- <id>` and `npm run retention -- <id>` (dead air over 1.2 s, first beat after 1 s, stretched images); fix every error. Check every text colour pair with `npm run contrast` (4.5:1 below 84 px, 3:1 above). Then `npm run sweep -- <id>` (6 frames per scene on one image, safe area in red) and read it: one idea per screen, no background or camera held longer than about 5 s, nothing clipped or overlapping, text inside x 80–1000 and above y 1500 (the platform UI covers the bottom and right edge), every source line and label readable, each beat's animation finished before the next starts. Fix and repeat until clean.
+`npx tsc --noEmit`, `npm run lint`, `npm run fresh -- <id>` and `npm run retention -- <id>` (dead air over 1.2 s, first beat after 1 s, a beat or transition without its sound, a scene with no sound, stretched images); fix every error. Check every text colour pair with `npm run contrast` (4.5:1 below 84 px, 3:1 above). Then `npm run sweep -- <id>` (6 frames per scene on one image, safe area in red) and read it: one idea per screen, no background or camera held longer than about 5 s, nothing clipped or overlapping, text inside x 80–1000 and above y 1500 (the platform UI covers the bottom and right edge), every source line and label readable, each beat's animation finished before the next starts. Fix and repeat until clean.
 
 ## Step 7 — Studio CLAUDE files
 

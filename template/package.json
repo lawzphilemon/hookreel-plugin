@@ -43,7 +43,9 @@
     "contrast": "node scripts/contrast.mjs",
     "preview": "node scripts/preview.mjs",
     "trim": "node --no-warnings scripts/trim-pauses.mjs",
-    "retention": "node --no-warnings scripts/retention.mjs"
+    "retention": "node --no-warnings scripts/retention.mjs",
+    "music": "node --no-warnings scripts/make-music.mjs",
+    "refcuts": "node --no-warnings scripts/ref-cuts.mjs"
   },
   "engines": {
     "node": ">=22.18"

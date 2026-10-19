@@ -117,6 +117,7 @@ What the references share; use it as the base, then invent beyond it:
 Rules:
 - **Always fresh (mandatory).** Every video's result is fresh: never reuse a previous video's scene designs as they are. Each video logs its moves and transitions in `src/proto/<id>/moves.json`; `npm run fresh` fails on a move or transition repeated inside the video and warns on repeats from the brand's last 3 videos. Propose bold ideas.
 - **No dead air, a hook that moves.** Something hero-sized is on screen whenever the voice speaks (no gap over about 1.2 s) and something moves in the first second. `npm run retention` checks both from `moves.json`, where every beat must carry `until` (the scene second its hero leaves; the lint fails without it), and fails on an image stretched out of its ratio.
+- **Motion craft (every beat).** Main moves are never linear: they ease out, and hero entrances go anticipation → overshoot → settle (a spring with low damping). Things that land or hit squash and stretch for a few frames (`squash()` in the kit) and impacts get a short decaying shake (`shake()`). Parts of one object overlap and follow through: a label trails its object by about 0.05 s, a group enters staggered 0.04–0.07 s apart, never all at once. Build depth with at least a background, a midground and a foreground, with a slow camera (push 1.00 → 1.06, a small pan, at most 1.5° of roll) and some secondary motion (grain, a drifting glow, a ±2 % breath), so no frame sits dead for more than about 0.5 s. Key text stays fully readable for at least 0.35 s + 0.15 s per word. Every transition has its sound.
 - **No long holds.** No background or camera holds longer than about 5 s: change it with a transition (circle wipe, colour flood, swipe, zoom-through, mask reveal; `Transition` in the kit), a different one each time.
 - Study all the references, not one; never copy their assets, brands or sounds.
 - Text contrast at least 4.5:1 below 84 px and 3:1 above (`npm run contrast`).
@@ -144,7 +145,8 @@ Safe area for 1080×1920: keep text inside x 80–1000 and above y ≈ 1500; the
 
 - Voiceover: one take per video, normalised to -16 LUFS with -3 dBTP peaks by `npm run vo`.
 - Too long or too loose: cap the pauses in the existing take (`npm run trim`, default 0.3 s, never below 0.18 s), then tighten holds, and only then rewrite and re-record. Never speed the voice up and never drop a step to hit a length.
-- Music: optional, rights cleared, normalised into the project, ducked about 13 dB under the voice and 8 dB in pauses.
+- Music: optional. Either original music synthesised from code (`npm run music -- <id> --mood energetic|cheerful|chill|dramatic`, no licence needed, remade after every new recording) or a rights-cleared track normalised into the project. Ducked about 13 dB under the voice and 8 dB in pauses (the kit's `Music`, the template's BackgroundMusic).
+- Sound effects follow the picture: every transition and every key beat has its sound, named per beat in `moves.json` (`sfx`, or `"none"` for a deliberate silence); `npm run retention` fails on a transition or a whole scene without one.
 - Sound effects: synthesised in the project (`npm run sfx`, no licence needed) or files with a commercial licence note; intensity `off | subtle | medium | dramatic`. Never meme sounds or sounds lifted from songs, films, cartoons or games.
 - Final mix: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP, measured with `npm run loudness -- <file.wav>` (Remotion's ffmpeg has no ebur128 filter).
 

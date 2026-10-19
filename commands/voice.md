@@ -41,7 +41,7 @@ Then write the word times the custom scenes run on:
 npm run words -- <id>
 ```
 
-It aligns each script word to the Whisper fragments character by character (so "K" + "laim" still gives "Klaim" its time, and "900 juta rupiah" still finds "Rp900 juta") and writes `src/proto/<id>/words.json`, replacing any `--estimate` version. Read the printed times against the recording for the beat words; every scene re-times itself through `wordsOf()`. Then check each beat still has time to finish its animation before the next one (scenes may now be shorter or longer than estimated) and adjust the scenes that are too tight.
+It aligns each script word to the Whisper fragments character by character (so "K" + "laim" still gives "Klaim" its time, and "900 juta rupiah" still finds "Rp900 juta") and writes `src/proto/<id>/words.json`, replacing any `--estimate` version. Read the printed times against the recording for the beat words; every scene re-times itself through `wordsOf()`. Then check each beat still has time to finish its animation before the next one (scenes may now be shorter or longer than estimated) and adjust the scenes that are too tight. If the video uses synthesised music, make it again so its length and riser follow the recording: `npm run music -- <id> --mood <mood>`.
 
 ## Step 3 — Storyboard as recorded (only if a storyboard was made)
 
