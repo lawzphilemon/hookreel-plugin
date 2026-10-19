@@ -16,6 +16,14 @@ If the user did not say, identify the take: transcribe it once (the `vo` script 
 
 ## Step 2 — Cut and sync
 
+If the video runs long or the take sounds loose, cap its pauses first; no retake needed:
+
+```bash
+npm run trim -- "<recording>" 0.3
+```
+
+It writes `out/<name>-trimmed.wav` (every pause inside the take capped at 0.3 s, 10 ms crossfades; lead-in and tail left to `npm run vo`) and warns on a cut that lands near speech: listen there. Use the trimmed file below. Not below 0.18 s, where speech sounds clipped. Never speed the voice up to hit a length. Then:
+
 ```bash
 npm run vo -- <video id> "<recording>"
 ```

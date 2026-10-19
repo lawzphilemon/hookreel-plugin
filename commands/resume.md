@@ -46,6 +46,7 @@ Ask what the user wants, then route:
 | Hook or beats | `/hookreel:story` | Script and build need re-approval |
 | A line or a beat idea | Edit `04-script.md` | Republish the script for approval, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then update `videos/<id>.json`, `npm run words` and the affected scenes |
 | Motion, layout or sound only | Edit the scenes in the studio's `src/proto/<id>/` | Render the changed scene and send it |
+| Too long or loose pacing | `npm run trim -- "<recording>"` (caps the pauses, no retake), then `/hookreel:voice` on the trimmed file | QA again |
 | New voiceover take | `/hookreel:voice` | QA again |
 | Cover or caption | `/hookreel:publish` | — |
 

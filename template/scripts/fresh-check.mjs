@@ -38,16 +38,22 @@ export const check = (moves, offsets, length, others = []) => {
   return { errors, warnings };
 };
 
-const main = (id) => {
-  const dir = "src/proto";
-  const moves = JSON.parse(fs.readFileSync(`${dir}/${id}/moves.json`, "utf8"));
-  const words = JSON.parse(fs.readFileSync(`${dir}/${id}/words.json`, "utf8"));
+// Scene id → start second in the video, and the video's length, from src/proto/<id>/words.json.
+export const sceneOffsets = (words) => {
   const offsets = {};
   let at = 0;
   for (const [sid, s] of Object.entries(words.scenes)) {
     offsets[sid] = at;
     at += s.secs + 1; // TIME.leadIn + TIME.tail
   }
+  return { offsets, length: at };
+};
+
+const main = (id) => {
+  const dir = "src/proto";
+  const moves = JSON.parse(fs.readFileSync(`${dir}/${id}/moves.json`, "utf8"));
+  const words = JSON.parse(fs.readFileSync(`${dir}/${id}/words.json`, "utf8"));
+  const { offsets, length: at } = sceneOffsets(words);
   const others = fs
     .readdirSync(dir, { withFileTypes: true })
     .filter((d) => d.isDirectory() && d.name !== id && fs.existsSync(`${dir}/${d.name}/moves.json`))

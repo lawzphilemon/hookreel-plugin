@@ -47,7 +47,7 @@ The plugin also bundles the **creator-os** skill (hook frameworks, 150 hook temp
 
 ## The template
 
-`template/` is a Remotion project. By default it is **tooling** for custom motion: `src/proto/kit.tsx` (focus-in words, grain, glow, sound effects, voiceover clips, source lines, spoken-word times, `protoReel`), `npm run vo` (voiceover prep), `npm run words` (character-aligned word times, `--estimate` before recording), `npm run sfx` (synthesised sound effects), `npm run loudness` (BS.1770 loudness and peaks in plain Node) and render. Each video's scenes are written new in `src/proto/<id>/`.
+`template/` is a Remotion project. By default it is **tooling** for custom motion: `src/proto/kit.tsx` (focus-in words, grain, glow, sound effects, voiceover clips, source lines, spoken-word times, `protoReel`), `npm run vo` (voiceover prep), `npm run words` (character-aligned word times, `--estimate` before recording), `npm run sfx` (synthesised sound effects), `npm run loudness` (BS.1770 loudness and peaks in plain Node), `npm run trim` (caps the pauses in a take, no retake), `npm run retention` (fails on dead air, a slow hook and stretched images) and render. Each video's scenes are written new in `src/proto/<id>/`.
 
 When the template look is chosen, a video is data, not code:
 
@@ -59,6 +59,8 @@ When the template look is chosen, a video is data, not code:
 - `npm run check` validates cues, colours and files; `npm run storyboard -- <id>` prints the frame-exact storyboard; `npm run vo` handles the voiceover; `npm run sfx` regenerates the sound effects.
 
 Breakdowns of past videos (scene by scene, with code patterns): `skills/hookreel-rules/references/motion-library.md` → E. Past work.
+
+The pause trim, the retention lint and the register rule (threat → photoreal, screen → real screenshot, concept → drawn; never fake a UI) are adapted from ideas in [Hyperframe Pro](https://github.com/buildwithhanif/hyperframe-pro) (MIT), rewritten for Remotion and recorded voiceovers.
 
 ## Principles
 

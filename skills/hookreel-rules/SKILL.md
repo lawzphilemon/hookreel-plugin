@@ -116,12 +116,21 @@ What the references share; use it as the base, then invent beyond it:
 
 Rules:
 - **Always fresh (mandatory).** Every video's result is fresh: never reuse a previous video's scene designs as they are. Each video logs its moves and transitions in `src/proto/<id>/moves.json`; `npm run fresh` fails on a move or transition repeated inside the video and warns on repeats from the brand's last 3 videos. Propose bold ideas.
+- **No dead air, a hook that moves.** Something hero-sized is on screen whenever the voice speaks (no gap over about 1.2 s) and something moves in the first second. `npm run retention` checks both from `moves.json`, where every beat must carry `until` (the scene second its hero leaves; the lint fails without it), and fails on an image stretched out of its ratio.
 - **No long holds.** No background or camera holds longer than about 5 s: change it with a transition (circle wipe, colour flood, swipe, zoom-through, mask reveal; `Transition` in the kit), a different one each time.
 - Study all the references, not one; never copy their assets, brands or sounds.
 - Text contrast at least 4.5:1 below 84 px and 3:1 above (`npm run contrast`).
 - Kinetic captions (`KineticCaption`) are an option styled into the motion, for muted viewing; otherwise remind the user to turn on the platform's auto-captions.
 - Gradients, glow, several colours and a background change per scene are allowed when the references call for them. A header or logo on every scene is not required. Burned-in captions are optional (only when the user asks).
-- Recreated UI mockups, not screenshots, unless the brief allows screenshots.
+- **Register first (mandatory).** Before deciding how a beat looks, decide which register it is in; a beat done well in the wrong register still fails:
+
+  | The beat is… | Hero | Why |
+  |---|---|---|
+  | a **threat**: something taken, lost, broken, a bill arriving | **photoreal** (licensed photo or footage, or an AI image with its licence and the platform's AI label; a recognisable real person only with that person's permission) | it has to reach the danger reflex; a drawing does not. If the brand bans frightening visuals, keep it photoreal but calm (the aftermath, not the attack) or rewrite the beat |
+  | a **screen**: "you have seen this exact screen" | **real screenshot**, cropped to the rows the beat is about, only when the brief allows screenshots **and** the owner of what is on it (the account holder, client or person whose data, name or messages show) has given permission | the viewer owns the real one; a copy is subtly wrong and reads as a lie. Screenshots not allowed: rewrite the beat so it no longer depends on recognising that screen |
+  | a **concept** or a **sensation** (slow, hot, confusing, a waiting period) | **drawn**: props, type, abstract UI | nothing to photograph, no screen to show |
+
+  **Never fake a UI.** No generated image or redrawn copy of a real product's screen presented as the real thing, and no invented numbers or messages inside a real app's look. An abstract mockup is fine: grey bars for text, simplified shapes, no pixel-for-pixel copy of a real app. Treat it as the drawn register. Record every permission (who, for which image, date) in `CLAUDE_<CODE>.md`; no permission, no screenshot or photo of that person or account.
 - The brand's own bans in `CLAUDE_<CODE>.md` still apply (for example no frightening visuals).
 - Style and process rules that are dropped for good: the template layouts and visual catalog as the default, one accent per scene, a single fixed background colour, no gradients or glow, a header on every scene, burned-in captions, the storyboard approval as a blocker. Do not bring them back unless the user asks.
 - Rules that stay, because they protect licensed and regulated users: true numbers with source labels, the illustration label on hypotheticals, no guaranteed outcomes or claim promises, the required disclaimers, licensed or synthesised sound only (see Evidence and Audio).
@@ -134,6 +143,7 @@ Safe area for 1080×1920: keep text inside x 80–1000 and above y ≈ 1500; the
 ## Audio
 
 - Voiceover: one take per video, normalised to -16 LUFS with -3 dBTP peaks by `npm run vo`.
+- Too long or too loose: cap the pauses in the existing take (`npm run trim`, default 0.3 s, never below 0.18 s), then tighten holds, and only then rewrite and re-record. Never speed the voice up and never drop a step to hit a length.
 - Music: optional, rights cleared, normalised into the project, ducked about 13 dB under the voice and 8 dB in pauses.
 - Sound effects: synthesised in the project (`npm run sfx`, no licence needed) or files with a commercial licence note; intensity `off | subtle | medium | dramatic`. Never meme sounds or sounds lifted from songs, films, cartoons or games.
 - Final mix: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP, measured with `npm run loudness -- <file.wav>` (Remotion's ffmpeg has no ebur128 filter).

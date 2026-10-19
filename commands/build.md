@@ -45,7 +45,7 @@ npx remotion ffmpeg -hide_banner -loglevel error -i "<reference>" -vf "fps=2,sca
 
 Write down what the reels and the library share and what each does that the others do not: pacing (how long one idea stays), type (sizes, weights, the italic or serif word), background (paper, grain, glow, colour per scene), transitions (wipes, circle reveals, push), props (receipts, stamps, calendars, toggles, notifications, chat boxes, dials, counters, progress rings), and how elements enter, act and leave. Never copy their assets, brands or sounds.
 
-Then write `<project>/06-motion-<id>.md`, one block per beat (about every 1.5–3 s of speech): the spoken words, the one idea on screen, the library move or reel it starts from and how this version differs, the props and how they move, the transition out, and the sound. **Always fresh** (mandatory): a new idea per beat, never a previous video's scene design reused as it is. Read the `moves.json` of the brand's last 3 videos in `src/proto/*/` and do not repeat their moves or transitions; inside this video no move and no transition twice. Plan a background or camera change at least every 4–5 s (pick from the transition set in the motion library). Propose bold ideas; the user can pull them back.
+Then write `<project>/06-motion-<id>.md`, one block per beat (about every 1.5–3 s of speech): the spoken words, the register (threat → photoreal, screen → real screenshot, concept → drawn; see `hookreel-rules` → Custom motion), the one idea on screen, the library move or reel it starts from and how this version differs, the props and how they move, the transition out, and the sound. **Always fresh** (mandatory): a new idea per beat, never a previous video's scene design reused as it is. Read the `moves.json` of the brand's last 3 videos in `src/proto/*/` and do not repeat their moves or transitions; inside this video no move and no transition twice. Plan a background or camera change at least every 4–5 s (pick from the transition set in the motion library). Propose bold ideas; the user can pull them back.
 
 ## Step 4 — Prototype one scene (approval gate)
 
@@ -53,7 +53,7 @@ Build the hook scene first, in `src/proto/<id>/`:
 
 1. Word times: `npm run words -- <id>` after recording, or `npm run words -- <id> --estimate` before (2.5 words per second; rerun after `/hookreel:voice`).
 2. `src/proto/<id>/scenes.tsx` with the scene components, using `src/proto/kit.tsx`: the font library `FONT` (`display` Open Sans 800, `sans` Rubik 500–700, `serif` Instrument Serif italic; the same for every brand), `useT`, `prog`, `mix`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `SourceLine`, `Transition` (circle, flood, swipe, zoom, mask), `KineticCaption` (optional captions for muted viewing, styled into the motion), `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`. Everything else (props, layouts) is written new for this video.
-3. `src/proto/<id>/moves.json`, the freshness log: one entry per beat, `{ "scene", "at" (scene seconds), "move", "transition" (only where the background or camera changes) }`, named in plain words ("counter assembled from dots", "colour flood"). Keep it in step with the scenes; `npm run fresh -- <id>` checks it.
+3. `src/proto/<id>/moves.json`, the freshness log: one entry per beat, `{ "scene", "at" (scene seconds), "move", "transition" (only where the background or camera changes), "until" (required: scene second the beat's hero leaves the screen) }`, named in plain words ("counter assembled from dots", "colour flood"). Keep it in step with the scenes; `npm run fresh -- <id>` and `npm run retention -- <id>` check it.
 4. `src/proto/<id>/Reel.tsx`: `export const REEL = protoReel(WORDS, [["<scene id>", Scene], …])`, and register the video and its layout sweep in `src/Root.tsx`:
 
 ```tsx
@@ -79,7 +79,7 @@ Build the remaining scenes in the approved look, with a new idea per beat (rules
 
 ## Step 6 — Validate and look
 
-`npx tsc --noEmit`, `npm run lint` and `npm run fresh -- <id>`; fix every error. Check every text colour pair with `npm run contrast` (4.5:1 below 84 px, 3:1 above). Then `npm run sweep -- <id>` (6 frames per scene on one image, safe area in red) and read it: one idea per screen, no background or camera held longer than about 5 s, nothing clipped or overlapping, text inside x 80–1000 and above y 1500 (the platform UI covers the bottom and right edge), every source line and label readable, each beat's animation finished before the next starts. Fix and repeat until clean.
+`npx tsc --noEmit`, `npm run lint`, `npm run fresh -- <id>` and `npm run retention -- <id>` (dead air over 1.2 s, first beat after 1 s, stretched images); fix every error. Check every text colour pair with `npm run contrast` (4.5:1 below 84 px, 3:1 above). Then `npm run sweep -- <id>` (6 frames per scene on one image, safe area in red) and read it: one idea per screen, no background or camera held longer than about 5 s, nothing clipped or overlapping, text inside x 80–1000 and above y 1500 (the platform UI covers the bottom and right edge), every source line and label readable, each beat's animation finished before the next starts. Fix and repeat until clean.
 
 ## Step 7 — Studio CLAUDE files
 
