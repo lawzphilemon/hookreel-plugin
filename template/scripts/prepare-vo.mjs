@@ -5,7 +5,8 @@
 //      the take to -16 LUFS with one fixed gain and a peak limiter (about -3 dBTP, room for music and SFX),
 //   2. transcribes it with Whisper (local) and lines the words up with the script,
 //   3. cuts at the pause nearest each scene boundary (or at the ranges you pass, in seconds),
-//   4. writes public/vo/<reel>/<scene>.wav (30 ms fades at both ends) plus <scene>.words.json for word-accurate cues and captions.
+//   4. writes public/vo/<reel>/<scene>.wav (30 ms fades at both ends) plus <scene>.words.json for word-accurate cues and captions,
+//      and (when it transcribes the whole take) out/<reel>-take.json with absolute word times for picking ranges.
 import fs from "fs";
 import path from "path";
 import { execSync, spawnSync } from "child_process";
@@ -173,6 +174,10 @@ if (ranges) {
   segments = ranges.split(",").map((r) => r.split("-").map(Number));
 } else {
   const heard = await hear(normalised);
+  // Full-take words with absolute times: pick explicit ranges from this file, no second Whisper pass.
+  const takeFile = path.join("out", `${reelId}-take.json`);
+  fs.writeFileSync(takeFile, JSON.stringify(heard, null, 2));
+  console.log(`Full-take transcript (absolute seconds): ${takeFile}`);
   const fullScript = scenes.map((s) => s.vo).join(" ");
   const times = scriptWordTimes(fullScript, heard, total);
   // Detect pauses on the original take: normalising lifts the room noise between sentences.
@@ -236,6 +241,10 @@ for (const [i, [start, end]] of segments.entries()) {
   console.log(`\n${scene.id}  ${start.toFixed(2)}s → ${end.toFixed(2)}s`);
   console.log(`  script: ${scene.vo}`);
   console.log(`  heard:  ${words.map((x) => x.text).join(" ")}`);
+  // About 2.5 spoken words a second; a clip twice as long hides a retake or false starts.
+  const estimate = splitWords(scene.vo).length / 2.5;
+  if (end - start > 2 * estimate)
+    console.warn(`  WARNING: clip is ${(end - start).toFixed(1)}s, over 2× the ${estimate.toFixed(1)}s estimate; check for a retake or false starts and cut it with explicit ranges (see out/${reelId}-take.json)`);
 }
 
 // Let the studio know about the new clips.
