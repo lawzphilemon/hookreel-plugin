@@ -29,8 +29,8 @@ Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follo
 Project <CODE> · <slug> · <brand> · created <date>
 | Stage | Status | Date | File |
 | brief / facts / story / script / build | confirmed · approved · needs re-approval · not started | … | … |
-| Video | Prototype | Built | Voiceover | QA | Critique | MP4 |
-| <CODE>-teaser | approved <date> | yes | recorded <date> | pass / — | written / — | out/<CODE>-teaser.mp4 |
+| Video | Prototype | Built | Voiceover | QA | Critique | MP4 | Posting folder |
+| <CODE>-teaser | approved <date> | yes | recorded <date> | pass / — | written / — | out/<CODE>-teaser.mp4 | publish/ (cover <n>) / — |
 ```
 
 Flag anything stale: facts older than about 30 days in `02-facts.md`, a `words.json` still estimated after recording, a studio `videos/<id>.json` whose lines differ from the approved script.

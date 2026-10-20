@@ -27,7 +27,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | voice | `public/vo/<id>/`, `src/proto/<id>/words.json` re-timed on the recording |
 | qa | `07-qa-<id>.md`, `out/<id>.mp4`, `out/<id>-preview.mp4`, then the mandatory **`07b-critique-<id>.md`** (the video, the workflow, plugin updates) |
 | carousel (any time, own gate) | `<project>/carousel/<id>/`: `01-source.md`, `02-copy.md` (approved), `carousel.html`, `slide-NN.png`, `verification.json` (`scripts/carousel.mjs`), `report.md` |
-| publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` (only after `07b-critique-<id>.md` exists) |
+| publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` (only after `07b-critique-<id>.md` exists), then once a cover is picked the posting folder `<project>/publish/` (`<id>.mp4`, `<id>-cover.png`, `<id>-caption.txt`) |
 
 Each stage reads the previous files and updates `project.json` and `PROJECTS.md`, so the pipeline resumes after a restart.
 
