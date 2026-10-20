@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.1 — 2026-10-20
+
+- **Private library.** Licensed assets the user may use but not redistribute (sound packs, motion templates) live in `hookreel-library/` in the working directory with a `LIBRARY.md` catalogue, never in the plugin or a public repo. `/hookreel:build` reads it, copies its sound effects into the studio's git-ignored `public/sfx/lib/` (named `lib/<name>` in `moves.json` and `Sfx`, found by `npm run retention`), and treats its templates as references like reference reels, never layouts to render. `/hookreel:qa` checks the library licence line and that no library file is committed.
+
 ## 0.13.0 — 2026-10-20
 
 Ideas from the Motion Format skill v1.0.0 (MIT, built on Bang Motion by Bang Tutorial, MIT), rewritten for Remotion and vertical reels.

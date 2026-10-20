@@ -27,4 +27,4 @@ npm run cover -- <id>              # cover variants → out/<id>-cover-<n>.png +
 
 `word-times.mjs`, `loudness.mjs`, `fresh-check.mjs`, `retention.mjs` and `contrast.mjs` each take `--self-test`.
 
-Recordings (`public/vo/`) and music (`public/music/`) are git-ignored on purpose.
+Recordings (`public/vo/`), music (`public/music/`) and sound effects (`public/sfx/`, including licensed private-library sounds in `public/sfx/lib/`) are git-ignored on purpose.

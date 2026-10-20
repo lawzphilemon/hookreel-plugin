@@ -35,9 +35,11 @@ npx remotion ffmpeg -y -i "<track>" -af loudnorm=I=-16:TP=-1.5:LRA=7 -ar 48000 p
 
 Run `npm run check` and fix every error.
 
+**Private library:** if `hookreel-library/LIBRARY.md` exists in the working directory, copy its sound effects into the studio (`mkdir -p public/sfx/lib && cp "<working dir>/hookreel-library/motion-format/sfx/"*/*.wav public/sfx/lib/`, or the command `LIBRARY.md` gives) when `public/sfx/lib/` is missing or older than the library, and add the library's licence line to `CLAUDE_<CODE>.md` under sound.
+
 ## Step 3 — Study the references
 
-**First read `references/motion-library.md` of the `hookreel-rules` skill in full** (the core reference moves, the Instagram motion library, the transition set, the font library, shot sizes (F), the style brief menus (G) and the not-a-slide checks (H)). It is the same for every brand. Then the user's reference reels for this video, which are the source of the look. Find them in `CLAUDE_<CODE>.md` (brief question 16); if none are listed, ask for them before designing anything (screen recordings or files of reels they like; links are fine if you can open them). Look at **all** of them, not just one:
+**First read `references/motion-library.md` of the `hookreel-rules` skill in full** (the core reference moves, the Instagram motion library, the transition set, the font library, shot sizes (F), the style brief menus (G) and the not-a-slide checks (H)). It is the same for every brand. If `hookreel-library/LIBRARY.md` exists, read it too: its templates are references like the reels (timing, easing, where the sounds land), never layouts to render, and its sound effects (`lib/<name>`) can be picked per beat. Then the user's reference reels for this video, which are the source of the look. Find them in `CLAUDE_<CODE>.md` (brief question 16); if none are listed, ask for them before designing anything (screen recordings or files of reels they like; links are fine if you can open them). Look at **all** of them, not just one:
 
 ```bash
 npm run refcuts -- "<reference>"

@@ -1,7 +1,7 @@
 {
   "name": "hookreel",
   "displayName": "HOOKREEL Short Video Pipeline",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Interview-to-video pipeline for short vertical videos (Reels, TikTok, Shorts) for any brand with its own context profile: structured interview and project CLAUDE.md, fact gate, WTF Hook 999 story, reviewed script, then new custom motion design per video invented from the user's reference reels (one prototype scene approved first), beats timed on character-aligned spoken words, synthesised sound effects, loudness check and a 60 fps Remotion toolkit; plus photo carousels from a source post, rendered and checked.",
   "author": {
     "name": "Lawrence Philemon"
