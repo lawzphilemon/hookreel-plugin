@@ -7,6 +7,6 @@ whisper.cpp
 # generated
 public/sfx
 src/videos.generated.ts
-# recordings and licensed music stay out of git
+# recordings, licensed music and private library sounds (public/sfx/lib, ignored with public/sfx) stay out of git
 public/vo
 public/music
