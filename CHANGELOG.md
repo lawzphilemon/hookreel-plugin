@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.3 — 2026-10-20
+
+- `/hookreel:publish` Step 4: once the user picks a cover, one posting folder per project at `hookreel-output/<CODE>_<slug>/publish/` with `<id>.mp4`, `<id>-cover.png` and `<id>-caption.txt` (copies of the studio render, the chosen cover and the caption code block), recorded as `stages.publish.<id>.folder` in `project.json` and in `PROJECTS.md`. No more fetching the MP4 from the studio's `out/` and the caption from a markdown file.
+- `/hookreel:resume`: the status table shows the posting folder per video.
+
 ## 0.12.2 — 2026-10-19
 
 Patch release from the self-critique of HKR-261019-3JH5.

@@ -51,4 +51,20 @@ Write `<project>/08-publish-<id>.md`: the cover variants with scores and file na
 
 Update `<project>/project.json` (`stages.publish.<id>`: covers, chosen cover once the user picks, caption file) and `PROJECTS.md`.
 
-End: "Pick a cover. The caption is in 08-publish-<id>.md, ready to paste."
+End: "Pick a cover. The caption is in 08-publish-<id>.md, ready to paste. Once you pick, everything to post goes in one folder."
+
+## Step 4 — Posting folder
+
+When the user picks a cover, put everything needed to post this video in one folder, `<project>/publish/`, so nothing has to be fetched from the studio:
+
+| File | Copy of |
+|---|---|
+| `<id>.mp4` | the studio's `out/<id>.mp4` (the original render, not the preview) |
+| `<id>-cover.png` | the chosen `out/<id>-cover-<n>.png` (the full 1080×1920, not the grid crop) |
+| `<id>-caption.txt` | the text inside the caption code block in `08-publish-<id>.md`, without the fences (UTF-8) |
+
+Copy, do not move: `out/` stays the studio's render folder. Check the copied MP4 has the same size as the original. Whenever the cover choice, the caption or the render changes later, overwrite the matching file here.
+
+Record it in `project.json` (`stages.publish.<id>.folder`: `"publish/"`, plus the chosen cover) and in `PROJECTS.md`.
+
+End: "Ready to post: `<project>/publish/` has <id>.mp4, <id>-cover.png and <id>-caption.txt. Upload the cover as the custom cover in Instagram."
