@@ -51,6 +51,14 @@ Ask what the user wants, then route:
 | Cover or caption | `/hookreel:publish` | — |
 | A carousel slide (copy or look) | Edit `carousel/<id>/02-copy.md` (re-approve) or `carousel.html` | Re-run `/hookreel:carousel` Step 4 and update `report.md` |
 
+**One-line revisions.** Most edits arrive as one short sentence ("logonya lebih besar", "adegan 3 kelamaan", "transisinya terlalu cepat"):
+1. Name the target (scene, beat, element or sound) and the change. When the target is ambiguous, take the most likely one and say which in one sentence; ask only when it cannot be guessed.
+2. Change only the target. Other scenes, colours, timing and sounds stay as they are unless the user asks.
+3. When a length changes, shift what follows (`until`, cues, the next beat's `at`) and re-run `npm run fresh` and `npm run retention`.
+4. Re-render only the changed seconds (`npx remotion still` at the changed frames, or `--frames=` for the range), then report in one sentence what changed, with numbers: "Scene 3 is now 2 s shorter, the logo 30 % larger."
+
+These edits stay inside the approved script; a new line, claim or number still goes back through the script gate.
+
 **Cascade rule:** editing a stage marks every later stage `needs re-approval` in `project.json` and `PROJECTS.md` (files are kept, approvals are not). Nothing is built again until the script is re-approved.
 
 Never create a new project code for an existing project; a new code is only for a new project.

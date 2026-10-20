@@ -13,8 +13,8 @@ npm run dev          # Remotion Studio
 npm run vo -- <id> "<recording>"   # one take per video → per-scene clips + heard fragments
 npm run words -- <id>              # src/proto/<id>/words.json, character-aligned (--estimate before recording)
 npm run sweep -- <id>              # 6 frames per scene at quarter scale on one image, safe area in red
-npm run fresh -- <id>              # freshness log src/proto/<id>/moves.json: no repeats, no hold over ~5 s
-npm run retention -- <id>          # no dead air over 1.2 s, first beat within 1 s, every transition heard, no stretched image
+npm run fresh -- <id>              # moves.json + style.json: no repeats, no hold over ~5 s, shot sizes change, one special beat, style brief new
+npm run retention -- <id>          # no dead air over 1.2 s, first beat within 1 s, every transition heard, no stretched image, no slide text
 npm run trim -- "<recording>"      # cap the pauses in a take (0.3 s) before npm run vo, no retake
 npm run music -- <id> --mood chill  # original music from code (energetic, cheerful, chill, dramatic), ducked by the kit's Music
 npm run refcuts -- "<reference>"   # cut rhythm of a reference reel + one frame per shot in out/refs/<name>/
@@ -25,6 +25,6 @@ npx remotion render <id>-motion out/<id>-mix.wav --codec=wav && npm run loudness
 npm run cover -- <id>              # cover variants → out/<id>-cover-<n>.png + 3:4 grid preview
 ```
 
-`word-times.mjs`, `loudness.mjs`, `fresh-check.mjs` and `contrast.mjs` each take `--self-test`.
+`word-times.mjs`, `loudness.mjs`, `fresh-check.mjs`, `retention.mjs` and `contrast.mjs` each take `--self-test`.
 
 Recordings (`public/vo/`) and music (`public/music/`) are git-ignored on purpose.

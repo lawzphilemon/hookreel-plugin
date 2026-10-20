@@ -1,16 +1,26 @@
 // Usage: node scripts/fresh-check.mjs <video id>   (npm run fresh -- <video id>)
 // Freshness log check. src/proto/<id>/moves.json lists every beat's move and every scene change:
-//   [{ "scene": "01-hook", "at": 1.35, "move": "counter assembled from dots" },
-//    { "scene": "01-hook", "at": 4.2, "move": "stamp lands on receipt", "transition": "circle wipe" }, …]
+//   [{ "scene": "01-hook", "at": 1.35, "move": "counter assembled from dots", "shot": "close" },
+//    { "scene": "01-hook", "at": 4.2, "move": "stamp lands on receipt", "transition": "circle wipe", "shot": "wide", "special": true }, …]
 // `at` is scene seconds; `transition` marks a background or camera change (wipe, flood, zoom-through, cut to
-// a new colour). Fails on a move or transition used twice in this video, or on a background or camera held
-// longer than 5.5 s. Warns on moves or transitions also used in the last 3 other videos in src/proto/.
+// a new colour); `shot` is the camera's shot size on that beat (wide, medium, close); `special` marks the one
+// beat that gets the most expensive effect. src/proto/<id>/style.json is the video's style brief:
+//   { "background": "<background motion>", "surface": ["<layer>", "<layer>"], "render": "<object render family>",
+//     "signature": "<signature move>", "opener": "<first 3 s>", "closing": "<closing>" }
+// Fails on a move or transition used twice in this video, a background or camera held longer than 5.5 s, a
+// beat without a shot size, three beats in a row at the same shot size, more than one special beat, a
+// missing or incomplete style.json (surface needs 2+ layers), or a style brief that shares 3+ of its 6 lines
+// with one of the last 3 other videos in src/proto/. Warns on moves, transitions and style lines also used
+// there, and on a video with no special beat.
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { camAt, frameOn, SHOT } from "../src/motion.ts";
 
 const MAX_HOLD = 5.5; // seconds a background or camera may hold (rule: about 5 s)
-const key = (s) => s.toLowerCase().replace(/\s+/g, " ").trim();
+const SHOTS = ["wide", "medium", "close"];
+const STYLE = ["background", "surface", "render", "signature", "opener", "closing"];
+const key = (s) => String(s).toLowerCase().replace(/\s+/g, " ").trim();
 
 // moves: the log; offsets: scene id → start second in the video; length: video seconds; others: logs of
 // the last videos. Returns { errors, warnings }.
@@ -31,10 +41,35 @@ export const check = (moves, offsets, length, others = []) => {
     if (t - prev > MAX_HOLD) errors.push(`background or camera holds ${(t - prev).toFixed(1)} s from ${prev.toFixed(1)} s (max ${MAX_HOLD} s)`);
     return t;
   });
+  // Shot sizes, in video order: a size held for three beats reads as a still camera.
+  const order = [...moves].sort((a, b) => offsets[a.scene] + a.at - (offsets[b.scene] + b.at));
+  order.forEach((m, i) => {
+    if (!SHOTS.includes(m.shot)) errors.push(`${m.scene} "${m.move}" @${m.at}s: needs "shot" (${SHOTS.join(", ")})`);
+    else if (i >= 2 && order[i - 1].shot === m.shot && order[i - 2].shot === m.shot) errors.push(`${m.scene} @${m.at}s: third beat in a row at shot "${m.shot}"; change the shot size`);
+  });
+  const special = moves.filter((m) => m.special);
+  if (special.length > 1) errors.push(`${special.length} special beats (${special.map((m) => `${m.scene} @${m.at}s`).join(", ")}); the most expensive effect is used once`);
+  if (!special.length) warnings.push(`no beat is marked "special": true; pick the one moment that gets the most expensive effect`);
   for (const o of others)
     for (const m of moves)
       for (const [kind, name] of [["move", m.move], ["transition", m.transition]])
         if (name && o.moves.some((x) => x[kind] && key(x[kind]) === key(name))) warnings.push(`${kind} "${name}" was also used in ${o.id}`);
+  return { errors, warnings };
+};
+
+// style: style.json of this video (or null); others: [{ id, style }] of the last videos. Returns { errors, warnings }.
+const line = (v) => (Array.isArray(v) ? v.map(key).sort().join(" + ") : key(v));
+export const checkStyle = (style, others = []) => {
+  const errors = [], warnings = [];
+  if (!style) return { errors: [`style.json missing: write the style brief (${STYLE.join(", ")})`], warnings };
+  for (const k of STYLE) if (!style[k] || (Array.isArray(style[k]) && !style[k].length)) errors.push(`style.json: "${k}" is empty`);
+  if (Array.isArray(style.surface) ? style.surface.length < 2 : style.surface) errors.push(`style.json: "surface" needs 2 or more layers (never a flat background)`);
+  for (const o of others) {
+    if (!o.style) continue;
+    const same = STYLE.filter((k) => style[k] && o.style[k] && line(style[k]) === line(o.style[k]));
+    if (same.length >= 3) errors.push(`style brief shares ${same.length} of ${STYLE.length} lines with ${o.id} (${same.join(", ")}); change at least ${same.length - 2}`);
+    else same.forEach((k) => warnings.push(`style "${k}" was also used in ${o.id}`));
+  }
   return { errors, warnings };
 };
 
@@ -54,26 +89,47 @@ const main = (id) => {
   const moves = JSON.parse(fs.readFileSync(`${dir}/${id}/moves.json`, "utf8"));
   const words = JSON.parse(fs.readFileSync(`${dir}/${id}/words.json`, "utf8"));
   const { offsets, length: at } = sceneOffsets(words);
+  const json = (f) => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : null);
   const others = fs
     .readdirSync(dir, { withFileTypes: true })
     .filter((d) => d.isDirectory() && d.name !== id && fs.existsSync(`${dir}/${d.name}/moves.json`))
     .map((d) => ({ id: d.name, file: `${dir}/${d.name}/moves.json` }))
     .sort((a, b) => fs.statSync(b.file).mtimeMs - fs.statSync(a.file).mtimeMs)
     .slice(0, 3)
-    .map((o) => ({ id: o.id, moves: JSON.parse(fs.readFileSync(o.file, "utf8")) }));
-  const { errors, warnings } = check(moves, offsets, at, others);
+    .map((o) => ({ id: o.id, moves: json(o.file), style: json(`${dir}/${o.id}/style.json`) }));
+  const a = check(moves, offsets, at, others), b = checkStyle(json(`${dir}/${id}/style.json`), others);
+  const errors = [...a.errors, ...b.errors], warnings = [...a.warnings, ...b.warnings];
   warnings.forEach((w) => console.log(`warn: ${w}`));
   errors.forEach((e) => console.log(`FAIL: ${e}`));
-  console.log(errors.length ? `${errors.length} freshness error(s)` : `fresh: ${moves.length} beats, no repeats, no hold over ${MAX_HOLD} s`);
+  console.log(errors.length ? `${errors.length} freshness error(s)` : `fresh: ${moves.length} beats, no repeats, no hold over ${MAX_HOLD} s, shot sizes change, style brief new`);
   process.exit(errors.length ? 1 : 0);
 };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (process.argv[2] === "--self-test") {
     const offsets = { a: 0, b: 5 };
-    const ok = check([{ scene: "a", at: 0, move: "dots", transition: "flood" }, { scene: "a", at: 3, move: "stamp" }, { scene: "b", at: 0, move: "dial", transition: "circle wipe" }, { scene: "b", at: 4, move: "ring", transition: "swipe" }], offsets, 12);
-    const bad = check([{ scene: "a", at: 0, move: "dots" }, { scene: "b", at: 1, move: "Dots" }], offsets, 12, [{ id: "old", moves: [{ move: "dots" }] }]);
-    if (ok.errors.length || bad.errors.length !== 2 || bad.warnings.length !== 2) throw new Error(`self-test failed: ${JSON.stringify({ ok, bad })}`);
+    const ok = check([{ scene: "a", at: 0, move: "dots", transition: "flood", shot: "close" }, { scene: "a", at: 3, move: "stamp", shot: "wide", special: true }, { scene: "b", at: 0, move: "dial", transition: "circle wipe", shot: "wide" }, { scene: "b", at: 4, move: "ring", transition: "swipe", shot: "medium" }], offsets, 12);
+    // repeat, hold, missing shot, two special beats
+    const bad = check([{ scene: "a", at: 0, move: "dots", special: true }, { scene: "b", at: 1, move: "Dots", shot: "close", special: true }], offsets, 12, [{ id: "old", moves: [{ move: "dots" }] }]);
+    const flat = check([{ scene: "a", at: 0, move: "x", shot: "close", transition: "t1" }, { scene: "a", at: 2, move: "y", shot: "close" }, { scene: "b", at: 0, move: "z", shot: "close", transition: "t2", special: true }, { scene: "b", at: 4, move: "w", shot: "wide", transition: "t3" }], offsets, 12);
+    const st = { background: "blobs", surface: ["horizon glow", "grain"], render: "clay", signature: "stamp", opener: "in media res", closing: "loop" };
+    const fine = checkStyle(st, [{ id: "old", style: { ...st, render: "flat", signature: "fold", opener: "sound first", closing: "freeze", background: "grid" } }]);
+    const close = checkStyle({ ...st, surface: ["grain", "Horizon glow"] }, [{ id: "old", style: { ...st, render: "flat", signature: "fold", opener: "x" } }]);
+    const thin = checkStyle({ ...st, surface: ["flat"] });
+    const results = [
+      ok.errors.length === 0 && ok.warnings.length === 0,
+      bad.errors.length === 4 && bad.errors.some((e) => e.includes('needs "shot"')) && bad.errors.some((e) => e.includes("2 special")) && bad.warnings.length === 2,
+      flat.errors.length === 1 && flat.errors[0].includes("third beat") && flat.warnings.length === 0,
+      fine.errors.length === 0 && fine.warnings.length === 1,
+      close.errors.length === 1 && close.errors[0].includes("3 of 6"),
+      thin.errors.length === 1 && checkStyle(null).errors.length === 1,
+      // camera: wide at 0, halfway into a close-up on (900, 300) at 0.35 s, edges clamped at the corner
+      camAt(0, []).s >= 1 && camAt(0, []).tx === 0,
+      camAt(0.35, [{ at: 0, s: SHOT.close, x: 900, y: 300 }]).s > 1.4 && camAt(0.35, [{ at: 0, s: SHOT.close, x: 900, y: 300 }]).s < 1.7,
+      ((c) => c.tx === 1080 - 1080 * c.s && c.ty === 0)(camAt(2, [{ at: 0, s: SHOT.close, x: 1080, y: 0, cut: true }])),
+      frameOn({ x: 440, y: 860, w: 200, h: 200 }, 0.5).s === 2.7,
+    ];
+    if (results.includes(false)) throw new Error(`self-test failed: ${JSON.stringify({ results, ok, bad, flat, fine, close, thin })}`);
     console.log("self-test ok");
   } else if (!process.argv[2]) {
     console.error("Usage: node scripts/fresh-check.mjs <video id>");

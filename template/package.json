@@ -39,7 +39,7 @@
     "words": "node scripts/word-times.mjs",
     "loudness": "node scripts/loudness.mjs",
     "sweep": "node scripts/sweep.mjs",
-    "fresh": "node scripts/fresh-check.mjs",
+    "fresh": "node --no-warnings scripts/fresh-check.mjs",
     "contrast": "node scripts/contrast.mjs",
     "preview": "node scripts/preview.mjs",
     "trim": "node --no-warnings scripts/trim-pauses.mjs",
