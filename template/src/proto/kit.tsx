@@ -84,7 +84,8 @@ export const Glow: React.FC<{ t: number; color: string; base: string }> = ({ t, 
   <AbsoluteFill style={{ background: `radial-gradient(950px 950px at ${540 + Math.sin(t * 0.7) * 170}px ${820 + Math.cos(t * 0.5) * 140}px, ${color}, transparent 70%), ${base}` }} />
 );
 
-// A sound effect at scene second `at` (files from `npm run sfx` or the studio's licensed sounds).
+// A sound effect at scene second `at` (files from `npm run sfx`, `npm run lib-sfx` for `lib/…` or the
+// studio's licensed sounds; all peak at -6 dBFS, so one volume means the same for every source).
 export const Sfx: React.FC<{ at: number; name: string; volume: number }> = ({ at, name, volume }) => (
   <Sequence from={Math.round(at * FPS)} layout="none">
     <Audio src={staticFile(`sfx/${name}.wav`)} volume={volume} />
@@ -114,9 +115,10 @@ export const wordsOf = (words: Words, id: string) => {
   };
 };
 
-export const Vo: React.FC<{ words: Words; id: string }> = ({ words, id }) => (
+// `volume` trims a take that measures loud in the mix check; `npm run vo` already levels it for the stereo mix.
+export const Vo: React.FC<{ words: Words; id: string; volume?: number }> = ({ words, id, volume = 1 }) => (
   <Sequence from={Math.round(TIME.leadIn * FPS)} layout="none">
-    <Audio src={staticFile(`vo/${words.video}/${id}.wav`)} />
+    <Audio src={staticFile(`vo/${words.video}/${id}.wav`)} volume={volume} />
   </Sequence>
 );
 
@@ -160,6 +162,8 @@ export const Transition: React.FC<{ t: number; at: number; kind: TransitionKind;
   const p = prog(t, at, dur, Easing.bezier(0.5, 0, 0.2, 1));
   if (p <= 0) return null;
   if (kind === "object") {
+    // Done: drop the slab, or its rotated corner stays parked at the left edge for the rest of the scene.
+    if (p >= 1) return <AbsoluteFill>{children}</AbsoluteFill>;
     const OW = 1500;
     const cx = mix(p, 1080 + OW / 2, -OW / 2);
     return (

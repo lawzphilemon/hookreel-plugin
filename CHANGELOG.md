@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.13.2 — 2026-10-20
+
+Patch release from the self-critique of HKR-261019-Y6VQ.
+
+- Kit `Transition kind="object"`: once the pass is done it returns only the next stage; the slab no longer stays parked at the left edge with its rotated corner showing.
+- Kit `Vo`: `volume` prop.
+- `npm run vo`: upmixes a mono take to stereo before levelling, so -16 LUFS is what the stereo mix hears (mono takes measured about 3 dB loud in the mix). `out/<id>-take.json` is written on every run that has none, also a rerun with ranges.
+- `npm run lib-sfx -- "<library>/<pack>/sfx"`: installs private library effects into `public/sfx/lib/` peak-normalised to -6 dBFS (they peaked the mix at -0.3 dBTP at volume 0.3–0.4).
+- `npm run retention`: currency codes (USD, IDR, SGD…) no longer count as all-caps text.
+- `/hookreel:voice`: a TTS path (voice clone): spoken forms and `[pause]` in the prompt, expansions, pace, the user saves the files, AI label.
+- `/hookreel:script`: the VOICEOVER template uses the scene ids (`01-hook`, `02-…`).
+- `/hookreel:qa`: the mix check runs before the first full MP4 render.
+
 ## 0.13.1 — 2026-10-20
 
 - **Private library.** Licensed assets the user may use but not redistribute (sound packs, motion templates) live in `hookreel-library/` in the working directory with a `LIBRARY.md` catalogue, never in the plugin or a public repo. `/hookreel:build` reads it, copies its sound effects into the studio's git-ignored `public/sfx/lib/` (named `lib/<name>` in `moves.json` and `Sfx`, found by `npm run retention`), and treats its templates as references like reference reels, never layouts to render. `/hookreel:qa` checks the library licence line and that no library file is committed.

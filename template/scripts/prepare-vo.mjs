@@ -1,12 +1,13 @@
 // Usage: node scripts/prepare-vo.mjs <video id> <full recording> [start-end,start-end,...]
 //
 // Turns one voiceover take for a whole reel into per-scene clips:
-//   1. removes rumble and mic thumps below 90 Hz (phone recordings pop on "p", "b", "k"), then brings
-//      the take to -16 LUFS with one fixed gain and a peak limiter (about -3 dBTP, room for music and SFX),
+//   1. upmixes a mono take to stereo (the reel's mix is stereo: a mono clip levelled alone lands about
+//      3 dB louder there), removes rumble and mic thumps below 90 Hz (phone recordings pop on "p", "b",
+//      "k"), then brings it to -16 LUFS with one fixed gain and a peak limiter (about -3 dBTP, room for music and SFX),
 //   2. transcribes it with Whisper (local) and lines the words up with the script,
 //   3. cuts at the pause nearest each scene boundary (or at the ranges you pass, in seconds),
 //   4. writes public/vo/<reel>/<scene>.wav (30 ms fades at both ends) plus <scene>.words.json for word-accurate cues and captions,
-//      and (when it transcribes the whole take) out/<reel>-take.json with absolute word times for picking ranges.
+//      and out/<reel>-take.json with the full take's words in absolute seconds, for picking ranges.
 import fs from "fs";
 import path from "path";
 import { execSync, spawnSync } from "child_process";
@@ -160,24 +161,29 @@ const fade = (file, seconds = 0.03) => {
 };
 
 fs.mkdirSync("out", { recursive: true });
-// High-pass first, then level, so the peak limit holds on the filtered voice.
+// High-pass first, then level, so the peak limit holds on the filtered voice. Stereo before measuring,
+// so -16 LUFS is what the stereo mix hears.
 const filtered = path.join("out", `${reelId}-highpassed.wav`);
-ffmpeg(`-i "${input}" -ar 48000 -c:a pcm_s16le "${filtered}"`);
+ffmpeg(`-i "${input}" -ac 2 -ar 48000 -c:a pcm_s16le "${filtered}"`);
 highpass(filtered);
 const normalised = path.join("out", `${reelId}-normalised.wav`);
 fs.copyFileSync(filtered, normalised);
 level(normalised);
 const total = duration(normalised);
 
+// Full-take words with absolute times (the format /hookreel:voice documents): pick explicit ranges from
+// this file. A rerun with ranges keeps the one the first run saved, so there is no second full pass.
+const takeFile = path.join("out", `${reelId}-take.json`);
+const heard = ranges && fs.existsSync(takeFile) ? null : await hear(normalised);
+if (heard) {
+  fs.writeFileSync(takeFile, JSON.stringify(heard, null, 2));
+  console.log(`Full-take transcript (absolute seconds): ${takeFile}`);
+}
+
 let segments;
 if (ranges) {
   segments = ranges.split(",").map((r) => r.split("-").map(Number));
 } else {
-  const heard = await hear(normalised);
-  // Full-take words with absolute times: pick explicit ranges from this file, no second Whisper pass.
-  const takeFile = path.join("out", `${reelId}-take.json`);
-  fs.writeFileSync(takeFile, JSON.stringify(heard, null, 2));
-  console.log(`Full-take transcript (absolute seconds): ${takeFile}`);
   const fullScript = scenes.map((s) => s.vo).join(" ");
   const times = scriptWordTimes(fullScript, heard, total);
   // Detect pauses on the original take: normalising lifts the room noise between sentences.
