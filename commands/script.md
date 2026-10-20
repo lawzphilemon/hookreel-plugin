@@ -89,7 +89,7 @@ What it does: [normalise -16 LUFS / -3 dBTP, local Whisper, cut per scene at the
 | Video | Recorded | Date | File |   (filled by /hookreel:voice)
 
 ## [video id] · [title] · ~[n] s
-| Scene | Line | Estimate |   (estimate = words ÷ 2.5 + 1 s; total at the end)
+| Scene | Line | Estimate |   (Scene = the scene id, `01-hook`, `02-<name>`…, the same ids as `04-script.md` and the clip names `npm run vo` writes; estimate = words ÷ 2.5 + 1 s; total at the end)
 ```
 
 Send the user the file.

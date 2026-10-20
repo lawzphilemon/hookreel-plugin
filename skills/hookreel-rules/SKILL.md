@@ -150,12 +150,12 @@ Safe area for 1080×1920: keep text inside x 80–1000 and above y ≈ 1500; the
 
 Licensed assets the user owns but may not redistribute (sound packs, motion templates, footage) live in **`hookreel-library/`** in the working directory, next to `hookreel-output/` and `hookreel-studio/`, never in this plugin or any public repository. Its `LIBRARY.md` lists each asset with its licence and how to use it. When it exists:
 - `/hookreel:build` reads `LIBRARY.md` with the motion library. Library templates and clips are **references**, like the user's reference reels: take timing, easing and sound placement, build new motion in Remotion, never render them as they are or copy their look; the always-fresh rule applies.
-- Library sound effects are copied into the studio's `public/sfx/lib/` (git-ignored with the rest of `public/sfx`) and named `lib/<name>` in `moves.json` and `Sfx`. They count as licensed sounds: their licence line from `LIBRARY.md` goes into `CLAUDE_<CODE>.md` and the QA report.
+- Library sound effects are installed into the studio's `public/sfx/lib/` (git-ignored with the rest of `public/sfx`) with `npm run lib-sfx -- "<hookreel-library>/<pack>/sfx"`, which peak-normalises each to -6 dBFS like the synthesised set (a plain copy peaked the mix near 0 dBTP), and named `lib/<name>` in `moves.json` and `Sfx`. They count as licensed sounds: their licence line from `LIBRARY.md` goes into `CLAUDE_<CODE>.md` and the QA report.
 - Never copy library files into the plugin, a public repository or anything shared; never put the library vendor's name or logo into a video.
 
 ## Audio
 
-- Voiceover: one take per video, normalised to -16 LUFS with -3 dBTP peaks by `npm run vo`.
+- Voiceover: one take per video (a recording, or a TTS voice clone with the AI label: `/hookreel:voice`), upmixed to stereo and normalised to -16 LUFS with -3 dBTP peaks by `npm run vo`.
 - Too long or too loose: cap the pauses in the existing take (`npm run trim`, default 0.3 s, never below 0.18 s), then tighten holds, and only then rewrite and re-record. Never speed the voice up and never drop a step to hit a length.
 - Music: optional. Either original music synthesised from code (`npm run music -- <id> --mood energetic|cheerful|chill|dramatic`, no licence needed, remade after every new recording) or a rights-cleared track normalised into the project. Ducked about 13 dB under the voice and 8 dB in pauses (the kit's `Music`, the template's BackgroundMusic).
 - Sound effects follow the picture: every transition and every key beat has its sound, named per beat in `moves.json` (`sfx`, or `"none"` for a deliberate silence); `npm run retention` fails on a transition or a whole scene without one.

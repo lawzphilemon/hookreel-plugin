@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Bash
 
 ## Step 1 — Checklist
 
-Go through every item and report pass or fail with evidence:
+Go through every item and report pass or fail with evidence. Run item 8 (audio) first: the WAV render and loudness check take a minute, a full MP4 render about 25, so every audio fix happens before the first MP4.
 
 1. **Layout:** `npm run sweep -- <id>` (6 frames per scene at quarter scale on one image, safe area drawn in red). One idea per screen; text inside x 80–1000 and above y 1500; nothing clipped or overlapping; every beat's animation finished before the next starts; the lower part of the safe area used, not left empty. Render a full-size still (`npx remotion still <id>-motion out/stills/<id>-<frame>.png --frame=<frame> --log=error`) only for a frame that looks wrong.
 2. **Sync:** `src/proto/<id>/words.json` comes from the recording (`npm run words -- <id>`, not `--estimate`); every beat lands on its spoken word (allow about 0.15 s); the render's length matches the sum of the scene lengths.

@@ -67,6 +67,7 @@ export const sfxAudit = (moves, words, has) => {
 };
 
 const MAX_TIERS = 2, MAX_WORDS = 6;
+const CURRENCY = /\b(USD|IDR|SGD|MYR|EUR|GBP|JPY|AUD|CNY|HKD)\b/g;
 // moves: moves.json. Returns { errors, warnings } for the on-screen text of every beat.
 export const slideCheck = (moves) => {
   const errors = [], warnings = [];
@@ -82,7 +83,9 @@ export const slideCheck = (moves) => {
       const n = String(x).trim().split(/\s+/).filter(Boolean).length;
       if (n > MAX_WORDS) errors.push(`${at}: "${x}" is ${n} words; at most ${MAX_WORDS} on screen, split it over two beats or show it`);
       if (n <= 4 && /[^.]\.$/.test(String(x).trim())) warnings.push(`${at}: "${x}" ends in a full stop; short phrases go without one unless the style brief chose it`);
-      if (/\p{Lu}{3}/u.test(x) && String(x) === String(x).toUpperCase()) caps.push(at);
+      // Currency codes (USD 1.000) are written in caps; they are not shouting.
+      const y = String(x).replace(CURRENCY, "");
+      if (/\p{Lu}{3}/u.test(y) && y === y.toUpperCase()) caps.push(at);
     }
   }
   if (caps.length > 1) warnings.push(`all-caps text on ${caps.length} beats (${caps.join(", ")}); sentence case, caps for one emphasis beat at most`);
@@ -205,6 +208,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       JSON.stringify(slideCheck([{ scene: "a", at: 0, move: "x", text: ["Premi naik", "sumber: OJK"] }, { scene: "a", at: 1, move: "y", text: [] }])) === '{"errors":[],"warnings":[]}',
       slideCheck([{ scene: "a", at: 0, move: "x", text: ["01 — FITUR", "Satu", "Dua"] }, { scene: "a", at: 1, move: "y" }, { scene: "a", at: 2, move: "z", text: ["ini kalimat yang terlalu panjang untuk layar"] }]).errors.length === 3,
       slideCheck([{ scene: "a", at: 0, move: "x", text: ["Bayar dulu."] }, { scene: "a", at: 1, move: "y", text: ["STOP"] }, { scene: "a", at: 2, move: "z", text: ["GRATIS"] }, { scene: "a", at: 3, move: "w", text: ["Rp1,5 jt"] }]).warnings.length === 2,
+      slideCheck([{ scene: "a", at: 0, move: "x", text: ["USD 10.000"] }, { scene: "a", at: 1, move: "y", text: ["Premi USD"] }, { scene: "a", at: 2, move: "z", text: ["USD"] }]).warnings.length === 0,
     ];
     if (ok.includes(false) || ok.includes(undefined)) throw new Error(`self-test failed: ${JSON.stringify({ ok, air, slow })}`);
     console.log("self-test ok");
