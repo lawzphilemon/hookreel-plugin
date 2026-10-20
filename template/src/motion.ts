@@ -49,6 +49,39 @@ export const TIME = {
   character: { at: 0.13, bubble: 0.6, chips: 0.67, push: 0.06 },
 } as const;
 
+// Shot sizes for custom scenes (world scale): wide shows the whole composition, medium fills about a
+// third to half of the frame with the element that speaks, close lets it fill most of the frame.
+// A breathing push of a few percent is not a shot change; it reads as a still camera.
+export const SHOT = { wide: 1, medium: 1.45, close: 2.1 } as const;
+export type ShotSize = keyof typeof SHOT;
+// One camera move: from scene second `at`, over `dur` seconds, to scale `s` centred on world point
+// (x, y). `cut: true` jumps there at `at` (a scene may be born in a close-up and pull back).
+export type Shot = { at: number; s: number; x?: number; y?: number; dur?: number; cut?: boolean };
+
+// Camera at scene second t: scale and translate for a top-left-origin wrapper. Ease in-out between
+// shots, a 1 % breath on top, and clamped so the edge of the world never shows.
+export const camAt = (t: number, shots: Shot[], W = 1080, H = 1920) => {
+  let s = 1, x = W / 2, y = H / 2;
+  for (const sh of shots) {
+    if (t < sh.at) break;
+    const d = sh.dur ?? 0.7;
+    const q = sh.cut || d <= 0 ? 1 : Math.min(1, (t - sh.at) / d);
+    const p = q * q * (3 - 2 * q);
+    s += (sh.s - s) * p;
+    x += ((sh.x ?? W / 2) - x) * p;
+    y += ((sh.y ?? H / 2) - y) * p;
+  }
+  s = Math.max(1, s * (1 + 0.01 * Math.sin(t * 0.7)));
+  return { s, tx: Math.min(0, Math.max(W - W * s, W / 2 - x * s)), ty: Math.min(0, Math.max(H - H * s, H / 2 - y * s)) };
+};
+
+// A shot that frames a box in world pixels so it fills `fill` of the frame (close ≈ 0.7, medium ≈ 0.45).
+export const frameOn = (box: { x: number; y: number; w: number; h: number }, fill = 0.45, W = 1080, H = 1920) => ({
+  s: Math.max(1, Math.min((W * fill) / box.w, (H * fill) / box.h)),
+  x: box.x + box.w / 2,
+  y: box.y + box.h / 2,
+});
+
 export type Entrance = "rise" | "focus" | "pop";
 export type Idle = "still" | "float";
 

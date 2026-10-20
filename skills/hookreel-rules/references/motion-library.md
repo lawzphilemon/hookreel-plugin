@@ -93,7 +93,7 @@ Keep busy character scenes readable: one idea per scene, a scrim behind any text
 
 ## C. Transition set
 
-No background or camera holds longer than about 5 s. Change it with a transition, a different one each time, and log it in `moves.json`. The kit's `Transition` covers five; invent more in the same way (a function of the frame, revealing the next stage over the current one).
+No background or camera holds longer than about 5 s. Change it with a transition, a different one each time, and log it in `moves.json`. The kit's `Transition` covers six; invent more in the same way (a function of the frame, revealing the next stage over the current one).
 
 | Transition | Kit | What it does | Good for |
 |---|---|---|---|
@@ -102,7 +102,24 @@ No background or camera holds longer than about 5 s. Change it with a transition
 | Swipe | `kind="swipe"` | The next stage slides in from the right like a phone screen | UI and step-by-step beats |
 | Zoom-through | `kind="zoom"` | The next stage grows from a small rounded card to full frame | Going "into" a phone, card or detail |
 | Mask reveal | `kind="mask"` | A soft diagonal wipe | Calm changes, editorial scenes |
-| Camera move (in the scene) | `transform` on a wrapper | Push in, pan across a wide layout, rotate a few degrees | Holding one stage longer while still moving the camera |
+| Object wipe | `kind="object"` (`shape` = the object, default a brand-colour slab) | An object passes close to the lens and the next stage is already behind it | Any change a prop of this beat can carry |
+| Shot change (in the scene) | `Camera` with `shots` (see F) | Close-up on the element that speaks, back to wide, close on the next | Holding one stage longer while the camera still tells the story |
+
+**Transitions carried by objects** (no kit component; build them per beat, as functions of the frame like the rest; from the Motion Format skill, see F):
+- The next beat's prop is the wipe: a phone, door, envelope or card rises from the edge and covers the frame; the camera is already in the new stage.
+- Out of the screen: the item picked in a UI lifts toward the camera, the screen folds away, and the item is a real object in the next stage.
+- Match cut on shape: a coloured object on dark cuts to the same shape as an outline on light, then gets its colour back.
+- Pull back to reveal: the subject shrinks to the centre while the next place builds around it.
+- A hand takes it: a hand enters and picks the object up; the gesture closes one beat and opens the next.
+- Colour field in two steps: a secondary colour sweeps, then the main one, and it stays as the next background (not a decorative bar passing by).
+- Into a symbol: a symbol grows fast into the lens with blur; its colour becomes the next background.
+- Flip to change: an icon turns edge-on; on its back the glyph and the line have changed.
+- A panel blooms into the next step: a button is tapped and its panel grows to fill the frame with the next screen.
+- A shape becomes a window: a logo shape or letter grows into a window onto the next stage.
+- Dim, then change: the line greys out before it leaves; the next line lands in the same place.
+- Delete and type: the old line deletes letter by letter from the left; the new one is typed in its place.
+
+**Transition craft.** Never slide the whole stage until its edge shows (it reads as "next page"; `Camera` clamps the world for this reason). A sudden spin or zoom with blur on every cut is an editor preset, not motion design. One kind of transition on every cut is a template, however expensive. Most changes are carried by elements that overlap in time (one leaves while the next arrives) or by an object wipe; a fast zoom-through only when it is motivated (diving into a phone screen).
 
 ## D. Font library (every brand)
 
@@ -217,3 +234,127 @@ A 27 s, 720×1280, 30 fps edit of phone footage. It is the one reference here fo
 - A **frosted stats card** (`backdropFilter: blur(18px)`, translucent dark, 1 px light border) slides up on a spring. Over the same 1.8 s, a route line **draws itself** (`strokeDashoffset` 1 → 0 with a glow) and the stats count up (`toFixed(2)`, m:ss formatting). The card **steps aside** (drops 500 px) while the footage needs the frame, then returns. This uses one `interpolate` with a separate easing per segment.
 
 Fonts: Barlow Condensed 600/800 for numbers and titles, Inter 500/600 for labels. Accent pink `#FF2D87`.
+
+## F. Camera: shot sizes
+
+Sections F–H and the object transitions in C are adapted from the **Motion Format** skill v1.0.0 (MIT), itself built on [Bang Motion](https://github.com/bangtutorial/bang-motion) by Bang Tutorial (MIT), rewritten for Remotion and vertical reels.
+
+"Zoom in and out" in motion design means **changing the shot size**, not a camera breath: a push of a few percent is nearly invisible and the video still reads as still.
+
+| Shot | Kit | Use |
+|---|---|---|
+| Wide | `SHOT.wide` (1) | The whole composition: several elements, or a line that needs the full width |
+| Medium | `SHOT.medium` (about 1.45) or `frameOn(box, 0.45)` | The element that speaks plus a little context, about a third to half of the frame |
+| Close | `SHOT.close` (about 2.1) or `frameOn(box, 0.7)` | One element or its detail fills the frame: emphasis, the moment of action, a small detail that must be read |
+
+- Aim at the element that is speaking now: the line that just landed, the prop that arrived, the button being tapped, the detail the voice names. The camera meets it; it does not chase it.
+- Change the shot on the beat: close on A → back to wide when the composition needs the whole frame → close on B. Never three beats in a row at the same size (`npm run fresh` fails on it). Log each beat's size as `shot` in `moves.json`.
+- Two tempos: the shot change itself (0.6–0.9 s, ease in-out) and a slow push while holding.
+- A scene may be born in a close-up (`cut: true`) and pull back; the video may open in one.
+- Text lands after the camera arrives, never mid-move. Do not swing close and wide faster than a viewer can read.
+- World inside `Camera`, screen layer outside: labels, source lines, captions and the CTA sit outside the rig so they never scale or get cut. Raster images inside the world need the resolution for the close-up (at least scale × displayed size).
+- **UI demos:** move close to the area about to be tapped (scale 1.4–2.2, 0.6–0.9 s ease in-out) so the tap reads, then pull back or pan to the result. Not on every tap.
+
+## G. Style brief menus (one pick each per video, in `style.json`)
+
+Every video's style brief names six lines (`/hookreel:build` Step 3): background motion (G1), background surface with 2+ layers (G2), object render family (G3), signature move, opener (G4) and closing (G5). `npm run fresh` fails when 3 of them match one of the brand's last 3 videos. The fonts and the brand palette stay fixed; these lines are what make two videos of one brand look different. The **signature move** is one kind of motion repeated as this video's identity (a fold, a stamp, a line that draws, a colour block hitting the edge); it moves objects and text, not the background.
+
+### G1. Background motion (never a still background; never "things streaking sideways" by default)
+
+| # | Background motion | Feel |
+|---|---|---|
+| 1 | Textured base + a slow shift of tint, light or grain | calm, premium |
+| 2 | A large 2–3 colour gradient drifting or turning (8–15 s per cycle) | soft, modern |
+| 3 | 2–4 blurred colour blobs floating (±60 px, 4–6 s) | friendly, light |
+| 4 | Living paper grain or texture (offset from t, never random) | organic, print |
+| 5 | One light sweep per segment (not continuous) | premium |
+| 6 | A large shape from the logo or theme turning slowly (20–40 s per turn), two layers of parallax | brand, strong |
+| 7 | Particles rising slowly (dust, bubbles), never horizontal; at most .35 opacity behind text | warm, alive |
+| 8 | A grid or pattern breathing (scale or opacity 1.00 ↔ 1.04, 6–10 s) | technical, precise |
+| 9 | A giant ghost word drifting behind (low contrast) | editorial |
+| 10 | A photo or illustration with slow zoom + two-layer parallax, darkened on the text side | narrative |
+| 11 | Horizontal flow (streaks, lanes): only when the theme is speed or flow | fast, data |
+| 12 | Colour fields from the palette snapping in on the beat (0.15–0.3 s), each filled with moving shapes | pop, energetic |
+
+### G2. Background surface (at least two layers; never one flat colour)
+
+- Horizon glow: a dark gradient with a radial glow of the accent rising from the bottom.
+- Diagonal duotone: accent darkened → base → light accent at about 160°.
+- Light mesh: a pale base with 3–4 large soft blobs in the palette.
+- Spotlight + tint: a soft radial pool of accent on the base.
+- Layered sky: a light vertical gradient with 2–3 thin bands at .2–.4 opacity.
+- Texture + tint: paper or grain (`Grain`) over any of the above; multiply on light, overlay on dark.
+- Grainy gradient: saturated 2–3 colour gradients inside the shapes and the background, fine grain over everything (it also dithers away banding; see `/hookreel:qa` for the render setting).
+
+Under the text keep a calm pocket: dark (luminance ≤ 25 %) or light (≥ 80 %), never a busy middle. Outside the pocket the background should be rich.
+
+### G3. Object render family (one per video, or two when the switch is the moment)
+
+Flat solid · flat with scattered palette dots · soft 3D clay (matte pastel, rounded, soft shadow) · glossy 3D (rim light, reflections) · glass or glowing orb · isometric (30°, no perspective) · realistic metal or marble (best as a licensed or generated image, animated as a layer) · neon line on dark · flat character illustration. Mixing families without a reason looks like stock assets.
+
+### G4. First 3 seconds (the hook beat's opening; two videos in a row never open the same way)
+
+- In media res: the object is already moving on frame 1.
+- Sound first: a hit or effect, the picture lands one beat later.
+- A giant word cut off by the frame edge; the camera pulls back to the whole line.
+- A line draws itself and turns out to be the product, the prop or the logo.
+- A texture in extreme close-up that turns out to be part of the object.
+- The question typed on something in the world (a receipt, a note), not a floating input box.
+- Dark → one light → the world.
+- The problem already happening: the frame opens in the middle of the mess.
+- A grey world with one subject in the brand colour.
+- The unexpected actor: who really uses it is on screen in the first second.
+- The result first: the outcome, very close and blurred, pulls back to make room for the line.
+- Old tools scattered: windows and papers tilted in 3D; the answer is born behind the pile.
+- A kinetic title assembling: letters fly in from different directions and lock.
+
+Text has eight ways in: up, down, left, right, from depth, mask reveal, word by word, typed. Pick from the meaning; two beats in a row never use the same way in.
+
+### G5. Closing (the CTA beat)
+
+- The last object becomes the logo (a morph, or a shape that closes).
+- The camera pulls back: the world was the logo shape all along.
+- The key word of the last line is replaced by the logo.
+- A diegetic CTA: a button in the UI or on an object is pressed, not CTA text floating.
+- A seamless loop: the last frame joins the first.
+- A hard stop: everything stops together, one line, cut.
+- Arrival: the hero object has arrived and a hand takes it; the brand only on its label.
+- Callback to the opener: the logo takes the opener's shape and leaves where it came in.
+- Handle → name: the handle or site is typed, deleted from the left, the brand name typed in its place.
+- Into a portal: the camera enters a shape; the logo waits behind the dark.
+
+Logo and CTA stacked in the centre only when the brief asks for an explicit CTA card. The required disclaimers stay on the end card either way.
+
+### G6. Several points without three tiles
+
+When the voice lists points (features, steps, reasons), pick one way per video; two videos in a row never use the same one:
+- One point demonstrated, the rest as 0.4 s flashes at the end.
+- One line with a word that changes: "Bayar ___" → premi / klaim / denda.
+- One object transforms from point A into point B.
+- Cards shuffled or thrown one by one from a hand or a pile.
+- Orbit: icons circle the subject and drop into it.
+- A mockup in use: scrolled or tapped, each point lights up in place.
+- A diegetic checklist ticked by actions in the world.
+- A before/after divider that slides per point.
+- One container whose contents change fast, landing on the brand's.
+- A claim → how → result cycle per point, repeated, not lined up.
+- A grid of icon tiles (the count follows the points, not always three): one option, never the default.
+
+## H. Not a slide: checks before showing anything
+
+A frame that is technically correct still fails when it reads as a presentation.
+
+- **One shot, one statement.** Up to 6 words per line on screen; a longer claim is split over two beats or shown as an object, an icon or a number. At most two text tiers per beat (one line + one world label); a kicker + title + body is a slide. Log the on-screen text per beat as `text` in `moves.json`; `npm run retention` fails on 3 tiers or 7+ words. Source lines, illustration labels, disclaimers and the text inside a UI mockup do not count (a mockup is read as a picture).
+- **Attention order:** the line first, the hero object next, details last; never a badge before its line.
+- **Sentence case.** All caps for one emphasis beat at most. Short phrases (4 words or fewer) without a full stop; `?` for a real question. The punctuation style is decided once in the style brief.
+- **Template skeleton.** The order hook → point → point → promise → logo → CTA, three feature tiles side by side, a search box being typed, a first line zooming in then leaving left, logo and CTA stacked in the centre: two or more of these in one video without the story asking for them is a template, whatever the colours. Pick the opener, the closing and the way of presenting points from G4–G6 instead.
+- **Every named thing is on screen.** Each product, brand, kind of person, object or number the voice names in a beat appears in that beat (as a prop, an icon, a logo, or the number with its source), unless a ban or a missing permission rules it out; then `06-motion` says so for that beat.
+- **Enter slow, leave fast.** Entrances 0.7–1.3 s with a firm ease-out, exits 0.35–0.55 s with an ease-in (`life(t, at, until)` in the kit). Symmetric in and out reads mechanical.
+- **One special moment.** The most expensive effect (a 3D move, the logo build, a big object wipe) is used once, on the beat marked `"special": true` in `moves.json`. Used everywhere, it stops being special.
+- **When in doubt,** darken the text pocket and make the type bigger.
+
+**Taste check, on the sweep** (`npm run sweep`):
+1. Could this frame be a corporate slide without changes? Then rebuild it.
+2. Does the eye know where to look within 0.2 s? If not, remove elements.
+3. With all text hidden, is the background still interesting but not noisy? Both must be yes.
+4. At each change, does something move because of the camera, not only because elements animate themselves?

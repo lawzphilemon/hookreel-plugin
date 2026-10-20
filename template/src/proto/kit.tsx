@@ -10,9 +10,9 @@ import { loadFont as loadOpenSans } from "@remotion/google-fonts/OpenSans";
 import { loadFont as loadRubik } from "@remotion/google-fonts/Rubik";
 import { loadFont as loadSerif } from "@remotion/google-fonts/InstrumentSerif";
 import { C, FPS } from "../brand";
-import { TIME } from "../motion.ts";
+import { TIME, camAt, frameOn, SHOT, type Shot } from "../motion.ts";
 
-export { C };
+export { C, frameOn, SHOT, type Shot };
 
 // Font library, the same for every brand: Open Sans 800 for headlines and big numbers, Rubik
 // 500–700 for supporting text, labels and UI mockups, Instrument Serif italic for the key word.
@@ -36,6 +36,20 @@ export const squash = (t: number, at: number) => {
   const k = t < at ? 0 : Math.max(0, 1 - (t - at) / 0.33) * Math.cos((t - at) * 27);
   return { sx: 1 + 0.25 * k, sy: 1 - 0.25 * k };
 };
+// Asymmetric life of an element, 0 → 1 → 0: enters slow and firm over `enter` s from `at`, leaves fast
+// over `exit` s, gone at `until`. Symmetric in and out reads mechanical.
+export const life = (t: number, at: number, until: number, enter = 0.9, exit = 0.45) =>
+  Math.min(prog(t, at, enter), 1 - prog(t, until - exit, exit, Easing.in(Easing.cubic)));
+
+// Camera rig with shot sizes (wide, medium, close; see SHOT and frameOn). Put the world inside:
+// background, props and text that belong to it. Labels, source lines and captions stay outside it (a
+// screen layer), so they never scale up or get cut at the edge. Keep the world at least frame-sized.
+//   <Camera t={t} shots={[{ at: 0, s: SHOT.close, x: 540, y: 700, cut: true }, { at: w("but"), s: SHOT.wide }]}>…</Camera>
+export const Camera: React.FC<{ t: number; shots: Shot[]; children: React.ReactNode }> = ({ t, shots, children }) => {
+  const { s, tx, ty } = camAt(t, shots);
+  return <AbsoluteFill style={{ transform: `translate(${tx}px, ${ty}px) scale(${s})`, transformOrigin: "0 0" }}>{children}</AbsoluteFill>;
+};
+
 // Decaying shake after an impact at scene second `at`: px offset for a translate, gone after 0.45 s.
 export const shake = (t: number, at: number, amp = 14) => (t >= at && t < at + 0.45 ? Math.sin((t - at) * 72) * (1 - (t - at) / 0.45) * amp : 0);
 
@@ -138,11 +152,25 @@ export const Music: React.FC<{ words: Words; src: string }> = ({ words, src }) =
 // scene second `at` over `dur`. Pick a different one per scene change and log it in moves.json; no
 // background or camera should hold longer than about 5 s.
 //   circle: grows from (x, y) · flood: a colour sweeps up, then uncovers the new stage · swipe: slides in
-//   from the right · zoom: the new stage zooms through from small · mask: a soft diagonal wipe
-export type TransitionKind = "circle" | "flood" | "swipe" | "zoom" | "mask";
-export const Transition: React.FC<{ t: number; at: number; kind: TransitionKind; dur?: number; color?: string; x?: number; y?: number; children: React.ReactNode }> = ({ t, at, kind, dur = 0.45, color = C.accent, x = 540, y = 960, children }) => {
+//   from the right · zoom: the new stage zooms through from small · mask: a soft diagonal wipe ·
+//   object: an object passes close to the lens, right to left, and the next stage is already behind it
+//   (`shape` = the object, e.g. a giant prop from this beat; default a brand-colour slab)
+export type TransitionKind = "circle" | "flood" | "swipe" | "zoom" | "mask" | "object";
+export const Transition: React.FC<{ t: number; at: number; kind: TransitionKind; dur?: number; color?: string; x?: number; y?: number; shape?: React.ReactNode; children: React.ReactNode }> = ({ t, at, kind, dur = 0.45, color = C.accent, x = 540, y = 960, shape, children }) => {
   const p = prog(t, at, dur, Easing.bezier(0.5, 0, 0.2, 1));
   if (p <= 0) return null;
+  if (kind === "object") {
+    const OW = 1500;
+    const cx = mix(p, 1080 + OW / 2, -OW / 2);
+    return (
+      <AbsoluteFill>
+        <AbsoluteFill style={{ clipPath: `inset(0 0 0 ${Math.max(0, cx)}px)` }}>{children}</AbsoluteFill>
+        <div style={{ position: "absolute", left: cx - OW / 2, top: -300, width: OW, height: 2520, borderRadius: OW / 2, background: shape ? undefined : color, transform: "rotate(-8deg)", filter: `blur(${Math.sin(p * Math.PI) * 10}px)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {shape}
+        </div>
+      </AbsoluteFill>
+    );
+  }
   if (kind === "flood") {
     const cover = prog(t, at, dur * 0.5, Easing.bezier(0.5, 0, 0.75, 0));
     const open = prog(t, at + dur * 0.5, dur * 0.5);

@@ -9,8 +9,12 @@
 //     scene. A beat with no `sfx` key at all is an error, so a sound cannot be forgotten.
 //   - a stretched image: an <Img> given both a width and a height without objectFit, drawn at a ratio
 //     other than its file's (read from the PNG, JPEG or WebP header in public/).
+//   - a slide: every beat lists its on-screen text in `text`, one string per tier (headline, label), or []
+//     for none; source lines, illustration labels, disclaimers and text inside a UI mockup do not count.
+//     More than 2 tiers (kicker + title + body), or a tier over 6 words, is a slide, not a video.
 // Warns on an objectFit "cover" that crops more than 10 % of an image (a screenshot loses the rows the
-// beat is about) and an objectFit "contain" that leaves empty bands in its box.
+// beat is about), an objectFit "contain" that leaves empty bands in its box, a short phrase (4 words or
+// fewer) ending in a full stop, and all-caps text on more than one beat.
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -60,6 +64,29 @@ export const sfxAudit = (moves, words, has) => {
   for (const sid of Object.keys(words.scenes))
     if (!moves.some((m) => m.scene === sid && typeof m.sfx === "string" && m.sfx !== "none")) errors.push(`${sid}: no sound effect in the whole scene`);
   return errors;
+};
+
+const MAX_TIERS = 2, MAX_WORDS = 6;
+// moves: moves.json. Returns { errors, warnings } for the on-screen text of every beat.
+export const slideCheck = (moves) => {
+  const errors = [], warnings = [];
+  const caps = [];
+  for (const m of moves) {
+    const at = `${m.scene} "${m.move}" @${m.at}s`;
+    if (!Array.isArray(m.text)) {
+      errors.push(`${at}: needs "text" (its on-screen text, one string per tier, or [])`);
+      continue;
+    }
+    if (m.text.length > MAX_TIERS) errors.push(`${at}: ${m.text.length} text tiers; at most ${MAX_TIERS} (one line + one label), a third tier is a slide`);
+    for (const x of m.text) {
+      const n = String(x).trim().split(/\s+/).filter(Boolean).length;
+      if (n > MAX_WORDS) errors.push(`${at}: "${x}" is ${n} words; at most ${MAX_WORDS} on screen, split it over two beats or show it`);
+      if (n <= 4 && /[^.]\.$/.test(String(x).trim())) warnings.push(`${at}: "${x}" ends in a full stop; short phrases go without one unless the style brief chose it`);
+      if (/\p{Lu}{3}/u.test(x) && String(x) === String(x).toUpperCase()) caps.push(at);
+    }
+  }
+  if (caps.length > 1) warnings.push(`all-caps text on ${caps.length} beats (${caps.join(", ")}); sentence case, caps for one emphasis beat at most`);
+  return { errors, warnings };
 };
 
 // Width and height of a PNG, JPEG or WebP from its header, or null.
@@ -134,6 +161,9 @@ const main = (id) => {
   else {
     const has = (name) => ["", "brand/"].some((d) => fs.existsSync(path.join("public", "sfx", `${d}${name}.wav`)));
     errors.push(...deadAir(read("moves.json"), read("words.json")), ...sfxAudit(read("moves.json"), read("words.json"), has));
+    const slide = slideCheck(read("moves.json"));
+    errors.push(...slide.errors);
+    warnings.push(...slide.warnings);
   }
   const sizeOf = (f) => {
     const p = path.join("public", f);
@@ -148,7 +178,7 @@ const main = (id) => {
   }
   warnings.forEach((w) => console.log(`warn: ${w}`));
   errors.forEach((e) => console.log(`FAIL: ${e}`));
-  console.log(errors.length ? `${errors.length} retention error(s)` : "retention: every beat has until and a sound, no dead air, hook moves in time, no stretched image");
+  console.log(errors.length ? `${errors.length} retention error(s)` : "retention: every beat has until and a sound, no dead air, hook moves in time, no stretched image, no slide text");
   process.exit(errors.length ? 1 : 0);
 };
 
@@ -172,6 +202,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 540, height: 660 }} />`, sizeOf) === null,
       imgElements(`a\n<Img src={x} style={{ w: a > b ? 1 : 2 }} />`)[0]?.line === 2,
       JSON.stringify(imageSize(Buffer.from("89504e470d0a1a0a0000000d494844520000021c00000294", "hex"))) === '{"w":540,"h":660}',
+      JSON.stringify(slideCheck([{ scene: "a", at: 0, move: "x", text: ["Premi naik", "sumber: OJK"] }, { scene: "a", at: 1, move: "y", text: [] }])) === '{"errors":[],"warnings":[]}',
+      slideCheck([{ scene: "a", at: 0, move: "x", text: ["01 — FITUR", "Satu", "Dua"] }, { scene: "a", at: 1, move: "y" }, { scene: "a", at: 2, move: "z", text: ["ini kalimat yang terlalu panjang untuk layar"] }]).errors.length === 3,
+      slideCheck([{ scene: "a", at: 0, move: "x", text: ["Bayar dulu."] }, { scene: "a", at: 1, move: "y", text: ["STOP"] }, { scene: "a", at: 2, move: "z", text: ["GRATIS"] }, { scene: "a", at: 3, move: "w", text: ["Rp1,5 jt"] }]).warnings.length === 2,
     ];
     if (ok.includes(false) || ok.includes(undefined)) throw new Error(`self-test failed: ${JSON.stringify({ ok, air, slow })}`);
     console.log("self-test ok");
