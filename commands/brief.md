@@ -92,7 +92,7 @@ Open questions: [anything still unknown]
 
 Every new project gets its own rules file, so later stages (and any later session) follow this brand and this video instead of generic defaults. Fill `${CLAUDE_PLUGIN_ROOT}/claude-md/project.md` and save it as **`<project>/CLAUDE_<CODE>.md`**:
 
-1. **Fixed rules**: from the context profile (voice, casing, punctuation, emoji, language, colours, typeface, logo, signature elements) plus the pipeline's fixed rules already in the skeleton (60 fps, frame = f(t), motion, safe area, sound targets, evidence).
+1. **Fixed rules**: from the context profile (voice, casing, punctuation, emoji, language, colours, typeface, logo, signature elements) plus the pipeline's fixed rules already in the skeleton (30 fps, frame = f(t), motion, safe area, sound targets, evidence).
 2. **Rules for this video**: from the brief (topic, pain and why, audience, storyline, format, length, CTA, proof).
 3. **Bans**: the profile's hard rules and never-say list, the brief's forbidden claims and dislikes, the generic filler list in the skeleton, and the visual and sound bans. Write bans as concrete items, never "avoid being generic". When a source is a screen recording of a real account, look through its frames for personal data (notifications, lock screen, names, policy or account numbers, phone numbers, emails) and record each one as a ban ("never show the policy number at 0:12"), so it is recreated or masked, never shown.
 

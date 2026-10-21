@@ -1,6 +1,6 @@
 ---
 name: storyboard
-description: Optional, on request — a frame-exact storyboard of the template look per video (every element, movement, sound effect, caption and spoken word, in seconds and frames at 60 fps, frame = f(t)), published for review; never a gate for the build
+description: Optional, on request — a frame-exact storyboard of the template look per video (every element, movement, sound effect, caption and spoken word, in seconds and frames at 30 fps, frame = f(t)), published for review; never a gate for the build
 allowed-tools: Read, Write, Edit, Bash
 ---
 
@@ -37,7 +37,7 @@ Generate the timed storyboard from the same planners the render uses (Node 22.18
 node --no-warnings "${CLAUDE_PLUGIN_ROOT}/template/scripts/storyboard.mjs" --video <project>/draft/videos/<id>.json --brand <project>/draft/brand.json --out <project>/05-storyboard-<id>.md
 ```
 
-It writes, per scene: start and end in seconds and frames; a row for every event (element entering, highlight, typing, strike, swap, dim, scene fade, caption line, voiceover start) with its movement, end time and sound effect at its final volume; and a second-by-second table of what is said, which caption is showing and what is moving. Times are **estimates at 2.5 words per second** until the voiceover is recorded; the file says so at the top.
+It writes, per scene: start and end in seconds and frames; a row for every event (element entering, highlight, typing, strike, swap, dim, scene fade, caption line, voiceover start) with its movement, end time and sound effect at its final volume; and a second-by-second table of what is said, which caption is showing and what is moving. Times are **estimates at 2.1 words per second** until the voiceover is recorded; the file says so at the top.
 
 Never edit the generated tables by hand: change the draft JSON and regenerate, so the storyboard always equals what will render.
 
@@ -86,4 +86,4 @@ End: "Storyboard approved. To save tokens, start a new session for production: /
 ## Rules
 - The storyboard plans; it never blocks `/hookreel:build`.
 - The generated timeline is the truth; the director's layer explains it, never contradicts it.
-- 60 fps; every time in seconds and frames, frame = round(t × 60).
+- 30 fps; every time in seconds and frames, frame = round(t × 30).

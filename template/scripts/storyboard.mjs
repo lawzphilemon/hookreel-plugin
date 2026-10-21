@@ -10,7 +10,7 @@
 // Writes a frame-exact storyboard from the same planners the render uses (src/plan.ts), so what
 // it says is what the video does: every element, movement, sound effect, caption and spoken
 // word, with times in seconds and frames, frame = round(t × FPS). Before a voiceover exists the
-// times are estimates at 2.5 words per second; after `npm run vo` they follow the recording.
+// times are estimates at 2.1 words per second; after `npm run vo` they follow the recording.
 // Needs only Node 22.18+ (no npm install).
 import fs from "fs";
 import path from "path";
@@ -73,7 +73,7 @@ const timings = video.scenes.map((scene) => {
 });
 const total = timings.reduce((a, t) => a + t.duration, 0);
 const status =
-  recorded === video.scenes.length ? "AS RECORDED — times follow the voiceover" : recorded ? `PARTLY RECORDED (${recorded}/${video.scenes.length} scenes)` : "PLANNED — times are estimates (2.5 words/s) until the voiceover is recorded";
+  recorded === video.scenes.length ? "AS RECORDED — times follow the voiceover" : recorded ? `PARTLY RECORDED (${recorded}/${video.scenes.length} scenes)` : "PLANNED — times are estimates (2.1 words/s) until the voiceover is recorded";
 
 const lines = [];
 lines.push(`# Storyboard · ${video.title} (\`${video.id}\`)`, "");

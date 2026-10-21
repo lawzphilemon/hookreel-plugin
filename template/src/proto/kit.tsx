@@ -63,9 +63,9 @@ export const Word: React.FC<{ t: number; at: number; style?: React.CSSProperties
   );
 };
 
-// Paper grain: SVG noise, reseeded every 3 frames so it lives like film. Put it above the content.
+// Paper grain: SVG noise, reseeded 20 times a second (any frame rate) so it lives like film. Put it above the content.
 export const Grain: React.FC<{ opacity: number }> = ({ opacity }) => {
-  const seed = Math.floor(useCurrentFrame() / 3) % 50;
+  const seed = Math.floor((useCurrentFrame() / FPS) * 20) % 50;
   return (
     <AbsoluteFill style={{ opacity, mixBlendMode: "multiply", pointerEvents: "none" }}>
       <svg width="100%" height="100%">
@@ -92,9 +92,25 @@ export const Sfx: React.FC<{ at: number; name: string; volume: number }> = ({ at
   </Sequence>
 );
 
-// Small source line, centred, above the platform UI. Every number on screen needs one.
-export const SourceLine: React.FC<{ t: number; at: number; children: React.ReactNode; color?: string; top?: number }> = ({ t, at, children, color = C.muted, top = 1440 }) => (
-  <div style={{ position: "absolute", left: 80, right: 80, top, textAlign: "center", fontFamily: sans, fontSize: 28, fontWeight: 500, color, opacity: prog(t, at, 0.4) }}>{children}</div>
+// Small source line, centred, above the platform UI. Every number on screen needs one. `backing` puts it
+// on a soft chip of that colour (e.g. the stage colour at 0.92 alpha), so it stays readable over a prop.
+export const SourceLine: React.FC<{ t: number; at: number; children: React.ReactNode; color?: string; top?: number; size?: number; backing?: string }> = ({ t, at, children, color = C.muted, top = 1440, size = 28, backing }) => (
+  <div style={{ position: "absolute", left: 70, right: 70, top, display: "flex", justifyContent: "center", fontFamily: sans, fontSize: size, fontWeight: 500, color, opacity: prog(t, at, 0.4) }}>
+    <div style={{ textAlign: "center", ...(backing ? { background: backing, borderRadius: 24, padding: "4px 18px" } : {}) }}>{children}</div>
+  </div>
+);
+
+// Screen-layer lines (outside the Camera): a headline and a supporting line, centred, entering slow and
+// leaving fast with life(), the text focusing in with Word. `italic` makes the supporting line the serif accent.
+export const Head: React.FC<{ t: number; at: number; until: number; top?: number; color?: string; size?: number; children: React.ReactNode }> = ({ t, at, until, top = 300, color = C.text, size = 92, children }) => (
+  <div style={{ position: "absolute", left: 80, right: 80, top, textAlign: "center", color, opacity: life(t, at, until, 0.5, 0.35), fontFamily: display, fontWeight: 800, fontSize: size, letterSpacing: "-0.04em", lineHeight: 1.05 }}>
+    <Word t={t} at={at}>{children}</Word>
+  </div>
+);
+export const Sub: React.FC<{ t: number; at: number; until: number; top: number; color?: string; italic?: boolean; size?: number; children: React.ReactNode }> = ({ t, at, until, top, color = C.text, italic, size = 48, children }) => (
+  <div style={{ position: "absolute", left: 80, right: 80, top, textAlign: "center", color, opacity: life(t, at, until, 0.5, 0.35), fontFamily: italic ? serif : sans, fontStyle: italic ? "italic" : undefined, fontWeight: italic ? 400 : 600, fontSize: italic ? size * 1.3 : size, lineHeight: 1.1 }}>
+    <Word t={t} at={at}>{children}</Word>
+  </div>
 );
 
 // src/proto/<video id>/words.json, written by `npm run words -- <video id>` after `npm run vo`.

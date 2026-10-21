@@ -1,6 +1,6 @@
 ---
 name: build
-description: Turn the approved script into new, custom motion design in the brand's Remotion studio, invented from the user's reference reels — one prototype scene for approval first, then every scene, timed on the spoken words at 60 fps (frame = f(t))
+description: Turn the approved script into new, custom motion design in the brand's Remotion studio, invented from the user's reference reels — one prototype scene for approval first, then every scene, timed on the spoken words at 30 fps (frame = f(t))
 allowed-tools: Read, Write, Edit, Bash, Glob
 ---
 
@@ -57,7 +57,7 @@ Then write `src/proto/<id>/style.json` (`{ "background", "surface": [2+ layers],
 
 Build the hook scene first, in `src/proto/<id>/`:
 
-1. Word times: `npm run words -- <id>` after recording, or `npm run words -- <id> --estimate` before (2.5 words per second; rerun after `/hookreel:voice`).
+1. Word times: `npm run words -- <id>` after recording, or `npm run words -- <id> --estimate` before (2.1 words per second; rerun after `/hookreel:voice`).
 2. `src/proto/<id>/scenes.tsx` with the scene components, using `src/proto/kit.tsx`: the font library `FONT` (`display` Open Sans 800, `sans` Rubik 500–700, `serif` Instrument Serif italic; the same for every brand), `useT`, `prog`, `mix`, `squash`, `shake`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `Music`, `SourceLine`, `Transition` (circle, flood, swipe, zoom, mask, object), `KineticCaption` (optional captions for muted viewing, styled into the motion), `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`, `Camera` with `SHOT` and `frameOn` for shot sizes (the world inside, labels and source lines outside), `life(t, at, until)` for slow-in, fast-out elements. Everything else (props, layouts) is written new for this video.
 3. `src/proto/<id>/moves.json`, the freshness log: one entry per beat, `{ "scene", "at" (scene seconds), "move", "transition" (only where the background or camera changes), "until" (required: scene second the beat's hero leaves the screen), "shot" (required: `wide`, `medium` or `close`), "text" (required: the on-screen text, one string per tier, `[]` for none; source lines, labels, disclaimers and text inside a mockup are left out), "special" (`true` on the one special beat), "sfx" (required: the sound on that beat, a file name in `public/sfx/` without `.wav`, or `"none"`; every transition needs a real one) }`, named in plain words ("counter assembled from dots", "colour flood"). Keep it in step with the scenes; `npm run fresh -- <id>` and `npm run retention -- <id>` check it.
 4. Music (if the brief chose synthesised music): `npm run music -- <id> --mood <mood>` writes `public/music/<id>-synth.wav` (about -14 LUFS, the length of the video, a riser into the last scene). Pass it as `protoReel`'s fourth argument; the kit's `Music` ducks it under the voice. Rerun it whenever the word times change.
@@ -86,7 +86,7 @@ Build the remaining scenes in the approved look, with a new idea per beat (rules
 
 ## Step 6 — Validate and look
 
-`npx tsc --noEmit`, `npm run lint`, `npm run fresh -- <id>` and `npm run retention -- <id>` (dead air over 1.2 s, first beat after 1 s, a beat or transition without its sound, a scene with no sound, stretched images); fix every error. Check every text colour pair with `npm run contrast` (4.5:1 below 84 px, 3:1 above). Then `npm run sweep -- <id>` (6 frames per scene on one image, safe area in red) and read it with the taste check of motion library H (could this frame be a corporate slide? does the eye know where to look in 0.2 s? is the background alive but quiet with the text hidden? does the camera move at each change?): one idea per screen, the shot size changing as planned, no background or camera held longer than about 5 s, nothing clipped or overlapping, text inside x 80–1000 and above y 1500 (the platform UI covers the bottom and right edge), every source line and label readable, each beat's animation finished before the next starts. Fix and repeat until clean.
+`npx tsc --noEmit`, `npm run lint`, `npm run fresh -- <id>` and `npm run retention -- <id>` (dead air over 1.2 s, first beat after 1 s, a beat or transition without its sound, a scene with no sound, stretched images); fix every error. Check every text colour pair the new scenes use with `npm run contrast` (4.5:1 below 84 px, 3:1 above), all of them before the first full render: list each text colour and the surface it sits on (stage, prop face, card, chip) from the scene code. A pair found failing after the MP4 costs a whole render. Then `npm run sweep -- <id>` (6 frames per scene on one image, safe area in red) and read it with the taste check of motion library H (could this frame be a corporate slide? does the eye know where to look in 0.2 s? is the background alive but quiet with the text hidden? does the camera move at each change?): one idea per screen, the shot size changing as planned, no background or camera held longer than about 5 s, nothing clipped or overlapping, text inside x 80–1000 and above y 1500 (the platform UI covers the bottom and right edge), every source line and label readable, each beat's animation finished before the next starts. Fix and repeat until clean.
 
 ## Step 7 — Studio CLAUDE files
 
@@ -108,7 +108,7 @@ Update `<project>/project.json` (`stages.build`, `studio`) and the Status column
 
 ## Step 8 — Remotion prompt (only when asked)
 
-Skip unless the user asks for a standalone prompt to rebuild the video elsewhere. Then write `<project>/06-remotion-prompt.md`: the time model (`fps = 60`, `frame = f(t) = round(t × 60)`, every value a pure function of the frame via clamped `interpolate()` and ease-out cubic-bezier(0.16, 1, 0.3, 1), no CSS transitions or wall-clock state), format 1080×1920 and the platform UI zones, brand tokens, per beat the spoken words with their times and every element's movement (`t (s) | F | element | property: from → to | D (s) | sound`), the audio (voiceover lead-in 0.27 s, loudness targets, each sound with its time and volume), and the bans from `CLAUDE_<CODE>.md`.
+Skip unless the user asks for a standalone prompt to rebuild the video elsewhere. Then write `<project>/06-remotion-prompt.md`: the time model (`fps = 30`, `frame = f(t) = round(t × 30)`, every value a pure function of the frame via clamped `interpolate()` and ease-out cubic-bezier(0.16, 1, 0.3, 1), no CSS transitions or wall-clock state), format 1080×1920 and the platform UI zones, brand tokens, per beat the spoken words with their times and every element's movement (`t (s) | F | element | property: from → to | D (s) | sound`), the audio (voiceover lead-in 0.27 s, loudness targets, each sound with its time and volume), and the bans from `CLAUDE_<CODE>.md`.
 
 ## Step 9 — Hand over
 

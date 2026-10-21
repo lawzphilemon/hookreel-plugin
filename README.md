@@ -56,7 +56,7 @@ When the template look is chosen, a video is data, not code:
 - `videos/<id>.json`: scenes, each with its voiceover line, one visual and optional cues. See `template/src/schema.ts`.
 - Two styles in `brand.json`: `clean` (fade-and-rise, nothing loops) and `playful` (bouncy pop entrances, floating elements, AI 3D cartoon characters).
 - 15 visual types: headline, stat (with a 1-in-100 dot grid), ranking, tiles, timeline, bars, flow, chat, journey, ui, list, logo, character (AI 3D cartoon, mascot or illustrated scene from an image or clip), swap and cta. Every type except character (it needs your own image files) in use: `reference/all-visuals.json`.
-- **60 fps, frame = f(t):** every time is in seconds (`src/motion.ts`); `src/plan.ts` decides when everything happens and which sounds play, for both the render and `npm run storyboard`.
+- **30 fps, frame = f(t):** every time is in seconds (`src/motion.ts`); `src/plan.ts` decides when everything happens and which sounds play, for both the render and `npm run storyboard`.
 - `npm run check` validates cues, colours and files; `npm run storyboard -- <id>` prints the frame-exact storyboard; `npm run vo` handles the voiceover; `npm run sfx` regenerates the sound effects.
 
 Breakdowns of past videos (scene by scene, with code patterns): `skills/hookreel-rules/references/motion-library.md` → E. Past work.

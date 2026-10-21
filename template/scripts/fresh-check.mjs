@@ -11,7 +11,9 @@
 // beat without a shot size, three beats in a row at the same shot size, more than one special beat, a
 // missing or incomplete style.json (surface needs 2+ layers), or a style brief that shares 3+ of its 6 lines
 // with one of the last 3 other videos in src/proto/. Warns on moves, transitions and style lines also used
-// there, and on a video with no special beat.
+// there, on a video with no special beat, and on a figure (a number or percentage in a beat's on-screen text)
+// that a sibling video of the same project also shows: the reels of one series never share a scene design,
+// and the same figure is where they drift into the same idea (an umbrella and a canopy for "105%").
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -73,6 +75,20 @@ export const checkStyle = (style, others = []) => {
   return { errors, warnings };
 };
 
+// Sibling videos (same project code, the first 15 characters of the id): one warning per figure this video
+// shows that a sibling shows too, naming both beats so the props can be compared. Returns warnings.
+// A figure is a percentage or an amount with separators (105%, 1,6%, 20.000); years and counts are left out.
+const figures = (m) => (m.text ?? []).join(" ").match(/\d[\d.,]*%|\d{1,3}(?:\.\d{3})+|\d+,\d+/g) ?? [];
+export const checkSiblings = (moves, siblings = []) => {
+  const warnings = [];
+  for (const m of moves)
+    for (const fig of new Set(figures(m)))
+      for (const o of siblings)
+        for (const x of o.moves.filter((x) => figures(x).includes(fig)))
+          warnings.push(`figure "${fig}" in ${m.scene} ("${m.move}") is also in ${o.id} ${x.scene} ("${x.move}"): make sure the prop and the idea differ`);
+  return warnings;
+};
+
 // Scene id → start second in the video, and the video's length, from src/proto/<id>/words.json.
 export const sceneOffsets = (words) => {
   const offsets = {};
@@ -97,8 +113,12 @@ const main = (id) => {
     .sort((a, b) => fs.statSync(b.file).mtimeMs - fs.statSync(a.file).mtimeMs)
     .slice(0, 3)
     .map((o) => ({ id: o.id, moves: json(o.file), style: json(`${dir}/${o.id}/style.json`) }));
+  const siblings = fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && d.name !== id && d.name.slice(0, 15) === id.slice(0, 15) && fs.existsSync(`${dir}/${d.name}/moves.json`))
+    .map((d) => ({ id: d.name, moves: json(`${dir}/${d.name}/moves.json`) }));
   const a = check(moves, offsets, at, others), b = checkStyle(json(`${dir}/${id}/style.json`), others);
-  const errors = [...a.errors, ...b.errors], warnings = [...a.warnings, ...b.warnings];
+  const errors = [...a.errors, ...b.errors], warnings = [...a.warnings, ...b.warnings, ...checkSiblings(moves, siblings)];
   warnings.forEach((w) => console.log(`warn: ${w}`));
   errors.forEach((e) => console.log(`FAIL: ${e}`));
   console.log(errors.length ? `${errors.length} freshness error(s)` : `fresh: ${moves.length} beats, no repeats, no hold over ${MAX_HOLD} s, shot sizes change, style brief new`);
@@ -128,6 +148,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       camAt(0.35, [{ at: 0, s: SHOT.close, x: 900, y: 300 }]).s > 1.4 && camAt(0.35, [{ at: 0, s: SHOT.close, x: 900, y: 300 }]).s < 1.7,
       ((c) => c.tx === 1080 - 1080 * c.s && c.ty === 0)(camAt(2, [{ at: 0, s: SHOT.close, x: 1080, y: 0, cut: true }])),
       frameOn({ x: 440, y: 860, w: 200, h: 200 }, 0.5).s === 2.7,
+      // siblings: the shared figure warns once per matching beat; a lone digit or another figure does not
+      checkSiblings([{ scene: "07", move: "umbrella opens", text: ["hingga 105% dari premi", "tahun 1"] }], [{ id: "X-kuliah", moves: [{ scene: "06", move: "canopy", text: ["Hingga 105%"] }, { scene: "05", move: "block", text: ["113%"] }] }]).length === 1,
     ];
     if (results.includes(false)) throw new Error(`self-test failed: ${JSON.stringify({ results, ok, bad, flat, fine, close, thin })}`);
     console.log("self-test ok");

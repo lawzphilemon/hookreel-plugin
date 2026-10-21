@@ -1,5 +1,5 @@
 // Usage: node scripts/word-times.mjs <video id> [--estimate]   (npm run words -- <video id>, after npm run vo)
-// --estimate: no recording yet; every word at 2.5 words per second, so a prototype scene can be built
+// --estimate: no recording yet; every word at 2.1 words per second, so a prototype scene can be built
 // before recording. Rerun without it after npm run vo and the scenes follow the real voice.
 // Writes src/proto/<video id>/words.json: every script word with the second it is spoken in its clip,
 // for the custom motion scenes (src/proto/kit.tsx wordsOf). Aligns characters, not words: Whisper
@@ -79,7 +79,7 @@ const main = (id, estimate) => {
   for (const s of video.scenes) {
     if (estimate) {
       const words = s.vo.split(/\s+/).filter(Boolean);
-      out.scenes[s.id] = { secs: Math.round((words.length / 2.5) * 100) / 100, words: words.map((w, i) => [w, Math.round((i / 2.5) * 100) / 100]) };
+      out.scenes[s.id] = { secs: Math.round((words.length / 2.1) * 100) / 100, words: words.map((w, i) => [w, Math.round((i / 2.1) * 100) / 100]) };
       continue;
     }
     const base = `public/vo/${id}/${s.id}`;
