@@ -57,7 +57,7 @@ for (const file of files) {
       if (v?.type === "character" && checkFiles && !fs.existsSync(path.join("public", v.src))) errors.push(`${tag} ${scene.id}: character not found: public/${v.src}`);
     }
   }
-  const seconds = Math.round(words / 2.5 + (video.scenes?.length ?? 0));
+  const seconds = Math.round(words / 2.1 + (video.scenes?.length ?? 0));
   if (seconds > 90) warnings.push(`${tag}: about ${seconds}s at a normal pace; most Reels land under 90s`);
   console.log(`${tag}: ${video.scenes?.length ?? 0} scenes, ${words} words, about ${seconds}s before recording`);
 }

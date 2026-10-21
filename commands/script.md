@@ -32,7 +32,7 @@ Before showing anything, check the whole script against `CLAUDE_<CODE>.md` and r
 - No banned phrase (brand never-say list and the generic filler list), no banned punctuation or emoji.
 - No claim outside the allowed list; every number has a source label.
 - The CTA matches the exact wording.
-- Length: about 2.5 words per second plus one second per scene, against the target length. If it runs long, propose specific cuts.
+- Length: about 2.1 words per second plus one second per scene, against the target length (measured: a human take about 2.0, an ElevenLabs clone about 2.15; use the chosen voice's own pace once a take exists). If it runs long, propose specific cuts.
 - **Hook audit:** run `wtf-hook-999-auditor` on scene 1 as written (not the story draft). Credibility and payoff at least 3, weighted score at least 4; otherwise apply its recommended rewrite (within the allowed claims) and audit again.
 - **Read-aloud pass:** read every line as the narrator will say it (the `hookreel-rules` voiceover rules): no sentence over about 15 words, no list read as a list, no colon or parenthesis that cannot be spoken, connectors where a listener would lose the thread. Rewrite what fails.
 
@@ -89,7 +89,7 @@ What it does: [normalise -16 LUFS / -3 dBTP, local Whisper, cut per scene at the
 | Video | Recorded | Date | File |   (filled by /hookreel:voice)
 
 ## [video id] · [title] · ~[n] s
-| Scene | Line | Estimate |   (Scene = the scene id, `01-hook`, `02-<name>`…, the same ids as `04-script.md` and the clip names `npm run vo` writes; estimate = words ÷ 2.5 + 1 s; total at the end)
+| Scene | Line | Estimate |   (Scene = the scene id, `01-hook`, `02-<name>`…, the same ids as `04-script.md` and the clip names `npm run vo` writes; estimate = words ÷ 2.1 + 1 s; total at the end)
 ```
 
 Send the user the file.

@@ -1,6 +1,6 @@
 ---
 name: hookreel-rules
-description: Shared rules for the hookreel short-video pipeline (brief, facts, story, script, storyboard, build, voice, qa, publish) — the project CLAUDE.md, review gates, evidence and claims, brand context profiles, writing voiceover for the ear, custom per-beat motion invented from the user's reference reels, the 60 fps time model (frame = f(t)), safe areas and audio. Use whenever a /hookreel command runs or a hookreel video is being written, built, or reviewed.
+description: Shared rules for the hookreel short-video pipeline (brief, facts, story, script, storyboard, build, voice, qa, publish) — the project CLAUDE.md, review gates, evidence and claims, brand context profiles, writing voiceover for the ear, custom per-beat motion invented from the user's reference reels, the 30 fps time model (frame = f(t)), safe areas and audio. Use whenever a /hookreel command runs or a hookreel video is being written, built, or reviewed.
 ---
 
 # HOOKREEL rules
@@ -65,9 +65,10 @@ The rulebook is loaded into every session, so it holds **rules only**, one line 
 - The storyboard is optional (on request) and never blocks the build.
 - A new claim, number or line after approval goes back to the user first.
 
-## Time model: 60 fps, frame = f(t)
+## Time model: 30 fps, frame = f(t)
 
-- Every duration and offset is written in seconds and converted with `frame = f(t) = round(t × 60)` (`src/motion.ts`). Never hard-code a frame count.
+- 30 fps since 0.14.0 (60 fps took twice as long to render for no visible gain on a phone). Videos built at 60 fps keep working: they are timed in seconds.
+- Every duration and offset is written in seconds and converted with `frame = f(t) = round(t × 30)` (`src/motion.ts`). Never hard-code a frame count; anything that must happen "every n frames" is written as a rate per second.
 - Every animated property is a pure function of the frame: `value(F) = from + (to − from) · ease(clamp((F − F0) / D))`, ease-out cubic-bezier(0.16, 1, 0.3, 1), via `interpolate()`. No CSS transitions or keyframe animations.
 - Custom scenes time every beat from the spoken words: `src/proto/<id>/words.json` (`npm run words`, character-aligned to the Whisper fragments, so a split or respelled word still lands on its fragment) read through `wordsOf()`. Never time beats by guessing or from the template's word aligner, which can run 0.3–1.1 s early.
 - Give every beat time to finish its animation before the next one starts.
@@ -90,7 +91,7 @@ These rules are binding in every look (they protect licensed and regulated users
 
 ## Writing the voiceover
 
-- For the ear: short sentences, one idea each, 10–30 words per scene, about 2.5 words per second.
+- For the ear: short sentences, one idea each, 10–30 words per scene, about 2.1 words per second (the old 2.5 left three reels 9–17 s over target).
 - What is written is what is said, and what any caption or on-screen word shows.
 - Hooks: 8–18 spoken words, understood in under a second, with a named payoff later in the video.
 - The CTA says the exact action and what the viewer gets.

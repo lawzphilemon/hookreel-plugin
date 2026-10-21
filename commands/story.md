@@ -37,7 +37,7 @@ Per video, a table:
 
 | # | Beat | What the viewer must feel or learn | Key line (draft) | Evidence (fact #) | Visual idea |
 
-Budget about 2.5 spoken words per second. Keep each video within the brief's target length; say which beats you would cut first if it runs long.
+Budget about 2.1 spoken words per second. Keep each video within the brief's target length; say which beats you would cut first if it runs long.
 
 ## Step 5 — Save
 

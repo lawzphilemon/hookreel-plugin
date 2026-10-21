@@ -16,7 +16,7 @@ Rules for building project **[CODE]** in this studio, written by `/hookreel:buil
 - Typeface: [..]; logo: [..]; signature elements: [..]
 
 ## Time and motion
-- 60 fps. Every time in seconds, frame = f(t) = round(t × 60) (`src/motion.ts`). Never hard-code frame counts.
+- 30 fps. Every time in seconds, frame = f(t) = round(t × 30) (`src/motion.ts`). Never hard-code frame counts.
 - Every animated property is a function of the frame via `interpolate` with clamped input and the brand ease-out. No CSS transitions or keyframe animations.
 - Custom motion per video (default): new per-beat scenes in `src/proto/<id>/`, invented from the reference reels, built on `src/proto/kit.tsx`. Beats time from `src/proto/<id>/words.json` (`npm run words -- <id>`) via `wordsOf()`; never guessed. Each beat finishes before the next. Never the template's infographic slides unless the project chose the template look (then timing comes from `src/plan.ts`).
 - Safe area: text inside x 80–1000 and above y 1500.

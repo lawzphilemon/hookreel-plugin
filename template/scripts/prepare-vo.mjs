@@ -247,8 +247,8 @@ for (const [i, [start, end]] of segments.entries()) {
   console.log(`\n${scene.id}  ${start.toFixed(2)}s → ${end.toFixed(2)}s`);
   console.log(`  script: ${scene.vo}`);
   console.log(`  heard:  ${words.map((x) => x.text).join(" ")}`);
-  // About 2.5 spoken words a second; a clip twice as long hides a retake or false starts.
-  const estimate = splitWords(scene.vo).length / 2.5;
+  // About 2.1 spoken words a second; a clip twice as long hides a retake or false starts.
+  const estimate = splitWords(scene.vo).length / 2.1;
   if (end - start > 2 * estimate)
     console.warn(`  WARNING: clip is ${(end - start).toFixed(1)}s, over 2× the ${estimate.toFixed(1)}s estimate; check for a retake or false starts and cut it with explicit ranges (see out/${reelId}-take.json)`);
 }

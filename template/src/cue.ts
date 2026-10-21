@@ -12,7 +12,7 @@ export type SceneTiming = {
 export const LEAD_IN = f(TIME.leadIn);
 export const TAIL = f(TIME.tail);
 // Fallback pace until a recording exists (~150 words per minute).
-const WORDS_PER_SECOND = 2.5;
+const WORDS_PER_SECOND = 2.1;
 
 export const estimateSeconds = (vo: string) => vo.trim().split(/\s+/).length / WORDS_PER_SECOND;
 

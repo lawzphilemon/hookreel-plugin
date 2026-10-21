@@ -2,7 +2,7 @@
 // frame = f(t) = round(t × FPS). Plain TypeScript (no React, no Remotion) so the storyboard
 // script uses exactly the same numbers as the render.
 
-export const FPS = 60;
+export const FPS = 30; // half the render time of 60; every motion is in seconds, so speeds do not change
 export const f = (seconds: number) => Math.round(seconds * FPS);
 export const t = (frames: number) => frames / FPS;
 

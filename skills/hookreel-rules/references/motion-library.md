@@ -292,6 +292,8 @@ Under the text keep a calm pocket: dark (luminance ≤ 25 %) or light (≥ 80 %)
 
 Flat solid · flat with scattered palette dots · soft 3D clay (matte pastel, rounded, soft shadow) · glossy 3D (rim light, reflections) · glass or glowing orb · isometric (30°, no perspective) · realistic metal or marble (best as a licensed or generated image, animated as a layer) · neon line on dark · flat character illustration. Mixing families without a reason looks like stock assets.
 
+Isometric: objects compared by height (columns, stacks, bars) stand on one screen baseline, plan points with the same a + b; otherwise the one in front sits lower and reads as shorter. A box that has not grown yet draws nothing, or its flat top face shows as a stray mark.
+
 ### G4. First 3 seconds (the hook beat's opening; two videos in a row never open the same way)
 
 - In media res: the object is already moving on frame 1.

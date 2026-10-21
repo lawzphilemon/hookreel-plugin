@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.14.0 — 2026-10-21
+
+30 fps, and the fixes from the self-critiques of HKR-261019-Y6VQ-deposito and -kuliah.
+
+- **30 fps** (was 60): `FPS` in `src/motion.ts`, the rules, the project and brand CLAUDE templates, build, storyboard and QA. Everything is timed in seconds, so speeds and beats do not change and videos built at 60 fps render as they are. Kit `Grain` reseeds 20 times a second instead of every 3 frames, so it flickers the same at any frame rate.
+- Kit `SourceLine`: `backing` (a soft chip behind the line, readable over a prop) and `size`.
+- Kit `Head` and `Sub`: the screen-layer headline and supporting line (life() in and out, Word focus, serif accent) that every custom video was rewriting.
+- Pace estimate 2.1 words a second (was 2.5) in script, story, storyboard, the rules and `npm run words -- --estimate`: three reels measured 2.0–2.15 and came out 9–17 s over target.
+- `npm run fresh`: warns when a figure (a percentage or an amount with separators) on screen is also shown by a sibling video of the same project, naming both beats, so a series does not draw the same idea twice (it would have caught an umbrella and a canopy both carrying "105%").
+- `/hookreel:build` Step 6: every text/surface pair goes through `npm run contrast` before the first full render.
+- `/hookreel:qa` Step 2: read the smallest encoded frames first (an empty frame is the smallest PNG); render one video at a time.
+- Motion library G3: isometric objects compared by height share a screen baseline; an ungrown box draws nothing.
+
 ## 0.13.2 — 2026-10-20
 
 Patch release from the self-critique of HKR-261019-Y6VQ.
