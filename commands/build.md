@@ -83,6 +83,7 @@ Build the remaining scenes in the approved look, with a new idea per beat (rules
 - Every number on screen has its source line (`SourceLine`, wording from `02-facts.md`); hypothetical amounts and examples carry the illustration label from `CLAUDE_<CODE>.md` (for example "Ilustrasi" / "Illustration").
 - Only allowed claims; required disclaimers on the end card; every ban in `CLAUDE_<CODE>.md`.
 - Sound effects synthesised (`npm run sfx`) or with a licence note; no meme or lifted sounds.
+- A beat may be a HyperFrames clip (`hookreel-rules` → HyperFrames clips): one motion unit, no audio, text from the script, source lines in Remotion over it, rendered again after `/hookreel:voice`.
 
 ## Step 6 — Validate and look
 
