@@ -154,6 +154,17 @@ Licensed assets the user owns but may not redistribute (sound packs, motion temp
 - Library sound effects are installed into the studio's `public/sfx/lib/` (git-ignored with the rest of `public/sfx`) with `npm run lib-sfx -- "<hookreel-library>/<pack>/sfx"`, which peak-normalises each to -6 dBFS like the synthesised set (a plain copy peaked the mix near 0 dBTP), and named `lib/<name>` in `moves.json` and `Sfx`. They count as licensed sounds: their licence line from `LIBRARY.md` goes into `CLAUDE_<CODE>.md` and the QA report.
 - Never copy library files into the plugin, a public repository or anything shared; never put the library vendor's name or logo into a video.
 
+## HyperFrames clips (optional)
+
+When HyperFrames is installed (`npx skills add heygen-com/hyperframes`: skills `motion-graphics`, `hyperframes-cli`), one beat may be built there and played in Remotion as a clip. Remotion stays the master timeline: voice, music, sound effects, captions, source lines and every gate (facts, script, prototype, qa) stay in hookreel.
+- **When:** one self-contained motion unit that is quicker in HTML (stat count-up, chart, map, animated headline or UI, logo sting). Never a whole scene sequence, and never the voice, music or captions, so sync and ducking hold.
+- **Brief the clip from the beat:** duration from the word times (`wordsOf`), 30 fps, the size of the area it fills (1080×1920 full frame), the font library `FONT`, brand colours from the context profile, on-screen text exactly as in `04-script.md`. Source lines, illustration labels and disclaimers are drawn in Remotion over the clip, not baked in, so QA reads them.
+- **No audio in the clip;** the beat's sound is named in `moves.json` like any other beat, and the beat's `move` says "(HyperFrames)".
+- **Set up once per shell:** HyperFrames needs FFmpeg; point it at the one Remotion ships: `HYPERFRAMES_FFMPEG_PATH` and `HYPERFRAMES_FFPROBE_PATH` = `<studio>/node_modules/@remotion/compositor-<platform>/ffmpeg(.exe)` and `ffprobe(.exe)` (it has libvpx-vp9). Set `HYPERFRAMES_NO_TELEMETRY=1` and send no `hyperframes feedback` reports unless the user agrees. Load the `FONT` families in the clip's HTML; HyperFrames falls back to Inter.
+- **Render and place:** `hyperframes render --fps 30` to MP4 for a full-frame beat, `--format webm` for a transparent overlay, into `public/hf/<id>/<beat>.mp4|webm`; play it with `<OffthreadVideo src={staticFile("hf/<id>/<beat>.webm")} muted transparent />` (`transparent` only for webm) in a `Sequence` from the beat's frame. Keep the HyperFrames project in `<project>/hyperframes/<id>-<beat>/` and render it again after `/hookreel:voice` re-times the words.
+- **Same rules:** the creative mandate and always-fresh rule apply (no HyperFrames registry block or template look as it is); private library files and Truemission-only characters never go into a HyperFrames project that is shared or public; HyperFrames itself is Apache-2.0 (checked 2026-10-21, v0.8.183); any registry block, font or media it pulls in is checked before the first commercial use and noted in `CLAUDE_<CODE>.md`.
+- **Routing:** inside a hookreel project a request for a video means `/hookreel`; a HyperFrames skill runs only for a beat that build or the user names. Outside hookreel, its own skills serve their own jobs (`embedded-captions`, `talking-head-recut`, `slideshow`).
+
 ## Audio
 
 - Voiceover: one take per video (a recording, or a TTS voice clone with the AI label: `/hookreel:voice`), upmixed to stereo and normalised to -16 LUFS with -3 dBTP peaks by `npm run vo`.

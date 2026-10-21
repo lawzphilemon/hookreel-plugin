@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.1 — 2026-10-21
+
+- HyperFrames clips (optional): `hookreel-rules` → HyperFrames clips says when one beat may be built in HyperFrames and how it plays in Remotion (no audio, text from the script, source lines in Remotion, `public/hf/`, re-rendered after the voice). `/hookreel:build` Step 5 and `/hookreel:qa` licences point to it. Remotion stays the master timeline.
+- Tested 2026-10-21: HyperFrames 0.8.183 with Remotion's bundled FFmpeg renders a 2 s 1080×1920 VP9 webm with alpha (30 fps, 18 s on this laptop), and `<OffthreadVideo transparent>` in Remotion 4.0.534 shows the background through it.
+
 ## 0.14.0 — 2026-10-21
 
 30 fps, and the fixes from the self-critiques of HKR-261019-Y6VQ-deposito and -kuliah.
