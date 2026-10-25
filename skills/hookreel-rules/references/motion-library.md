@@ -360,3 +360,48 @@ A frame that is technically correct still fails when it reads as a presentation.
 2. Does the eye know where to look within 0.2 s? If not, remove elements.
 3. With all text hidden, is the background still interesting but not noisy? Both must be yes.
 4. At each change, does something move because of the camera, not only because elements animate themselves?
+
+## I. AI Code-Motion Reference Library (Opus 5.5 & Guanmo AI Motion)
+
+Studied from `yihui-dev/awesome-opus5-5-videos` (700+ prompts, 418 remakes on Skillry) and `guanmo-ai/awesome-ai-motion` (1,400+ curated code animations across 7 domains). Read whenever designing scenes, writing prompts, or building Remotion/HTML components.
+
+### I1. Core Philosophy: Zero Cuts, Continuous Flow & Beat Math
+- **Animation as $f(t)$:** Every visual attribute is a closed-form pure function of time. No mutable component state between frames, no drift.
+- **Continuous One-Take (No Dissolves):** No crossfades, no blur-ins, no hard cuts. Every scene morphs out of the previous one:
+  - Text rises out of horizontal mask baselines (`clip-path`).
+  - Icons pop from zero scale on an under-damped spring.
+  - A primary shape floods the entire canvas and contracts into the next stage.
+- **Beat Grid Synchronization:** Calibrate the timeline to musical BPM (e.g., 120 BPM = 0.5s per beat). Major state transitions, camera cuts, and audio peaks land strictly on the downbeat.
+- **Direct Cursor Manipulation:** A simulated pointer drives changes through visible intent: springy taps (squashing target by 6–10%), drags with rubber-band resistance, and long-press expansions.
+
+### I2. The 6-Part Prompt Architecture for AI Motion
+Use this structure when asking Claude / LLMs to generate motion code:
+1. `<inputs>`: Required brand assets, audio track with BPM & drop timing, reference images.
+2. `<direction>`: Key aesthetic (e.g., Apple launch film, dark-mode technical HUD), strict bans (no crossfades, no template layouts, no dead air > 1s), typography pairing, and camera scale behavior.
+3. `<structure>`: Detailed beat sheet mapping each downbeat to a physical state transition.
+4. `<build>`: Technical constraints (single-file HTML/Remotion, closed-form springs, SVG displacement shaders for liquid glass, peak-aligned SFX at -14 LUFS).
+5. `<gotchas>`: Critical browser/compositor quirks (avoid `will-change` on scaled containers to prevent text blur; container text swapping needs staggered masks; clone scenes for displacement).
+6. `<start>`: Gatekeeper: demand beat map + 4 still preview moments before generating full implementation code.
+
+### I3. 10 Code-Motion Signature Moves to Draw From
+| Move | Origin | Mechanism & Timing | Best For |
+|---|---|---|---|
+| **Single Shape UI Odyssey** | @twoclipping | One continuous container morphs size, radius, fill across 8–12 UI states (Button → Loader → Player → Slider → Tabs → Chart → Toast). | Product showcase, UI speedrun |
+| **Liquid Glass & Refractive Lens** | @twoclipping | SVG `feDisplacementMap` + chromatic edge shift over cloned backdrop; stretches into toolbars and magnifies content. | Premium tech, luxury launch |
+| **Mechanical Iris Shutter** | @twoclipping | 6–8 aperture blades sweep open and shut along trigonometric arcs over photos/stamps. | Photo reveals, camera features |
+| **Paper Map Origami Unfold** | @melvynx | A single tile unfolds like an origami map along seams (center, plus, corners) into an isometric bento grid. | Multi-feature reveals, catalogs |
+| **Exploded Anatomy / CAD Breakdown** | @wheresryan22 | Orthographic line drawings disassemble into floating dimensional layers with caliper measurements. | Explaining complex mechanisms, engines, architecture |
+| **Direct Manipulation Rubber-Band** | @stephanlivera | Cursor drags a slider or toggle past its boundary; container stretches with rubber-banding tension before springing back. | Interactive feels, mobile app demos |
+| **Particle Orbit & Digit Collapse** | @ajith_io / @galihwar | Cloud of ambient particles rotates in 3D space, accelerates, and collapses into crisp numerical digits on the drop. | Big statistics, countdowns, milestones |
+| **Highlighter Baseline Wipe** | @deedydas | Key phrase rises from a baseline mask; 0.2s later, a colorful highlighter stroke paints behind the italic serif accent. | Educational explainers, quotes |
+| **Sketch to 3D Extrusion** | @tomkrcha | Flat line-art sketch receives shadow, extrudes into an orthographic 3D mesh, and rotates on the beat. | Vision, transformation, design tools |
+| **Color Flood Canvas Wipe** | @twoclipping | An active circle grows exponentially (scale 0.1 → 3.5 in 0.3s) flooding the frame, then contracts into a new container. | Major chapter transition, climax |
+
+### I4. 7 Use Case Framework (Guanmo AI Motion)
+- **Product Commercial (产品宣传):** 15–30s high-velocity demos, continuous morphs, hardware exploded views, tangible physical UI.
+- **Knowledge Explainer (知识讲解):** Anatomy schematics, step-by-step logic maps, algorithm visualizers, editorial typography.
+- **Micro-interactions (短动效):** Loopable single-shape UI journeys, responsive buttons, spring toggles, haptic visual feedback.
+- **Character Animation (角色动画):** Stylized avatars, pixel-art loops, 3D character staging with reactive gestures.
+- **3D Interactive (3D 交互):** Three.js spatial planes, procedural landscapes, physics-driven particle flows.
+- **Narrative Short Film (叙事短片):** Multi-shot cinematic continuity, emotional pacing, metaphorical scene evolution.
+- **Music & Audio Video (音乐视频):** Frequency-reactive typography, beat-locked motion bursts, lyric pacing.

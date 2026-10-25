@@ -106,7 +106,7 @@ A cue is the word or phrase, copied exactly from the scene's voiceover, on which
 
 **Same for every brand.** The mandate, the motion library and the font library apply to every brand identically; there are no brand-specific variants of the look. Only a 3D character is brand-specific: opt-in per brand, from that brand's own character sheet, and a person's own character images never go into a public repository.
 
-**Before designing any scene, read** `references/motion-library.md` in full (the user's core reference moves, the Instagram motion library, the transition set, the font library, shot sizes, the style brief menus and the not-a-slide checks) and the user's reference reels for this video (listed in `CLAUDE_<CODE>.md`; ask for them if missing).
+**Before designing any scene, read** `references/motion-library.md` in full (the user's core reference moves, the Instagram motion library, the transition set, the font library, shot sizes, the style brief menus, the not-a-slide checks, and section I's AI code-motion reference library — prompt architecture and signature moves to draw from when a beat needs something the library above does not already have) and the user's reference reels for this video (listed in `CLAUDE_<CODE>.md`; ask for them if missing).
 
 **Fonts:** the font library in `src/proto/kit.tsx` (`FONT`): Open Sans 800 for headlines and big numbers, Rubik 500–700 for supporting text, labels and UI mockups, Instrument Serif italic for the accent on the key word.
 
