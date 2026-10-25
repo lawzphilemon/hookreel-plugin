@@ -69,6 +69,7 @@ The shot-size camera, the not-a-slide checks, the style brief menus (background 
 
 - **Evidence first.** No number on screen without a source label; estimates say so.
 - **The brand's voice, not ours.** Everything about tone, claims and look comes from the context profile.
+- **Shipped brand presets** in `brands/<brand>/` (`brand.json` + `CLAUDE.md`): a brand's colour tokens, voice, compliance rules, end-card disclaimers, CTA shape and measured pacing, so `/hookreel:brief` starts from the brand instead of a blank interview. `brands/truemission/` is the first one; private assets (logo, watermark, recordings, SFX library) are never in the repository and are added inside the studio's `public/`.
 - **Revise on paper, then on one scene.** Hooks, beats and the script are approved before anything is built; the look is approved on one rendered prototype scene.
 - **Fresh every time, same rules for every brand.** Each video's motion is invented from your reference reels and the motion library (`skills/hookreel-rules/references/motion-library.md`), set in one font library (Open Sans, Rubik, Instrument Serif); only a 3D character is brand-specific.
 - **No surprise licences.** Sound effects are synthesised; music and recordings stay out of public repositories.

@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.15.0 — 2026-10-25
+
+- **`brands/truemission/`** (`brand.json` + `CLAUDE.md` + `README.md`): the first shipped brand preset.
+  Colour tokens, fonts, radius and motion; voice ("kamu"/"Sahabat", never "Anda"); compliance hard rules
+  (source line on every number, "Ilustrasi" on hypotheticals, the one allowed guarantee form, "dijamin
+  LPS" reserved for a bank deposit, "bukan bunga", "tetap bisa ditolak", the three end-card disclaimers);
+  the CTA shape including the DM alternative and the 55 % rule; and the pacing measured on the brand's own
+  reels — half the viewers gone by 2.7 s, the payoff inside the first 10 s, 40–60 s for a cold feed.
+  No logo, watermark, character poses, recordings, SFX library or client facts: those stay private.
+- `/hookreel:brief` Step 1 reads a preset as a found context profile and says which one it used.
+- README: the presets folder is documented; `/hookreel:build` lists `scripts/pace.mjs` among the files an
+  older studio must receive.
+
+## 0.14.2 — 2026-10-25
+
+Three gates from the performance review of HKR-261019-Y6VQ-cara-kerja (91.8 s). Insights showed the
+keyword ask on screen at 80.95 s (88.2 % of the runtime) with the retention curve already down to about
+8 % of viewers, and the reward — "RIPLAY lewat DM" — only in the voiceover, on screen never.
+
+- `scripts/retention.mjs` → `ctaAudit`: **fails** when the ask (on screen or first spoken) lands after
+  55 % of the runtime, and when a declared `cta.reward` never appears in the CTA scene's on-screen
+  `text`; **warns** about the same when no keyword is declared, and about a reel with no save or share
+  ask anywhere. Reads `cta: { keyword, reward }` from `videos/<id>.json` (`/hookreel:build` now releases
+  it). Self-test covers the late ask, the early one, and a reward that exists only in the audio.
+- `scripts/pace.mjs` (new): the pace gate, called by `prepare-vo`. A take slower than the planned rate
+  stretches every scene and moves the ask without touching a word — 1.94 words/s turned this project's
+  75 s plan into 91.8 s. Fails the voice step when the voice runs more than 8 % over the plan, and names
+  the three worst scenes. `--allow-drift` overrides. `npm run pace` runs its self-test.
+- `prepare-vo`: per-scene seconds and the planned estimate are kept for that check; the retake estimate
+  uses `PLANNED_WPS` (2.1 in the template) instead of a number written twice.
+- `/hookreel:qa` item 4 lists the two CTA gates; a new closing rule says every "Open before posting" item
+  is closed before the render ships (this project shipped with "decide on the length" still open).
+- `/hookreel:publish`: the caption CTA belongs inside the first ~125 characters (this one sat at
+  character 666 of 1.282), plus one line that asks for the save or the share, or a reason in
+  `DECISIONS.md` why neither is asked.
+
 ## 0.14.1 — 2026-10-21
 
 - HyperFrames clips (optional): `hookreel-rules` → HyperFrames clips says when one beat may be built in HyperFrames and how it plays in Remotion (no audio, text from the script, source lines in Remotion, `public/hf/`, re-rendered after the voice). `/hookreel:build` Step 5 and `/hookreel:qa` licences point to it. Remotion stays the master timeline.

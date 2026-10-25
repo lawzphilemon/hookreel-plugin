@@ -18,6 +18,7 @@ Look for a brand context profile before asking anything: a `*context-profile*.js
 
 - Found: read it fully. Extract brand name, voice and tone rules, hard rules and forbidden claims, colours, fonts, logo file, motion rules, and any proof points. These answers are now known; do not ask them again.
 - Several found: ask which one this video uses.
+- **A shipped preset** in `${CLAUDE_PLUGIN_ROOT}/brands/<brand>/` (for example `brands/truemission/`: a `brand.json` plus a `CLAUDE.md` with the brand's voice, compliance hard rules, end-card disclaimers, CTA shape and measured pacing): read both before the interview and treat them as a found context profile, saying which preset you used. A preset is a starting point, never a reason to skip the evidence round — the topic, the numbers and their sources still come from the user for this video.
 - None: ask whether one exists. If not, offer to build one first with the `brandcore` skill if it is available, or continue with a short brand block (name, voice in one line, colours, font, logo file, hard rules) collected in Step 2.
 
 ## Step 2 — Interview

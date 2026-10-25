@@ -12,9 +12,18 @@
 //   - a slide: every beat lists its on-screen text in `text`, one string per tier (headline, label), or []
 //     for none; source lines, illustration labels, disclaimers and text inside a UI mockup do not count.
 //     More than 2 tiers (kicker + title + body), or a tier over 6 words, is a slide, not a video.
+//   - a late ask: the scene whose id contains "cta" must open before 55 % of the runtime, and so must
+//     the spoken keyword. Declare the keyword in `videos/<id>.json` as
+//     `"cta": { "keyword": "PROSPER", "reward": "RIPLAY" }`; without it the same check only warns,
+//     because guessing a keyword is worse than not checking. A real reel at 91.8 s put its ask at
+//     81.0 s — 88.2 % in — where the retention curve had about 8 % of viewers left, 25 s after the
+//     guarantee that made the ask worth answering.
+//   - an unearned ask: with a `cta.reward`, at least one beat of the CTA scene must carry that reward in
+//     its on-screen `text`. A reward that exists only in the voiceover is invisible in a muted feed.
 // Warns on an objectFit "cover" that crops more than 10 % of an image (a screenshot loses the rows the
 // beat is about), an objectFit "contain" that leaves empty bands in its box, a short phrase (4 words or
-// fewer) ending in a full stop, and all-caps text on more than one beat.
+// fewer) ending in a full stop, all-caps text on more than one beat, and a reel with no save or share
+// ask anywhere in its on-screen text.
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -92,6 +101,47 @@ export const slideCheck = (moves) => {
   return { errors, warnings };
 };
 
+const MAX_CTA_AT = 0.55; // the ask has to land before 55 % of the runtime
+const ASK = /\b(simpan|simpan ini|bagikan|kirim ke|share|save)\b/i;
+const bare = (x) => String(x).replace(/[^\p{L}\p{N}]/gu, "").toUpperCase();
+
+// moves: moves.json; words: words.json; cta: the video's `cta` block (keyword, reward) or null.
+// Returns { errors, warnings }.
+export const ctaAudit = (moves, words, cta) => {
+  const errors = [], warnings = [];
+  const { offsets, length } = sceneOffsets(words);
+  const keyword = typeof cta?.keyword === "string" ? cta.keyword.trim() : null;
+  const reward = typeof cta?.reward === "string" ? cta.reward.trim() : null;
+  const at = (t) => `${t.toFixed(2)} s = ${((t / length) * 100).toFixed(1)} % of ${length.toFixed(1)} s`;
+  // Held to the same limit with or without a declared keyword; only the severity changes.
+  const limit = (msg) => (keyword ? errors : warnings).push(`${msg} (add cta.keyword to videos/<id>.json to make this an error)`);
+  const sceneId = Object.keys(words.scenes).find((s) => /cta/i.test(s));
+  const max = `${(MAX_CTA_AT * 100).toFixed(0)} % of the runtime`;
+  if (!sceneId) warnings.push('no scene id containing "cta": the ask cannot be located');
+  else {
+    const beats = moves.filter((m) => m.scene === sceneId).sort((a, b) => a.at - b.at);
+    const textOf = (b) => (b.text ?? []).join(" ");
+    const kwRe = keyword ? new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i") : null;
+    // Where the ask is on screen, not where its scene starts: the scene may open on a price chip.
+    const askBeat = kwRe ? beats.find((b) => kwRe.test(textOf(b))) : null;
+    const first = offsets[sceneId] + ((askBeat ?? beats[0])?.at ?? 0);
+    if (first / length > MAX_CTA_AT) limit(`the ask is on screen at ${at(first)}; it must land before ${max}`);
+    if (keyword) {
+      const said = (words.scenes[sceneId]?.words ?? []).find(([w]) => bare(w) === bare(keyword));
+      if (said) {
+        const spoken = offsets[sceneId] + TIME.leadIn + said[1];
+        if (spoken / length > MAX_CTA_AT) errors.push(`"${keyword}" is first spoken at ${at(spoken)}; the ask must land before ${max}`);
+      }
+      const onScreen = beats.map(textOf).join(" ");
+      if (!kwRe.test(onScreen)) warnings.push(`${sceneId} never shows "${keyword}" on screen: a muted feed hears nothing of the ask`);
+      if (!reward) warnings.push(`${sceneId}: no cta.reward in videos/<id>.json, so the CTA screen text was not checked for what the viewer gets`);
+      else if (!onScreen.toLowerCase().includes(reward.toLowerCase())) errors.push(`${sceneId} never shows the reward ("${reward}") on screen: the ask tells the viewer to act without telling them what they get`);
+    }
+  }
+  if (!ASK.test(moves.flatMap((m) => m.text ?? []).join(" | "))) warnings.push("no save or share ask anywhere in the on-screen text: the behaviour that actually spreads a reel is left unnamed");
+  return { errors, warnings };
+};
+
 // Width and height of a PNG, JPEG or WebP from its header, or null.
 export const imageSize = (b) => {
   if (b.readUInt32BE(0) === 0x89504e47) return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
@@ -159,20 +209,28 @@ export const checkImg = (text, sizeOf) => {
 const main = (id) => {
   const dir = path.join("src", "proto", id);
   const errors = [], warnings = [];
+  let askClean = false;
   const read = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
-  if (!fs.existsSync(path.join(dir, "moves.json")) || !fs.existsSync(path.join(dir, "words.json"))) errors.push(`${dir}: moves.json and words.json are needed (npm run words -- ${id})`);
+  if (!fs.existsSync(dir)) errors.push(`${dir} not found: a template-look video has no beats to lint (retention covers custom motion only)`);
+  else if (!fs.existsSync(path.join(dir, "moves.json")) || !fs.existsSync(path.join(dir, "words.json"))) errors.push(`${dir}: moves.json and words.json are needed (npm run words -- ${id})`);
   else {
     const has = (name) => ["", "brand/"].some((d) => fs.existsSync(path.join("public", "sfx", `${d}${name}.wav`)));
     errors.push(...deadAir(read("moves.json"), read("words.json")), ...sfxAudit(read("moves.json"), read("words.json"), has));
     const slide = slideCheck(read("moves.json"));
     errors.push(...slide.errors);
     warnings.push(...slide.warnings);
+    const videoFile = path.join("videos", `${id}.json`);
+    const cta = fs.existsSync(videoFile) ? JSON.parse(fs.readFileSync(videoFile, "utf8")).cta : null;
+    const ask = ctaAudit(read("moves.json"), read("words.json"), cta ?? null);
+    errors.push(...ask.errors);
+    warnings.push(...ask.warnings);
+    askClean = !ask.errors.length && !ask.warnings.length;
   }
   const sizeOf = (f) => {
     const p = path.join("public", f);
     return fs.existsSync(p) ? imageSize(fs.readFileSync(p)) : null;
   };
-  for (const f of fs.readdirSync(dir, { recursive: true }).filter((f) => /\.(tsx|jsx)$/.test(f))) {
+  for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir, { recursive: true }) : []).filter((f) => /\.(tsx|jsx)$/.test(f))) {
     for (const el of imgElements(fs.readFileSync(path.join(dir, f), "utf8"))) {
       const r = checkImg(el.text, sizeOf);
       if (r?.error) errors.push(`${f}:${el.line} ${r.error}`);
@@ -181,7 +239,7 @@ const main = (id) => {
   }
   warnings.forEach((w) => console.log(`warn: ${w}`));
   errors.forEach((e) => console.log(`FAIL: ${e}`));
-  console.log(errors.length ? `${errors.length} retention error(s)` : "retention: every beat has until and a sound, no dead air, hook moves in time, no stretched image, no slide text");
+  console.log(errors.length ? `${errors.length} retention error(s)` : `retention: every beat has until and a sound, no dead air, hook moves in time, no stretched image, no slide text${askClean ? ", the ask lands in time and carries its reward" : ""}`);
   process.exit(errors.length ? 1 : 0);
 };
 
@@ -209,6 +267,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       slideCheck([{ scene: "a", at: 0, move: "x", text: ["01 — FITUR", "Satu", "Dua"] }, { scene: "a", at: 1, move: "y" }, { scene: "a", at: 2, move: "z", text: ["ini kalimat yang terlalu panjang untuk layar"] }]).errors.length === 3,
       slideCheck([{ scene: "a", at: 0, move: "x", text: ["Bayar dulu."] }, { scene: "a", at: 1, move: "y", text: ["STOP"] }, { scene: "a", at: 2, move: "z", text: ["GRATIS"] }, { scene: "a", at: 3, move: "w", text: ["Rp1,5 jt"] }]).warnings.length === 2,
       slideCheck([{ scene: "a", at: 0, move: "x", text: ["USD 10.000"] }, { scene: "a", at: 1, move: "y", text: ["Premi USD"] }, { scene: "a", at: 2, move: "z", text: ["USD"] }]).warnings.length === 0,
+      // CTA gates: an ask at 82 % is an error with a keyword and only a warning without one; an early
+      // ask carrying its reward is clean; a reward that never reaches the screen is an error.
+      ctaAudit([{ scene: "02-cta", at: 0.3, text: ["Komentar PROSPER"] }], { scenes: { a: { secs: 20 }, "02-cta": { secs: 4 } } }, { keyword: "PROSPER" }).errors.length === 1,
+      ctaAudit([{ scene: "02-cta", at: 0.3, text: ["Komentar PROSPER"] }], { scenes: { a: { secs: 20 }, "02-cta": { secs: 4 } } }, null).errors.length === 0,
+      ctaAudit([{ scene: "02-cta", at: 0.3, text: ["Komentar PROSPER"] }, { scene: "02-cta", at: 1, text: ["RIPLAY lewat DM"] }], { scenes: { a: { secs: 2 }, "02-cta": { secs: 4 } } }, { keyword: "PROSPER", reward: "RIPLAY" }).errors.length === 0,
+      ctaAudit([{ scene: "02-cta", at: 0.3, text: ["Komentar PROSPER"] }], { scenes: { a: { secs: 2 }, "02-cta": { secs: 4 } } }, { keyword: "PROSPER", reward: "RIPLAY" }).errors.some((e) => e.includes("RIPLAY")),
+      ctaAudit([{ scene: "02-cta", at: 0.3, text: ["Simpan ini"] }], { scenes: { a: { secs: 2 }, "02-cta": { secs: 4 } } }, null).warnings.every((w) => !w.includes("save or share")),
+      // A spoken keyword only counts where it is said: same late scene, keyword 20 s into it.
+      ctaAudit([{ scene: "02-cta", at: 0.3, text: ["Komentar PROSPER"] }], { scenes: { a: { secs: 20 }, "02-cta": { secs: 40, words: [["PROSPER", 20]] } } }, { keyword: "PROSPER" }).errors.some((e) => e.includes("first spoken")),
     ];
     if (ok.includes(false) || ok.includes(undefined)) throw new Error(`self-test failed: ${JSON.stringify({ ok, air, slow })}`);
     console.log("self-test ok");

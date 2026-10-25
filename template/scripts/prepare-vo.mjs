@@ -13,6 +13,12 @@ import path from "path";
 import { execSync, spawnSync } from "child_process";
 import { downloadWhisperModel, installWhisperCpp, transcribe, toCaptions } from "@remotion/install-whisper-cpp";
 import { scriptWordTimes, splitWords } from "../src/align.ts";
+import { TIME } from "../src/motion.ts";
+import { paceAudit } from "./pace.mjs";
+
+// The rate the script planned at (2.1 words/s since 0.14.0). A slower take stretches every scene and
+// pushes the CTA later without changing a word — see scripts/pace.mjs for why that gate exists.
+const PLANNED_WPS = 2.1;
 
 const [reelId, input, ranges] = process.argv.slice(2);
 if (!reelId || !input) {
@@ -237,6 +243,7 @@ if (segments.length !== scenes.length) {
 
 const outDir = path.join("public", "vo", reelId);
 fs.mkdirSync(outDir, { recursive: true });
+const paced = [];
 for (const [i, [start, end]] of segments.entries()) {
   const scene = scenes[i];
   const clip = path.join(outDir, `${scene.id}.wav`);
@@ -247,11 +254,28 @@ for (const [i, [start, end]] of segments.entries()) {
   console.log(`\n${scene.id}  ${start.toFixed(2)}s → ${end.toFixed(2)}s`);
   console.log(`  script: ${scene.vo}`);
   console.log(`  heard:  ${words.map((x) => x.text).join(" ")}`);
-  // About 2.1 spoken words a second; a clip twice as long hides a retake or false starts.
-  const estimate = splitWords(scene.vo).length / 2.1;
+  // Against the planned pace; a clip twice as long hides a retake or false starts.
+  const estimate = splitWords(scene.vo).length / PLANNED_WPS;
+  paced.push({ id: scene.id, actual: end - start, est: estimate });
   if (end - start > 2 * estimate)
     console.warn(`  WARNING: clip is ${(end - start).toFixed(1)}s, over 2× the ${estimate.toFixed(1)}s estimate; check for a retake or false starts and cut it with explicit ranges (see out/${reelId}-take.json)`);
 }
+
+// Pace gate (scripts/pace.mjs): a take slower than the plan re-times the whole reel, and the CTA leaves
+// the part of the runtime where viewers still are. The clips are written either way; this stops the
+// build so the scene times are fixed before any motion work.
+const pace = paceAudit({
+  paced,
+  wordCount: scenes.reduce((n, s) => n + splitWords(s.vo).length, 0),
+  sceneCount: scenes.length,
+  wps: PLANNED_WPS,
+  pad: TIME.leadIn + TIME.tail,
+});
+if (pace.fail.length && !process.argv.includes("--allow-drift")) {
+  pace.fail.forEach((line) => console.error(line));
+  process.exit(1);
+}
+console.log(`\n${pace.message}`);
 
 // Let the studio know about the new clips.
 execSync("node scripts/register-videos.mjs", { stdio: "inherit" });
