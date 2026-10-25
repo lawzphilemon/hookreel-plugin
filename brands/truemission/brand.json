@@ -1,0 +1,43 @@
+{
+  "name": "Truemission",
+  "logo": null,
+  "colors": {
+    "bg": "#F9F0EC",
+    "text": "#000000",
+    "muted": "#6F6360",
+    "surface": "#FFFFFF",
+    "track": "#E6D9D3",
+    "accent": "#AE0001",
+    "onAccent": "#FFFFFF",
+    "panel": "#AE0001",
+    "panelText": "#FFFFFF",
+    "panelMuted": "#FFE3E3",
+    "panelSoft": "#6F6360",
+    "panelLine": "#8F0001",
+    "error": "#C62828",
+    "errorText": "#AE0001"
+  },
+  "fonts": {
+    "sans": "Rubik",
+    "mono": "JetBrains Mono",
+    "display": "Open Sans"
+  },
+  "labels": {
+    "source": "Sumber"
+  },
+  "radius": {
+    "card": 28,
+    "pill": 999
+  },
+  "motion": {
+    "entranceMs": 360,
+    "entrance": "focus",
+    "text": "kinetic",
+    "camera": "push"
+  },
+  "headlineCase": "as-written",
+  "captions": {
+    "align": "center",
+    "reveal": "word"
+  }
+}

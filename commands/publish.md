@@ -38,6 +38,8 @@ This writes `out/<id>-cover-<n>.png` (1080×1920) and `out/<id>-cover-<n>-grid.p
 Follow `creator-os` Workflow B (`references/script-structures.md`, caption format):
 - **First two lines: a second hook**, a different mechanism from the spoken hook (the viewer already heard that one). It must work alone in the preview before "more" (about 125 characters). Score it with the same rubric.
 - Two to four sentences of value, in the brand voice from `CLAUDE_<CODE>.md`.
+- **The CTA inside the first ~125 characters, or repeated there.** A caption that puts it in the fourth paragraph is invisible: the feed cuts at about 125 characters behind "… more", which is where the only ask of a real reel sat (character 666 of 1.282, so nobody read it).
+- **One line that asks for the save or the share, not only the keyword.** Shares are what carries a reel to people who never open the post page; a keyword ask alone excludes exactly those viewers. Name the intended recipient ("kirim ke yang sedang menyiapkan dana kuliah dalam dolar"), or ask for the save when the value is a reference. If the video deliberately asks for neither, write the reason in `DECISIONS.md`.
 - The CTA exactly as in the video.
 - Three to five relevant hashtags.
 
