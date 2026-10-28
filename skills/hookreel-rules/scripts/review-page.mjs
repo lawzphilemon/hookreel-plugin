@@ -21,6 +21,22 @@ const inline = (s) => {
 
 const cells = (line) => line.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
 
+// Scene ids in tables whose first column is "Scene id" or "Scene" that are not the 01-hook form
+// `npm run check` enforces at build (two digits, a dash, lowercase words and dashes). Caught here it
+// costs one edit; caught at build, a rename across videos/, the clips and words.json.
+export const badSceneIds = (md) => {
+  const lines = md.replace(/\r\n/g, "\n").split("\n");
+  const bad = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (!/^\|/.test(lines[i]) || !/^\|[\s:|-]+\|\s*$/.test(lines[i + 1] ?? "") || !/^scene( id)?$/i.test(cells(lines[i])[0])) continue;
+    for (i += 2; i < lines.length && /^\|/.test(lines[i]); i++) {
+      const id = cells(lines[i])[0].replace(/`/g, "");
+      if (id && !/^\d\d-[a-z0-9-]+$/.test(id)) bad.push(id);
+    }
+  }
+  return bad;
+};
+
 export const toHtml = (md, { cards = false } = {}) => {
   const lines = md.replace(/\r\n/g, "\n").split("\n");
   const out = [];
@@ -125,6 +141,7 @@ if (process.argv[2] === "--test") {
   check(html.includes("<pre><code>&lt;x&gt;</code></pre>"), "fence");
   check(toHtml("| id | vo |\n|---|---|\n| 01 | Halo |", { cards: true }).includes('<h4>01</h4><p><span class="label">vo</span>Halo</p>'), "cards");
   check(toHtml("Rp100 * 2 * 3").includes("Rp100 * 2 * 3"), "lone asterisks stay");
+  check(JSON.stringify(badSceneIds("| Scene id | vo |\n|---|---|\n| 01-hook | a |\n| s2-why | b |\n| `03-cta` | c |")) === '["s2-why"]', "scene ids");
   console.log("review-page self-check passed");
 } else {
   const args = process.argv.slice(2);
@@ -137,6 +154,11 @@ if (process.argv[2] === "--test") {
   const md = fs.readFileSync(file, "utf8");
   const title = opt("--title") ?? (md.match(/^# (.+)$/m)?.[1] ?? path.basename(file, ".md"));
   const out = opt("--out") ?? file.replace(/\.md$/, ".html");
+  const bad = args.includes("--cards") ? badSceneIds(md) : [];
+  if (bad.length) {
+    console.error(`scene ids must look like 01-hook (two digits, a dash, lowercase words and dashes): ${bad.join(", ")}`);
+    process.exit(1);
+  }
   fs.writeFileSync(out, page(title, toHtml(md, { cards: args.includes("--cards") })));
   console.log(`${out}  (${Math.round(fs.statSync(out).size / 1024)} KB)`);
 }

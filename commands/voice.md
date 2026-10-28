@@ -1,6 +1,6 @@
 ---
 name: voice
-description: Put a recorded voiceover take into a video — normalise, transcribe, cut per scene at the pauses, re-time every beat on the spoken words (character-aligned) — then check the mix loudness and peaks
+description: Put a voiceover into a video — an ElevenLabs take with exact character times (no Whisper), or a recording normalised, transcribed and cut at the pauses — re-time every beat on the spoken words (character-aligned), then check the mix loudness and peaks
 allowed-tools: Read, Write, Bash
 ---
 
@@ -16,7 +16,19 @@ If the user did not say, identify the take: transcribe it once (the `vo` script 
 
 ### TTS instead of a recording (a voice clone)
 
-When the user chooses a synthetic voice (for example their own ElevenLabs voice clone) over recording, generate one take per video and treat it like a recording from Step 2 on:
+When the user chooses a synthetic voice (for example their own ElevenLabs voice clone) over recording:
+
+**ElevenLabs with an API key (the fast path).** `ELEVENLABS_API_KEY` in the studio's `.env.local` (ask the user to put it there; never in code, `videos/` or chat), the voice in `videos/<id>.json` → `"tts": { "voice": "<voice id>", "model": "eleven_multilingual_v2", "settings": { … } }` or `ELEVENLABS_VOICE_ID` in `.env.local`. For every number, date, amount or short form, add the scene's `say`: the `vo` with `{shown|spoken}` spans from the pronunciation table of `VOICEOVER_<CODE>.md`, e.g. `"say": "Premi mulai {USD 2.500|dua ribu lima ratus dolar} per tahun."` (`npm run check` fails when `say` does not read as the `vo` once each span is replaced by its shown text). Then:
+
+```bash
+npm run tts -- <id> --dry
+npm run tts -- <id>
+npm run words -- <id>
+```
+
+`--dry` prints the text and its character count and spends nothing. The real run asks for the whole video as one take (one delivery) with a time for every character, levels it like a recording, cuts every scene at the middle of the silence between scenes, and writes `public/vo/<id>/` with exact word times: no Whisper, no pause detection, no ranges. Each shown form becomes the word in `words.json`, so a cue on "USD 2.500" lands where it is spoken. The take and its times are cached in `out/<id>-tts.*`; a rerun of an unchanged script costs no credits. The pace gate runs as in Step 2. Go on with Step 2's re-time check and music, then Step 4.
+
+**Any other TTS (no API key, or another tool):** generate one take per video and treat it like a recording from Step 2 on:
 - **Prompt:** the approved lines in order, unchanged, with the spoken forms from the pronunciation table of `VOICEOVER_<CODE>.md`: numbers, dates and amounts written as words ("dua puluh lima ribu dolar", not "USD 25.000"), acronyms spelled the way they should be heard. Put `[pause]` (or the model's own break tag) between scenes: pause detection then cuts every scene without ranges.
 - **Expect expansions:** TTS reads short forms in full ("AS" → "Amerika Serikat"). Write the form you want heard in the prompt; if the audio still differs from the script, keep the meaning, set `vo` in `videos/<id>.json` to what is said (so cues and word times match) and keep the on-screen text from the script. Record the change in `DECISIONS.md`.
 - **Pace:** TTS can read slower than the 2.1 words a second estimate (1.9–2.15 measured): check the length against the target before syncing, then `npm run trim` or the model's speed setting (about 1.1), with the user's OK since both change the voice.
@@ -67,11 +79,11 @@ The director's layer is merged in from `director/<id>.json`. Copy `storyboard/<i
 Render the audio alone and measure it:
 
 ```bash
-npx remotion render <id>-motion out/<id>-mix.wav --codec=wav --log=error
+npm run chunks -- <id> --audio-only
 npm run loudness -- out/<id>-mix.wav
 ```
 
-(`<id>-motion` is the custom composition; use `<id>` only for a template-look video. `npm run loudness` measures BS.1770 integrated loudness and peaks in plain Node, because Remotion's ffmpeg has no ebur128 filter.)
+(`npm run chunks` renders the custom composition `<id>-motion` and caches the WAV for the final render; for a template-look video use `npx remotion render <id> out/<id>-mix.wav --codec=wav --log=error`. `npm run loudness` measures BS.1770 integrated loudness and peaks in plain Node, because Remotion's ffmpeg has no ebur128 filter.)
 
 Update `<project>/project.json` (`stages.voice.<id>`), `PROJECTS.md`, and the Status table in `<project>/VOICEOVER_<CODE>.md` (recorded, date, file).
 

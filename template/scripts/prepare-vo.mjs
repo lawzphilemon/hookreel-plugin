@@ -15,6 +15,7 @@ import { downloadWhisperModel, installWhisperCpp, transcribe, toCaptions } from 
 import { scriptWordTimes, splitWords } from "../src/align.ts";
 import { TIME } from "../src/motion.ts";
 import { paceAudit } from "./pace.mjs";
+import { ffmpeg, duration, highpass, level, fade } from "./vo-audio.mjs";
 
 // The rate the script planned at (2.1 words/s since 0.14.0). A slower take stretches every scene and
 // pushes the CTA later without changing a word — see scripts/pace.mjs for why that gate exists.
@@ -25,8 +26,6 @@ if (!reelId || !input) {
   console.error("Usage: node scripts/prepare-vo.mjs <video id> <recording> [start-end,...]");
   process.exit(1);
 }
-
-const ffmpeg = (args) => execSync(`npx remotion ffmpeg -y -loglevel error ${args}`, { stdio: "inherit" });
 
 // Scenes, in order, straight from the video file so it stays the single source of truth.
 const { scenes, language = "en" } = JSON.parse(fs.readFileSync(path.join("videos", `${reelId}.json`), "utf8"));
@@ -61,14 +60,6 @@ const hear = async (file) => {
   }));
 };
 
-const duration = (file) =>
-  Number(
-    spawnSync("npx", ["remotion", "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", file], {
-      shell: true,
-      encoding: "utf8",
-    }).stdout.trim().split(/\s+/).pop(),
-  );
-
 const silences = (file) => {
   const res = spawnSync("npx", ["remotion", "ffmpeg", "-hide_banner", "-i", `"${file}"`, "-af", "silencedetect=noise=-30dB:d=0.2", "-f", "null", "-"], {
     shell: true,
@@ -79,91 +70,6 @@ const silences = (file) => {
   let m;
   while ((m = re.exec(res.stderr))) out.push({ start: Number(m[1]), end: Number(m[2]) });
   return out;
-};
-
-// A 16-bit PCM WAV, edited in place: Remotion's bundled ffmpeg has no highpass, limiter or fade filter.
-const pcm = (file) => {
-  const buf = fs.readFileSync(file);
-  let at = 12, channels = 1, rate = 48000, bits = 16, data = null;
-  while (at < buf.length - 8) {
-    const id = buf.toString("ascii", at, at + 4);
-    const size = buf.readUInt32LE(at + 4);
-    if (id === "fmt ") { channels = buf.readUInt16LE(at + 10); rate = buf.readUInt32LE(at + 12); bits = buf.readUInt16LE(at + 22); }
-    if (id === "data") { data = { start: at + 8, size: Math.min(size, buf.length - at - 8) }; break; }
-    at += 8 + size + (size % 2);
-  }
-  if (!data || bits !== 16) throw new Error(`${file}: expected 16-bit PCM, got ${bits}-bit`);
-  const pos = (i, c) => data.start + (i * channels + c) * 2;
-  return {
-    channels, rate, n: Math.floor(data.size / 2 / channels),
-    get: (i, c) => buf.readInt16LE(pos(i, c)),
-    set: (i, c, v) => buf.writeInt16LE(Math.max(-32768, Math.min(32767, Math.round(v))), pos(i, c)),
-    save: () => fs.writeFileSync(file, buf),
-  };
-};
-
-// 4th-order high-pass (two RBJ biquads, Q 0.707).
-const highpass = (file, hz = 90) => {
-  const w0 = pcm(file);
-  const w = (2 * Math.PI * hz) / w0.rate, alpha = Math.sin(w) / (2 * Math.SQRT1_2), cos = Math.cos(w), a0 = 1 + alpha;
-  const b = [(1 + cos) / 2 / a0, -(1 + cos) / a0, (1 + cos) / 2 / a0], a = [(-2 * cos) / a0, (1 - alpha) / a0];
-  for (let c = 0; c < w0.channels; c++) {
-    const st = [[0, 0, 0, 0], [0, 0, 0, 0]]; // x1 x2 y1 y2 per stage
-    for (let i = 0; i < w0.n; i++) {
-      let x = w0.get(i, c);
-      for (const s of st) {
-        const y = b[0] * x + b[1] * s[0] + b[2] * s[1] - a[0] * s[2] - a[1] * s[3];
-        s[1] = s[0]; s[0] = x; s[3] = s[2]; s[2] = y; x = y;
-      }
-      w0.set(i, c, x);
-    }
-  }
-  w0.save();
-};
-
-// Integrated loudness (LUFS) of a file, from ffmpeg's loudnorm measurement.
-const loudness = (file) => {
-  const res = spawnSync("npx", ["remotion", "ffmpeg", "-hide_banner", "-i", `"${file}"`, "-af", "loudnorm=print_format=json", "-f", "null", "-"], {
-    shell: true,
-    encoding: "utf8",
-  });
-  return Number(/"input_i" : "(-?[\d.]+)"/.exec(res.stderr)[1]);
-};
-
-// One fixed gain to -16 LUFS for the whole take, with a look-ahead peak limiter at -3.5 dBFS (about
-// -3 dBTP) on the loudest syllables. Single-pass loudnorm is dynamic instead: it lifts the
-// room noise before the first word by 30 dB, heard as a burst when the first clip starts.
-const level = (file, lufs = -16, ceilingDb = -3.5) => {
-  const w0 = pcm(file);
-  const gain = 10 ** ((lufs - loudness(file)) / 20), ceiling = 32767 * 10 ** (ceilingDb / 20);
-  const look = Math.round(w0.rate * 0.005), release = 1 - Math.exp(-1 / (w0.rate * 0.08));
-  const g = new Float32Array(w0.n).fill(1);
-  for (let i = 0; i < w0.n; i++) {
-    let peak = 0;
-    for (let c = 0; c < w0.channels; c++) peak = Math.max(peak, Math.abs(w0.get(i, c)) * gain);
-    if (peak <= ceiling) continue;
-    const need = ceiling / peak;
-    // Ramp down over the 5 ms before the peak so the limiter never clicks.
-    for (let j = Math.max(0, i - look); j <= i; j++) g[j] = Math.min(g[j], need + ((1 - need) * (i - j)) / look);
-  }
-  let env = 1;
-  for (let i = 0; i < w0.n; i++) {
-    env = Math.min(g[i], env + (1 - env) * release);
-    for (let c = 0; c < w0.channels; c++) w0.set(i, c, w0.get(i, c) * gain * env);
-  }
-  w0.save();
-};
-
-// 30 ms fade at both ends of a clip, so no clip starts or stops with a step.
-const fade = (file, seconds = 0.03) => {
-  const w0 = pcm(file);
-  const len = Math.min(Math.round(w0.rate * seconds), Math.floor(w0.n / 2));
-  for (let i = 0; i < len; i++)
-    for (let c = 0; c < w0.channels; c++) {
-      w0.set(i, c, (w0.get(i, c) * i) / len);
-      w0.set(w0.n - 1 - i, c, (w0.get(w0.n - 1 - i, c) * i) / len);
-    }
-  w0.save();
 };
 
 fs.mkdirSync("out", { recursive: true });

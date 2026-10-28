@@ -48,6 +48,7 @@ Ask what the user wants, then route:
 | Motion, layout or sound only | Edit the scenes in the studio's `src/proto/<id>/` | Render the changed scene and send it |
 | Too long or loose pacing | `npm run trim -- "<recording>"` (caps the pauses, no retake), then `/hookreel:voice` on the trimmed file | QA again |
 | New voiceover take | `/hookreel:voice` | QA again |
+| The rest of a video after its prototype is approved | `/hookreel:produce <id>` | Cover and caption: `/hookreel:publish` |
 | Cover or caption | `/hookreel:publish` | — |
 | A carousel slide (copy or look) | Edit `carousel/<id>/02-copy.md` (re-approve) or `carousel.html` | Re-run `/hookreel:carousel` Step 4 and update `report.md` |
 
@@ -55,7 +56,7 @@ Ask what the user wants, then route:
 1. Name the target (scene, beat, element or sound) and the change. When the target is ambiguous, take the most likely one and say which in one sentence; ask only when it cannot be guessed.
 2. Change only the target. Other scenes, colours, timing and sounds stay as they are unless the user asks.
 3. When a length changes, shift what follows (`until`, cues, the next beat's `at`) and re-run `npm run fresh` and `npm run retention`.
-4. Re-render only the changed seconds (`npx remotion still` at the changed frames, or `--frames=` for the range), then report in one sentence what changed, with numbers: "Scene 3 is now 2 s shorter, the logo 30 % larger."
+4. Re-render only the changed seconds (`npx remotion still` at the changed frames, or `--frames=` for the range); for the deliverable, `npm run chunks -- <id>` re-renders only the scenes whose files changed and joins them with the rest. Then report in one sentence what changed, with numbers: "Scene 3 is now 2 s shorter, the logo 30 % larger."
 
 These edits stay inside the approved script; a new line, claim or number still goes back through the script gate.
 

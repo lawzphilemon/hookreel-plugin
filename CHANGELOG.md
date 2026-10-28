@@ -1,5 +1,52 @@
 # Changelog
 
+## 0.16.0 — 2026-10-28
+
+Faster production at the same output, from the article "How to build motion design studio with Opus 5.5"
+(@0xMovez, 2026-09-27) read against the self-critiques of HKR-261015-3A9P, HKR-261019-3JH5 and the three
+HKR-261019-Y6VQ reels. Their biggest costs were full renders (about 25 min each, up to four per video), fixes
+found only in the MP4 that a still would have shown, Whisper on CPU, and scene ids renamed late.
+
+- **`npm run chunks -- <id>`** (`scripts/render-chunks.mjs`): the MP4 scene by scene. Bundles once, renders the
+  audio first as one WAV (`--audio-only` stops there for the loudness check), renders each scene's frame range
+  without audio into `out/chunks/<id>/<scene>-<hash>.mp4`, and joins them with ffmpeg concat (video copied, not
+  re-encoded). A scene whose file (`src/proto/<id>/scenes/<scene>.tsx`), words, range, shared code, non-audio
+  assets, lock file and flags did not change is reused, so a fix costs the scenes it touched. Stops on code that
+  breaks frame = f(t) (`Math.random`, `Date`, timers, React state and effects, CSS transitions); `--check`
+  renders three frames twice and compares their hashes; `--dry` lists what would be rendered or reused. Assets
+  are hashed by content, not mtime. Checks the joined file's frame count. Tested on HKR-261019-Y6VQ-deposito
+  (84.5 s, 8 scenes): first chunked render 23 min with the check, one changed scene plus its audio 5.5 min;
+  frames match the earlier full render.
+- **`npm run sheets -- <id>`** (`scripts/sheets.mjs`, kit `protoReel(…).sheet`, composition `<id>-critique`):
+  critique sheets in one render: a contact sheet every 0.5 s, 12-frame strips around every transition in
+  `moves.json`, and every beat at 360 px wide at the moment its hero is complete, safe area drawn on every
+  tile. `--gate <critique.md>` passes only when every criterion (hook, phone readability, motion quality,
+  variety, composition, brand accuracy, sound sync) scores 8+ on sheets made after the last code change.
+- `/hookreel:qa` Step 1b: the scored critique loop on those sheets (`07a-critique-<id>.md`, three rounds at
+  most) before any full render; item 8 and Step 2 use `npm run chunks`; the self-critique records minutes and
+  renders per step.
+- **`npm run tts -- <id>`** (`scripts/tts-vo.mjs`): ElevenLabs' with-timestamps endpoint, the whole video as
+  one take, levelled like a recording, cut at the middle of the silence between scenes, word fragments from the
+  character times: no Whisper, no pause detection, no ranges. A scene's `say` carries `{shown|spoken}` spans
+  ("{USD 2.500|dua ribu lima ratus dolar}") so cues on numbers land where they are spoken; `npm run check`
+  fails when `say` does not read as the `vo`. Key in `.env.local` (now in `.gitignore`), voice from `tts.voice`,
+  `--voice` or `ELEVENLABS_VOICE_ID`, no fallback voice. The take is cached: an unchanged script costs no
+  credits. `--dry` spends nothing.
+- `scripts/vo-audio.mjs`: prepare-vo's stereo WAV helpers (high-pass, loudness, level, fade) shared with tts-vo.
+  `word-times.mjs` exports `lcsMap`.
+- **Spring presets** `SPRING` in `src/motion.ts` (snappy 0.30 s, default 0.53 s, heavy 0.93 s, playful 0.60 s
+  with visible overshoot, measured at 30 fps) and kit `spr(t, at, preset)` / `glide(t, from, steps)` (several
+  targets, one spring per change), on Remotion's `spring()`, a pure function of the frame.
+- **`/hookreel:produce <id>`**: after the prototype is approved, the rest of build, voice and qa in one run,
+  stopping only for the user's calls (a changed line or claim, a ban, a voice problem, a critique that does not
+  pass after three rounds).
+- `/hookreel:build`: one file per scene (`scenes/<scene id>.tsx`, shared props in `shared.tsx`), and Step 5
+  builds the remaining scenes with up to four parallel subagents, each owning its scene files, with
+  `06-motion-<id>.md`, `moves.json` and the prototype as the spec; the `<id>-critique` composition is
+  registered with the others. Older studios get the new files listed in Step 1.
+- `review-page.mjs --cards` refuses to publish a script or recording guide whose scene ids are not `01-hook`
+  form, so the id is fixed at the script, not renamed across clips and words.json at build.
+
 ## 0.15.0 — 2026-10-25
 
 - **`brands/truemission/`** (`brand.json` + `CLAUDE.md` + `README.md`): the first shipped brand preset.

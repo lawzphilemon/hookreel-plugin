@@ -1,7 +1,7 @@
 ---
 name: build
 description: Turn the approved script into new, custom motion design in the brand's Remotion studio, invented from the user's reference reels — one prototype scene for approval first, then every scene, timed on the spoken words at 30 fps (frame = f(t))
-allowed-tools: Read, Write, Edit, Bash, Glob
+allowed-tools: Read, Write, Edit, Bash, Glob, Agent
 ---
 
 # HKR-6 — Build
@@ -21,7 +21,7 @@ Stop unless `04-script.md` starts with `Status: approved`. A storyboard is not r
 One studio per brand: `hookreel-studio/<brand-slug>/` in the working directory.
 
 - **Does not exist:** copy `${CLAUDE_PLUGIN_ROOT}/template` (all files, including dotfiles) into it and run `npm install` there (Node 22.18+). The install generates the sound effects and registers the videos.
-- **Exists:** keep it. Never overwrite files the user may have edited (`src/`, `scripts/`); only add files. If it predates this version, copy in `src/proto/kit.tsx`, `scripts/word-times.mjs`, `loudness.mjs`, `sweep.mjs`, `fresh-check.mjs`, `contrast.mjs`, `preview.mjs`, `pace.mjs` and their `package.json` scripts (`words`, `loudness`, `sweep`, `fresh`, `contrast`, `preview`, `pace`) when they are missing. Studios from before 0.13.0: replace `scripts/fresh-check.mjs` and `scripts/retention.mjs` with the plugin's (tooling, not user code), add `SHOT`, `Shot`, `camAt` and `frameOn` to `src/motion.ts`, and add `Camera`, `life` and the `object` transition to `src/proto/kit.tsx` from the plugin's template without touching the rest of the user's kit. Older videos' `moves.json` need not change; the new fields are checked only on the video being built.
+- **Exists:** keep it. Never overwrite files the user may have edited (`src/`, `scripts/`); only add files. If it predates this version, copy in `src/proto/kit.tsx`, `scripts/word-times.mjs`, `loudness.mjs`, `sweep.mjs`, `fresh-check.mjs`, `contrast.mjs`, `preview.mjs`, `pace.mjs` and their `package.json` scripts (`words`, `loudness`, `sweep`, `fresh`, `contrast`, `preview`, `pace`) when they are missing. Studios from before 0.13.0: replace `scripts/fresh-check.mjs` and `scripts/retention.mjs` with the plugin's (tooling, not user code), add `SHOT`, `Shot`, `camAt` and `frameOn` to `src/motion.ts`, and add `Camera`, `life` and the `object` transition to `src/proto/kit.tsx` from the plugin's template without touching the rest of the user's kit. Older videos' `moves.json` need not change; the new fields are checked only on the video being built. Studios from before 0.16.0: add `scripts/render-chunks.mjs`, `sheets.mjs`, `tts-vo.mjs` and `vo-audio.mjs` and their `package.json` scripts (`chunks`, `sheets`, `tts`); replace `scripts/prepare-vo.mjs` and `word-times.mjs` (tooling: prepare-vo now imports its audio helpers from `vo-audio.mjs`); add `SPRING` to `src/motion.ts`, `spr`, `glide` and the `sheet` part of `protoReel` to `src/proto/kit.tsx` without touching the rest of the user's kit, the `say` check to `scripts/check-video.mjs`, and `.env.local` to `.gitignore`.
 
 ## Step 2 — Release the script
 
@@ -59,15 +59,18 @@ Then write `src/proto/<id>/style.json` (`{ "background", "surface": [2+ layers],
 Build the hook scene first, in `src/proto/<id>/`:
 
 1. Word times: `npm run words -- <id>` after recording, or `npm run words -- <id> --estimate` before (2.1 words per second; rerun after `/hookreel:voice`).
-2. `src/proto/<id>/scenes.tsx` with the scene components, using `src/proto/kit.tsx`: the font library `FONT` (`display` Open Sans 800, `sans` Rubik 500–700, `serif` Instrument Serif italic; the same for every brand), `useT`, `prog`, `mix`, `squash`, `shake`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `Music`, `SourceLine`, `Transition` (circle, flood, swipe, zoom, mask, object), `KineticCaption` (optional captions for muted viewing, styled into the motion), `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`, `Camera` with `SHOT` and `frameOn` for shot sizes (the world inside, labels and source lines outside), `life(t, at, until)` for slow-in, fast-out elements. Everything else (props, layouts) is written new for this video.
+2. One file per scene, `src/proto/<id>/scenes/<scene id>.tsx` (default export: the scene component), and the props and helpers several scenes share in `src/proto/<id>/shared.tsx`. One file per scene is what lets `npm run chunks` re-render only the scenes a fix touched, and lets Step 5 build scenes in parallel. The scenes use `src/proto/kit.tsx`: the font library `FONT` (`display` Open Sans 800, `sans` Rubik 500–700, `serif` Instrument Serif italic; the same for every brand), `useT`, `prog`, `mix`, `squash`, `shake`, `Word`, `Glow`, `Grain`, `Sfx`, `Vo`, `Music`, `SourceLine`, `Transition` (circle, flood, swipe, zoom, mask, object), `KineticCaption` (optional captions for muted viewing, styled into the motion), `wordsOf(WORDS, sceneId)` for "when is this word spoken", `sceneSeconds`, `Camera` with `SHOT` and `frameOn` for shot sizes (the world inside, labels and source lines outside), `life(t, at, until)` for slow-in, fast-out elements, `spr(t, at, preset)` and `glide(t, from, steps)` for motion with mass (presets `snappy`, `default`, `heavy`, `playful` in `SPRING`, `src/motion.ts`: pick by the element's weight instead of tuning an easing per scene). Everything else (props, layouts) is written new for this video.
 3. `src/proto/<id>/moves.json`, the freshness log: one entry per beat, `{ "scene", "at" (scene seconds), "move", "transition" (only where the background or camera changes), "until" (required: scene second the beat's hero leaves the screen), "shot" (required: `wide`, `medium` or `close`), "text" (required: the on-screen text, one string per tier, `[]` for none; source lines, labels, disclaimers and text inside a mockup are left out), "special" (`true` on the one special beat), "sfx" (required: the sound on that beat, a file name in `public/sfx/` without `.wav`, or `"none"`; every transition needs a real one) }`, named in plain words ("counter assembled from dots", "colour flood"). Keep it in step with the scenes; `npm run fresh -- <id>` and `npm run retention -- <id>` check it.
 4. Music (if the brief chose synthesised music): `npm run music -- <id> --mood <mood>` writes `public/music/<id>-synth.wav` (about -14 LUFS, the length of the video, a riser into the last scene). Pass it as `protoReel`'s fourth argument; the kit's `Music` ducks it under the voice. Rerun it whenever the word times change.
-5. `src/proto/<id>/Reel.tsx`: `export const REEL = protoReel(WORDS, [["<scene id>", Scene], …], 6, "music/<id>-synth.wav")` (leave the music out if there is none), and register the video and its layout sweep in `src/Root.tsx`:
+5. `src/proto/<id>/Reel.tsx`: import each scene (`import Hook from "./scenes/01-hook";`), `export const REEL = protoReel(WORDS, [["01-hook", Hook], …], 6, "music/<id>-synth.wav")` (leave the music out if there is none), and register the video, its layout sweep and its critique sheets in `src/Root.tsx`:
 
 ```tsx
 <Composition id="<id>-motion" component={REEL.component} durationInFrames={REEL.frames} fps={FPS} width={1080} height={1920} />
 <Composition id="<id>-sweep" component={REEL.sweep} durationInFrames={REEL.frames} fps={FPS} {...REEL.sweepSize} />
+<Composition id="<id>-critique" component={REEL.sheet} durationInFrames={REEL.frames} fps={FPS} {...REEL.sheetSize} defaultProps={{ pages: [] }} />
 ```
+
+(`<id>-sheet` is taken: the template look registers it for every video.)
 
 6. Render only the prototype scene (`--frames=0-<last frame of the scene>`) and send it:
 
@@ -79,7 +82,11 @@ Ask for approval or changes. **Build no other scene until the user approves the 
 
 ## Step 5 — Every scene
 
-Build the remaining scenes in the approved look, with a new idea per beat (rules in `hookreel-rules` → Custom motion). The binding rules hold in every scene:
+Build the remaining scenes in the approved look, with a new idea per beat (rules in `hookreel-rules` → Custom motion).
+
+**In parallel.** When the host can run subagents, split the remaining scenes into up to four groups of neighbouring scenes and give each group to one subagent at once. Each brief holds: the video id and the scene ids it owns; the path of `06-motion-<id>.md` (its beat blocks are the spec: words, register, text, shot, move, transition, sound) and of `style.json` and `moves.json` (moves are already assigned per beat, so groups never pick the same one); the approved prototype scene file as the reference for the look (read it, never copy its layout); `src/proto/kit.tsx`, `shared.tsx` and `CLAUDE_<CODE>.md` (bans, labels, disclaimers); and the rule that it writes only `scenes/<its scene ids>.tsx`, never `shared.tsx`, `Reel.tsx`, `moves.json` or another scene, and reports anything it needs added to `shared.tsx` instead of adding it. When all are back: add what they asked for to `shared.tsx`, wire `Reel.tsx`, then run Step 6 on the whole video. Without subagents, build the scenes one after another.
+
+The binding rules hold in every scene:
 
 - Every number on screen has its source line (`SourceLine`, wording from `02-facts.md`); hypothetical amounts and examples carry the illustration label from `CLAUDE_<CODE>.md` (for example "Ilustrasi" / "Illustration").
 - Only allowed claims; required disclaimers on the end card; every ban in `CLAUDE_<CODE>.md`.
@@ -116,4 +123,4 @@ Skip unless the user asks for a standalone prompt to rebuild the video elsewhere
 
 Start the studio (`npm run dev`, or the host's preview tool) and point to the `<id>-motion` composition.
 
-End: "Play `<id>-motion` in Studio. When the voiceover is recorded, start a new session: /hookreel:resume <CODE>, then /hookreel:voice."
+End: "Play `<id>-motion` in Studio. When the voiceover is recorded (or the project uses a synthetic voice), start a new session: /hookreel:resume <CODE>, then /hookreel:produce <id> (voice, checks, critique loop, render and QA in one run), or /hookreel:voice and /hookreel:qa one at a time."

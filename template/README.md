@@ -11,6 +11,7 @@ npm install          # also generates sound effects and registers videos
 npm run check        # cues, colours, files
 npm run dev          # Remotion Studio
 npm run vo -- <id> "<recording>"   # one take per video → per-scene clips + heard fragments
+npm run tts -- <id> [--dry]        # ElevenLabs take with character times → per-scene clips, no Whisper (key in .env.local)
 npm run words -- <id>              # src/proto/<id>/words.json, character-aligned (--estimate before recording)
 npm run sweep -- <id>              # 6 frames per scene at quarter scale on one image, safe area in red
 npm run fresh -- <id>              # moves.json + style.json: no repeats, no hold over ~5 s, shot sizes change, one special beat, style brief new
@@ -21,7 +22,9 @@ npm run refcuts -- "<reference>"   # cut rhythm of a reference reel + one frame 
 npm run contrast -- "#text" "#bg" 28   # WCAG ratio per text colour pair (4.5:1 below 84 px, 3:1 above)
 npx remotion render <id>-motion out/<id>.mp4
 npm run preview -- <id>            # out/<id>-preview.mp4 (crf 27) + out/<id>-ig-test.mp4 (Instagram-like)
-npx remotion render <id>-motion out/<id>-mix.wav --codec=wav && npm run loudness -- out/<id>-mix.wav
+npm run sheets -- <id>             # critique sheets: contact (0.5 s), transition strips, phone-size tiles; --gate <critique.md>
+npm run chunks -- <id> --audio-only && npm run loudness -- out/<id>-mix.wav
+npm run chunks -- <id>             # out/<id>.mp4 scene by scene, unchanged scenes reused (--check: determinism)
 npm run cover -- <id>              # cover variants → out/<id>-cover-<n>.png + 3:4 grid preview
 ```
 

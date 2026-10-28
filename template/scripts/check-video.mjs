@@ -45,6 +45,9 @@ for (const file of files) {
     ids.add(scene.id);
     if (!/^\d\d-[a-z0-9-]+$/.test(scene.id)) errors.push(`${tag}: scene id "${scene.id}" should look like 01-hook`);
     words += scene.vo.trim().split(/\s+/).length;
+    // `say` is the vo as ElevenLabs reads it (npm run tts): {shown|spoken} spans, shown text identical to the vo.
+    if (scene.say !== undefined && scene.say.replace(/\{([^|}]*)\|[^}]*\}/g, "$1") !== scene.vo)
+      errors.push(`${tag} ${scene.id}: say must read as the vo once every {shown|spoken} span is replaced by its shown text`);
     const cues = [];
     collectCues(scene.visual, cues, "visual");
     collectCues(scene.note, cues, "note");

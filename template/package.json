@@ -47,7 +47,10 @@
     "pace": "node --no-warnings scripts/pace.mjs --self-test",
     "music": "node --no-warnings scripts/make-music.mjs",
     "refcuts": "node --no-warnings scripts/ref-cuts.mjs",
-    "lib-sfx": "node scripts/lib-sfx.mjs"
+    "lib-sfx": "node scripts/lib-sfx.mjs",
+    "chunks": "node --no-warnings scripts/render-chunks.mjs",
+    "sheets": "node --no-warnings scripts/sheets.mjs",
+    "tts": "node --no-warnings scripts/tts-vo.mjs"
   },
   "engines": {
     "node": ">=22.18"

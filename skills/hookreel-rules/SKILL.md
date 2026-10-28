@@ -10,7 +10,8 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 ## Pipeline and files
 
 ```text
-/hookreel:brief → facts → story → script [publish + approve] → build [prototype scene: render + approve, then every scene] → voice → qa [+ self-critique] → publish
+/hookreel:brief → facts → story → script [publish + approve] → build [prototype scene: render + approve, then every scene] → voice → qa [critique loop on stills, chunked render, self-critique] → publish
+/hookreel:produce <id>     (after the prototype is approved: the rest of build, voice and qa in one run)
 /hookreel:carousel        (a photo carousel from a source post: copy approved, then HTML → checked PNGs)
 /hookreel:storyboard      (optional, on request: a timed plan, not a gate)
 /hookreel:resume <CODE>   (reopen any project later)
@@ -25,7 +26,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | storyboard (optional) | `draft/brand.json`, `draft/videos/<id>.json`, `05-storyboard-<id>.md` |
 | build | `06-motion-<id>.md` (beat ideas from the references), `hookreel-studio/<brand>/` (brand.json, videos/, `src/proto/<id>/` scenes + `words.json` + `moves.json` (freshness log) + `style.json` (style brief), compositions `<id>-motion` and `<id>-sweep`, studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `out/<id>-proto.mp4` approved, `06-remotion-prompt.md` (only on request) |
 | voice | `public/vo/<id>/`, `src/proto/<id>/words.json` re-timed on the recording |
-| qa | `07-qa-<id>.md`, `out/<id>.mp4`, `out/<id>-preview.mp4`, then the mandatory **`07b-critique-<id>.md`** (the video, the workflow, plugin updates) |
+| qa | `07a-critique-<id>.md` (scored critique rounds on `out/sheets/<id>/`), `07-qa-<id>.md`, `out/chunks/<id>/` → `out/<id>.mp4`, `out/<id>-preview.mp4`, then the mandatory **`07b-critique-<id>.md`** (the video, the workflow, plugin updates) |
 | carousel (any time, own gate) | `<project>/carousel/<id>/`: `01-source.md`, `02-copy.md` (approved), `carousel.html`, `slide-NN.png`, `verification.json` (`scripts/carousel.mjs`), `report.md` |
 | publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` (only after `07b-critique-<id>.md` exists), then once a cover is picked the posting folder `<project>/publish/` (`<id>.mp4`, `<id>-cover.png`, `<id>-caption.txt`) |
 
@@ -69,7 +70,7 @@ The rulebook is loaded into every session, so it holds **rules only**, one line 
 
 - 30 fps since 0.14.0 (60 fps took twice as long to render for no visible gain on a phone). Videos built at 60 fps keep working: they are timed in seconds.
 - Every duration and offset is written in seconds and converted with `frame = f(t) = round(t × 30)` (`src/motion.ts`). Never hard-code a frame count; anything that must happen "every n frames" is written as a rate per second.
-- Every animated property is a pure function of the frame: `value(F) = from + (to − from) · ease(clamp((F − F0) / D))`, ease-out cubic-bezier(0.16, 1, 0.3, 1), via `interpolate()`. No CSS transitions or keyframe animations.
+- Every animated property is a pure function of the frame: `value(F) = from + (to − from) · ease(clamp((F − F0) / D))`, ease-out cubic-bezier(0.16, 1, 0.3, 1), via `interpolate()`, or a spring from the `SPRING` presets (kit `spr`, `glide`; Remotion's `spring()` is a pure function of the frame too). No CSS transitions, keyframe animations, `Math.random`, wall-clock time or React state: `npm run chunks` refuses them, because a scene rendered on its own must be the same picture it is inside the whole video.
 - Custom scenes time every beat from the spoken words: `src/proto/<id>/words.json` (`npm run words`, character-aligned to the Whisper fragments, so a split or respelled word still lands on its fragment) read through `wordsOf()`. Never time beats by guessing or from the template's word aligner, which can run 0.3–1.1 s early.
 - Give every beat time to finish its animation before the next one starts.
 - The template's data-driven visuals take their times from `src/plan.ts` (and `npm run storyboard` prints it); that path is used only when the user asks for the template look.
@@ -167,7 +168,7 @@ When HyperFrames is installed (`npx skills add heygen-com/hyperframes`: skills `
 
 ## Audio
 
-- Voiceover: one take per video (a recording, or a TTS voice clone with the AI label: `/hookreel:voice`), upmixed to stereo and normalised to -16 LUFS with -3 dBTP peaks by `npm run vo`.
+- Voiceover: one take per video (a recording, or a TTS voice clone with the AI label: `/hookreel:voice`), upmixed to stereo and normalised to -16 LUFS with -3 dBTP peaks by `npm run vo` (a recording) or `npm run tts` (ElevenLabs with character times, no Whisper).
 - Too long or too loose: cap the pauses in the existing take (`npm run trim`, default 0.3 s, never below 0.18 s), then tighten holds, and only then rewrite and re-record. Never speed the voice up and never drop a step to hit a length.
 - Music: optional. Either original music synthesised from code (`npm run music -- <id> --mood energetic|cheerful|chill|dramatic`, no licence needed, remade after every new recording) or a rights-cleared track normalised into the project. Ducked about 13 dB under the voice and 8 dB in pauses (the kit's `Music`, the template's BackgroundMusic).
 - Sound effects follow the picture: every transition and every key beat has its sound, named per beat in `moves.json` (`sfx`, or `"none"` for a deliberate silence); `npm run retention` fails on a transition or a whole scene without one.
