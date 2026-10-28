@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.17.0 — 2026-10-28
+
+Rules from a read of seven public Claude Code motion toolkits (whaleyxbt/claude-motion, howseen-ai/claude-motion-design,
+haidrrrry/claude-remotion-skill, charlie947/motion-graphics-skills, Barty-Bart/motion-graphics, cth9191/animate,
+nateherkai/herk-edit-kit) set against 0.16.0. Most of what they teach is already here (springs, exits, reading holds,
+stagger, pause trimming, ducking, critique sheets, the 8+ gate); only three gaps were real. Markdown only, no script changes.
+
+- `hookreel-rules` Audio: sound placement. An effect starts 2–3 frames before its visual lands, a riser ends on its
+  hit, one impact per video on the `special` beat, tonal effects share one key with the music, pan follows the hero's
+  screen position, continuous motion stays silent, and music and effects dip about 1 s before the turn beat.
+- `/hookreel:story` Step 4: every beat gets a role (start, build, change, turn, quiet, payoff, close) with its pace;
+  every cut has a reason that can be said out loud; the last beat may call back to the first image, changed.
+- `/hookreel:qa` item 12: frame 0 is a real image of the hook (autoplay thumbnail) and sound placement is checked on
+  the strips; muted viewing is now item 13.
+- Not taken: stillness quotas (conflict with "no frame dead for more than 0.5 s"), style packs of `animate`
+  (illustration looks, against the brand mandate), talking-head footage editing (no footage in these reels).
+
 ## 0.16.0 — 2026-10-28
 
 Faster production at the same output, from the article "How to build motion design studio with Opus 5.5"
