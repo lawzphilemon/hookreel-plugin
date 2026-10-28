@@ -37,6 +37,20 @@ Per video, a table:
 
 | # | Beat | What the viewer must feel or learn | Key line (draft) | Evidence (fact #) | Visual idea |
 
+Give every beat a role from this set (the order varies; the roles and their pace recur):
+
+| Role | Does | Pace |
+|---|---|---|
+| start | the subject at rest, before anything happens | held, quiet, 1–1.5 s |
+| build | one framing, detail added | 3–6 s, rising |
+| change | the subject's form or state changes | a hit on the change |
+| turn | it could go wrong, or everything gathers | builds slowly, then changes in 1–3 frames; sound drops just before; carries the loudest hit and the `special` beat |
+| quiet | alone, still | held, the lowest sound |
+| payoff | the claim is proved or the result shown | held long enough to read |
+| close | the ask, or a return to the opening image, changed by the story | calm |
+
+Every cut or transition between beats has a reason you can say out loud (next step, this becomes that, cause and effect, later, back to an earlier image changed). A beat with no reason to be there is cut. Where it fits, the last beat calls back to the first image, changed.
+
 Budget about 2.1 spoken words per second. Keep each video within the brief's target length; say which beats you would cut first if it runs long.
 
 ## Step 5 — Save
