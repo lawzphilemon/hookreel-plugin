@@ -49,6 +49,20 @@ export const TIME = {
   character: { at: 0.13, bubble: 0.6, chips: 0.67, push: 0.06 },
 } as const;
 
+// Spring presets for custom scenes (kit spr and glide): motion with mass, which accelerates, overshoots a
+// little and settles. Measured at 30 fps (settled within 1 %, highest point):
+//   snappy  0.30 s, 1.02: buttons, toggles, leading edges
+//   default 0.53 s, 1.05: cards, containers, camera
+//   heavy   0.93 s, 1.00: big type, 3D objects, logo lockups
+//   playful 0.60 s, 1.19: mascots and stickers, overshoot meant to be seen
+export const SPRING = {
+  snappy: { damping: 22, stiffness: 320, mass: 0.6 },
+  default: { damping: 18, stiffness: 170, mass: 1 },
+  heavy: { damping: 28, stiffness: 90, mass: 2.6 },
+  playful: { damping: 10, stiffness: 160, mass: 0.7 },
+} as const;
+export type SpringName = keyof typeof SPRING;
+
 // Shot sizes for custom scenes (world scale): wide shows the whole composition, medium fills about a
 // third to half of the frame with the element that speaks, close lets it fill most of the frame.
 // A breathing push of a few percent is not a shot change; it reads as a still camera.

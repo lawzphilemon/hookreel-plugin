@@ -47,7 +47,7 @@ Save `<project>/04-script.md`, per video:
 | Scene id | Voiceover (exact) | Beats on screen | Cue word → beat | Sources and labels on screen |
 ```
 
-Scene ids are `01-hook`, `02-<name>`, `03-<name>`… (two digits, a dash, lowercase words and dashes: the format `npm run check` enforces). Never `s01-…`.
+Scene ids are `01-hook`, `02-<name>`, `03-<name>`… (two digits, a dash, lowercase words and dashes: the format `npm run check` enforces). Never `s01-…`; `review-page.mjs --cards` refuses to publish a script or recording guide with any other id.
 
 The recording guide is a separate file, `VOICEOVER_<CODE>.md` (Step 6), so the person recording never has to read the script tables.
 

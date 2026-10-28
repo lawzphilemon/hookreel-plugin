@@ -16,7 +16,7 @@ const norm = (x) => x.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 // Longest common subsequence of two strings: map from index in a to index in b. On ties it skips
 // characters of b first, so a word lands on its own fragment rather than a stray letter of an extra
 // heard word before it ("rupiah hilang" for "Rp120 juta hilang").
-const lcsMap = (a, b) => {
+export const lcsMap = (a, b) => {
   const n = a.length, m = b.length, w = m + 1;
   const L = new Uint32Array((n + 1) * w);
   for (let i = n - 1; i >= 0; i--)

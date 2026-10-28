@@ -90,6 +90,7 @@ export type CtaSpec = {
 export type SceneSpec = {
   id: string; // "01-hook", also the voiceover file name
   vo: string; // exactly what is said; captions show this text
+  say?: string; // for npm run tts only: the vo with {shown|spoken} spans, e.g. "{Rp900 juta|sembilan ratus juta rupiah}"
   visual: Visual;
   note?: { label?: string; text: Rich; cue?: Cue }; // "Watch out" style card under the visual
   sfx?: { name: string; cue?: Cue; offset?: number; volume?: number }[]; // extra sounds on cues; offset in seconds (negative = before the cue, e.g. a riser)

@@ -3,6 +3,7 @@ dist
 out
 .DS_Store
 .env
+.env.local
 whisper.cpp
 # generated
 public/sfx

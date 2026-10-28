@@ -4,15 +4,15 @@
 // library, time helpers, focus-in words, grain, glow, sound effects, voiceover clips, source lines,
 // spoken-word times and the reel wrapper. Every value is a function of the frame.
 import React from "react";
-import { AbsoluteFill, Easing, Freeze, interpolate, Sequence, Series, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Easing, Freeze, interpolate, Sequence, Series, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Audio } from "@remotion/media";
 import { loadFont as loadOpenSans } from "@remotion/google-fonts/OpenSans";
 import { loadFont as loadRubik } from "@remotion/google-fonts/Rubik";
 import { loadFont as loadSerif } from "@remotion/google-fonts/InstrumentSerif";
 import { C, FPS } from "../brand";
-import { TIME, camAt, frameOn, SHOT, type Shot } from "../motion.ts";
+import { TIME, camAt, frameOn, SHOT, SPRING, type Shot, type SpringName } from "../motion.ts";
 
-export { C, frameOn, SHOT, type Shot };
+export { C, frameOn, SHOT, SPRING, type Shot, type SpringName };
 
 // Font library, the same for every brand: Open Sans 800 for headlines and big numbers, Rubik
 // 500–700 for supporting text, labels and UI mockups, Instrument Serif italic for the key word.
@@ -30,6 +30,15 @@ export const useT = () => useCurrentFrame() / FPS;
 // 0 → 1 from `start` over `dur` seconds.
 export const prog = (t: number, start: number, dur: number, easing = EASE) => interpolate(t, [start, start + dur], [0, 1], { ...clamp, easing });
 export const mix = (p: number, a: number, b: number) => a + (b - a) * p;
+// Spring 0 → 1 from scene second `at` (presets in motion.ts SPRING), a pure function of t like everything
+// else. It passes 1 a little before settling, so use it for scale and position; clamp it for opacity.
+export const spr = (t: number, at: number, preset: SpringName = "default") =>
+  t <= at ? 0 : spring({ frame: (t - at) * FPS, fps: FPS, config: SPRING[preset] });
+// A value with several targets: each change is its own spring from its own time, added on top of the
+// last, so the motion stays continuous when a new target arrives mid-flight.
+//   const x = glide(t, 120, [{ at: w("klik"), to: 540 }, { at: w("lalu"), to: 900, preset: "snappy" }]);
+export const glide = (t: number, from: number, steps: { at: number; to: number; preset?: SpringName }[]) =>
+  steps.reduce((v, s, i) => v + (s.to - (i ? steps[i - 1].to : from)) * spr(t, s.at, s.preset), from);
 // Squash and stretch for something that lands or hits at scene second `at`: scale it by { sx, sy }; it
 // wobbles back to 1 within about 0.33 s.
 export const squash = (t: number, at: number) => {
@@ -292,5 +301,50 @@ export const protoReel = (words: Words, scenes: [string, React.FC][], perScene =
       ))}
     </AbsoluteFill>
   );
-  return { component, sweep, sweepSize: { width: W * perScene, height: grid.length * (H + LABEL) }, frames: scenes.reduce((n, [id]) => n + frames(id), 0) };
+  // Critique sheets (`npm run sheets -- <video id>`): one page per frame of this composition, each page a
+  // grid of video frames at tile width `w`, with the safe area drawn. The script picks the frames (contact
+  // sheet at 2 fps, 12-frame strips around each transition, phone-size tiles per beat) and passes them as props.
+  let acc = 0;
+  const starts = scenes.map(([id]) => {
+    const s = { id, from: acc };
+    acc += frames(id);
+    return s;
+  });
+  const sceneAt = (f: number) => starts.filter((s) => s.from <= f).pop()?.id ?? "";
+  const Sheet: React.FC<{ pages: SheetPage[] }> = ({ pages }) => {
+    const page = pages[useCurrentFrame()];
+    if (!page) return null;
+    const k = page.w / 1080, h = 1920 * k;
+    return (
+      <AbsoluteFill style={{ background: "#222" }}>
+        <div style={{ height: 60, color: "#fff", fontFamily: sans, fontSize: 30, lineHeight: "60px", paddingLeft: 12 }}>{page.title}</div>
+        <div style={{ display: "flex", flexWrap: "wrap", width: page.w * page.cols }}>
+          {page.frames.map((f, i) => (
+            <div key={`${i}-${f}`} style={{ width: page.w, height: h + LABEL, position: "relative", overflow: "hidden" }}>
+              <div style={{ width: 1080, height: 1920, transform: `scale(${k})`, transformOrigin: "top left" }}>
+                <Freeze frame={f}>
+                  <Reel />
+                </Freeze>
+              </div>
+              <div style={{ position: "absolute", left: 0, right: 0, top: 1500 * k, height: 2, background: line }} />
+              <div style={{ position: "absolute", top: 0, height: h, left: 80 * k, width: 1, background: line }} />
+              <div style={{ position: "absolute", top: 0, height: h, left: 1000 * k, width: 1, background: line }} />
+              <div style={{ position: "absolute", left: 6, top: h, color: "#fff", fontFamily: sans, fontSize: 15, lineHeight: `${LABEL}px` }}>
+                {sceneAt(f)} · {(f / FPS).toFixed(2)} s · f{f}
+              </div>
+            </div>
+          ))}
+        </div>
+      </AbsoluteFill>
+    );
+  };
+  return {
+    component,
+    sweep,
+    sweepSize: { width: W * perScene, height: grid.length * (H + LABEL) },
+    sheet: Sheet,
+    sheetSize: { width: 1620, height: 2100 },
+    frames: scenes.reduce((n, [id]) => n + frames(id), 0),
+  };
 };
+export type SheetPage = { title: string; cols: number; w: number; frames: number[] };
