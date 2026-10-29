@@ -33,7 +33,7 @@ Before showing anything, check the whole script against `CLAUDE_<CODE>.md` and r
 - No claim outside the allowed list; every number has a source label.
 - The CTA matches the exact wording.
 - Length: about 2.1 words per second plus one second per scene, against the target length (measured: a human take about 2.0, an ElevenLabs clone about 2.15; use the chosen voice's own pace once a take exists). If it runs long, propose specific cuts.
-- **Hook audit:** run `wtf-hook-999-auditor` on scene 1 as written (not the story draft). Credibility and payoff at least 3, weighted score at least 4; otherwise apply its recommended rewrite (within the allowed claims) and audit again.
+- **Hook audit:** run `hooklab-auditor` on scene 1 as written (not the story draft). Credibility and payoff at least 3, weighted score at least 4; otherwise apply its recommended rewrite (within the allowed claims) and audit again.
 - **Read-aloud pass:** read every line as the narrator will say it (the `hookreel-rules` voiceover rules): no sentence over about 15 words, no list read as a list, no colon or parenthesis that cannot be spoken, connectors where a listener would lose the thread. Rewrite what fails.
 
 Fix every hit before publishing, and add the results (hook score, cuts made, rules checked) as a short **Checks** section at the end of `04-script.md`, so the user reviews a script that has already passed them.

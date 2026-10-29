@@ -47,6 +47,14 @@ stills) and the self-critique.
 - `template-remotion/`: the old Remotion template, kept for studios made before 0.18.0 and for the
   template look (data-driven slides, storyboard).
 
+**Naming and disclaimer**
+- The bundled hook skills are renamed to **HookLab**:
+  - `wtf-hook-999*` → `hooklab`, `hooklab-generator`, `hooklab-auditor`, `hooklab-optimizer`.
+  - The two hook groups are now "Shock Hook" (types 1–6) and "Power Hook" (types 7–15).
+  - The third-party framework's brand names are removed.
+- README and both manifests say in large type that the plugin is made by Lawrence Philemon for
+  personal use and is not sold.
+
 ## 0.17.0 — 2026-10-28
 
 Rules from a read of seven public Claude Code motion toolkits (whaleyxbt/claude-motion, howseen-ai/claude-motion-design,

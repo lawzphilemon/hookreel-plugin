@@ -1,6 +1,6 @@
 ---
 name: story
-description: Build the story with the WTF Hook 999 framework, three hook options across Gain, Pain and Curiosity, then a beat sheet per video that keeps the user's own storyline
+description: Build the story with the HookLab framework, three hook options across Gain, Pain and Curiosity, then a beat sheet per video that keeps the user's own storyline
 allowed-tools: Read, Write, Skill
 ---
 
@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Skill
 
 ## Step 1 — Load the framework
 
-Load the WTF Hook 999 skill (`wtf-hook-999`, bundled with this plugin) and follow its workflow and hook types. Use `wtf-hook-999-auditor` to score and tighten the hooks before they are shown.
+Load the HookLab skill (`hooklab`, bundled with this plugin) and follow its workflow and hook types. Use `hooklab-auditor` to score and tighten the hooks before they are shown.
 
 Use only the **allowed claims** from `02-facts.md`. Apply the brand voice and hard rules from the context profile, not the framework author's personal voice rules.
 

@@ -22,7 +22,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 |---|---|
 | brief | project code, `<project>/01-brief.md`, **`<project>/CLAUDE_<CODE>.md`** (mandatory rulebook) + `CLAUDE.md` import, `project.json`, row in `hookreel-output/PROJECTS.md` |
 | facts | `02-facts.md` (bans added to `CLAUDE_<CODE>.md`) |
-| story | `03-story.md` (hooks + beat sheets, uses WTF Hook 999; confirmed with the script) |
+| story | `03-story.md` (hooks + beat sheets, uses HookLab; confirmed with the script) |
 | script | `04-script.md` (hook options on top, scenes, pronunciation table, checks), published for review, `Status: approved`; then `VOICEOVER_<CODE>.md` (recording guide, only when a human records) |
 | storyboard (optional) | `draft/brand.json`, `draft/videos/<id>.json`, `05-storyboard-<id>.md` |
 | build | `06-motion-<id>.md` (beat ideas from the references), `hookreel-studio/<brand>/` (brand.json, videos/, `reels/<id>/` = `compositions/<scene id>.html` + `words.json` + `moves.json` (freshness log) + `style.json` (style brief), with `index.html` and `assets/` written by `npm run assemble`; studio `CLAUDE_<CODE>.md` + import line in its `CLAUDE.md`), `out/<id>-proto.mp4` approved, `06-motion-prompt.md` (only on request) |
@@ -38,7 +38,7 @@ Each stage reads the previous files and updates `project.json` and `PROJECTS.md`
 Many users run this on plans with a limited token budget. Save tokens without cutting output:
 - **Sessions are optional.** Every stage reads its state from files (`project.json`, `CLAUDE_<CODE>.md`, the stage outputs), not from chat history, so a fresh session loses nothing. Run the whole video in one session by default; only when the context runs low, continue in a new one with `/hookreel:resume <CODE>`.
 - **Generate review pages, never type them.** `scripts/review-page.mjs` in this skill folder turns a stage's markdown into the HTML page to publish (`--cards` for the script). Edit the markdown, regenerate the page.
-- **Read only the hook type you need.** WTF Hook templates are one file per type in `references/templates/` of the `wtf-hook-999` skill; never read all 15.
+- **Read only the hook type you need.** HookLab templates are one file per type in `references/templates/` of the `hooklab` skill; never read all 15.
 - **The humanizer runs once**, on the final caption or text, not on every reply.
 - **`06-motion-prompt.md` only on request.**
 - **Edit in place.** Change only the lines that change (video JSON, script, reports, director file); write a whole file only when it is created.

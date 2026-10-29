@@ -1,8 +1,18 @@
 # HOOKREEL Short Video Pipeline
 
+> [!IMPORTANT]
+> # ⚠️ Untuk penggunaan pribadi, tidak dijual
+> # ⚠️ For personal use, not for sale
+>
+> **Plugin ini dibuat oleh Lawrence Philemon untuk penggunaan pribadi dan tidak dijual.**
+> Tidak ada versi berbayar, langganan, atau layanan resmi di balik repositori ini. Kalau ada yang menjual plugin ini atau menawarkannya sebagai produk berbayar, itu bukan dari pembuatnya.
+>
+> **This plugin is made by Lawrence Philemon for personal use and is not sold.**
+> There is no paid version, subscription or official service behind this repository. Anyone selling it or offering it as a paid product is not its author.
+
 Claude Code plugin that turns an interview into a finished short vertical video (Instagram Reels, TikTok, YouTube Shorts) for **any brand**, driven by that brand's context profile.
 
-Interview → verified facts → a story built with the WTF Hook 999 framework → voiceover script → a [HyperFrames](https://github.com/heygen-com/hyperframes) video (HTML + GSAP) with **new motion design for every video**, invented per beat from your reference reels (approved on a rendered prototype scene first), beats timed on the spoken words, synthesised sound effects and music ducking.
+Interview → verified facts → a story built with the HookLab framework → voiceover script → a [HyperFrames](https://github.com/heygen-com/hyperframes) video (HTML + GSAP) with **new motion design for every video**, invented per beat from your reference reels (approved on a rendered prototype scene first), beats timed on the spoken words, synthesised sound effects and music ducking.
 
 ## Install
 
@@ -35,7 +45,7 @@ Facts are checked without a stop unless a claim cannot be verified or contradict
 | `/hookreel:make` | The whole pipeline below in one run, stopping only at the four stops (plus a failed claim, or a call only you can make). If the context runs low, continue with `/hookreel:resume <CODE>`. | everything below |
 | `/hookreel:brief` | One message: at most six questions (topic and pain, audience awareness, sources and numbers, proof and must-not-claim, CTA, reference reels) and the rest pre-filled from the brand preset or defaults; your reply confirms it. Gives the project a unique code and writes its rulebook **CLAUDE_<CODE>.md**: fixed rules, rules for this video, and concrete bans so nothing comes out generic. | `hookreel-output/<CODE>_<slug>/01-brief.md`, `CLAUDE_<CODE>.md`, `project.json` |
 | `/hookreel:facts` | Every number and claim verified against primary sources, dated, estimates labelled; allowed and forbidden claims. Asks only when a claim fails | `02-facts.md` |
-| `/hookreel:story` | WTF Hook 999: three hooks per video (Gain, Pain, Curiosity), beat sheets; keeps your own storyline if you give one. Reviewed with the script | `03-story.md` |
+| `/hookreel:story` | HookLab: three hooks per video (Gain, Pain, Curiosity), beat sheets; keeps your own storyline if you give one. Reviewed with the script | `03-story.md` |
 | `/hookreel:script` | Exact voiceover per scene, a sketch of each beat on screen, cue words, checked against the bans. **Published for you to read and approve, with the three hooks on top: one reply picks the hook and approves.** Holds the pronunciation table for the voice. When a human records, writes the recording guide: how to record, pronunciation, lines per scene, recording status. | `04-script.md`, `VOICEOVER_<CODE>.md` (recorded voice only) |
 | `/hookreel:build` | Studies all your reference reels, designs new motion per beat, renders **one prototype scene for your approval**, then builds every scene in the brand's HyperFrames studio (`reels/<id>/compositions/`, one HTML file per scene), checks each beat visually; on request, writes a standalone HyperFrames/GSAP prompt built on frame = f(t) | `06-motion-<id>.md`, `hookreel-studio/<brand>/`, `out/<id>-proto.mp4` |
 | `/hookreel:voice` | One recorded take per video: normalised, transcribed locally, cut per scene, every beat re-timed on the spoken words (character-aligned), mix loudness checked | `public/vo/<id>/`, `reels/<id>/words.json` |
@@ -50,7 +60,7 @@ Nothing is built before the script is approved, and no scene beyond the prototyp
 
 **Token budget.** Built to run on plans with limited tokens: each stage reads its state from files, so a video runs in one session, and if the context runs low you continue in a new one with `/hookreel:resume <CODE>`; review pages are generated from the markdown instead of typed out; hook templates load one type at a time; the humanizer runs once on the final text; the standalone motion prompt is written only on request.
 
-The plugin bundles the **WTF Hook 999** skills (`wtf-hook-999`, `-generator`, `-auditor`, `-optimizer`, from [lawzphilemon/wtf-hook-999](https://github.com/lawzphilemon/wtf-hook-999), MIT): `/hookreel:story` builds the hooks with them, and they work on their own for any hook. No separate install needed.
+The plugin bundles the **HookLab** skills (`hooklab`, `-generator`, `-auditor`, `-optimizer`): `/hookreel:story` builds the hooks with them, and they work on their own for any hook. No separate install needed.
 
 The plugin also bundles **humanizer-id** and **humanizer-en**, passive filters that remove AI writing patterns from Indonesian and English text; `/hookreel:publish` runs them on the caption.
 

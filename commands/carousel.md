@@ -31,7 +31,7 @@ Write `<dir>/01-source.md`: URL, platform, the visible handle, how it was retrie
 
 Write `<dir>/02-copy.md`, one `## Slide NN` per slide: a kicker (2–4 words), a headline (at most ~12 words), body (at most ~40 words), an optional accent line.
 
-- One idea per slide. Slide 1 is the hook: keep the source's claim and score it with the bundled `wtf-hook-999-auditor`; sharpen it without promising more than the source says. The last slide carries the disclaimers and the CTA.
+- One idea per slide. Slide 1 is the hook: keep the source's claim and score it with the bundled `hooklab-auditor`; sharpen it without promising more than the source says. The last slide carries the disclaimers and the CTA.
 - Keep the source's meaning and hedges ("bergantung pada definisi polis" stays). No new claim, number or example. A regulated topic (insurance, finance, health, legal) is checked against `<project>/02-facts.md` when it exists; a claim that is not on the allowed list is flagged for the user, not dropped silently.
 - **Brand voice:** rewrite every line in the client's voice from its context profile: form of address (kami/kamu/Anda), register, sentence length, words and phrases it bans, its sample lines, its forbidden claims. Only the voice changes: the meaning, the hedges and the claim limits stay as in the source, and no claim is added. Never mix in the user's own voice, another brand's voice or a framework author's personal voice (`hookreel-rules`: the brand comes from its context profile).
 - A segment rebuilt around an `[unreadable]` part is rebuilt only from the meaning around it, and flagged.
