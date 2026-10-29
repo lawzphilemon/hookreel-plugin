@@ -1,12 +1,12 @@
 // Time model: every duration and offset is written in seconds and turned into frames by f(t).
-// frame = f(t) = round(t × FPS). Plain TypeScript (no React, no Remotion) so the storyboard
+// frame = f(t) = round(t × FPS). Plain JavaScript (no React, no renderer) so the storyboard
 // script uses exactly the same numbers as the render.
 
 export const FPS = 30; // half the render time of 60; every motion is in seconds, so speeds do not change
-export const f = (seconds: number) => Math.round(seconds * FPS);
-export const t = (frames: number) => frames / FPS;
+export const f = (seconds        ) => Math.round(seconds * FPS);
+export const t = (frames        ) => frames / FPS;
 
-export const EASE = { name: "ease-out cubic-bezier(0.16, 1, 0.3, 1)", bezier: [0.16, 1, 0.3, 1] as const };
+export const EASE = { name: "ease-out cubic-bezier(0.16, 1, 0.3, 1)", bezier: [0.16, 1, 0.3, 1]          };
 
 // Seconds. Changing a value here changes the render and the storyboard together.
 export const TIME = {
@@ -47,7 +47,7 @@ export const TIME = {
   pop: { damping: 10, stiffness: 160, mass: 0.7, scale: 0.6, settle: 0.7 },
   float: { period: 2.4, amp: 6, characterAmp: 14 },
   character: { at: 0.13, bubble: 0.6, chips: 0.67, push: 0.06 },
-} as const;
+}         ;
 
 // Spring presets for custom scenes (kit spr and glide): motion with mass, which accelerates, overshoots a
 // little and settles. Measured at 30 fps (settled within 1 %, highest point):
@@ -60,21 +60,21 @@ export const SPRING = {
   default: { damping: 18, stiffness: 170, mass: 1 },
   heavy: { damping: 28, stiffness: 90, mass: 2.6 },
   playful: { damping: 10, stiffness: 160, mass: 0.7 },
-} as const;
-export type SpringName = keyof typeof SPRING;
+}         ;
+                                             
 
 // Shot sizes for custom scenes (world scale): wide shows the whole composition, medium fills about a
 // third to half of the frame with the element that speaks, close lets it fill most of the frame.
 // A breathing push of a few percent is not a shot change; it reads as a still camera.
-export const SHOT = { wide: 1, medium: 1.45, close: 2.1 } as const;
-export type ShotSize = keyof typeof SHOT;
+export const SHOT = { wide: 1, medium: 1.45, close: 2.1 }         ;
+                                         
 // One camera move: from scene second `at`, over `dur` seconds, to scale `s` centred on world point
 // (x, y). `cut: true` jumps there at `at` (a scene may be born in a close-up and pull back).
-export type Shot = { at: number; s: number; x?: number; y?: number; dur?: number; cut?: boolean };
+                                                                                                  
 
 // Camera at scene second t: scale and translate for a top-left-origin wrapper. Ease in-out between
 // shots, a 1 % breath on top, and clamped so the edge of the world never shows.
-export const camAt = (t: number, shots: Shot[], W = 1080, H = 1920) => {
+export const camAt = (t        , shots        , W = 1080, H = 1920) => {
   let s = 1, x = W / 2, y = H / 2;
   for (const sh of shots) {
     if (t < sh.at) break;
@@ -90,19 +90,19 @@ export const camAt = (t: number, shots: Shot[], W = 1080, H = 1920) => {
 };
 
 // A shot that frames a box in world pixels so it fills `fill` of the frame (close ≈ 0.7, medium ≈ 0.45).
-export const frameOn = (box: { x: number; y: number; w: number; h: number }, fill = 0.45, W = 1080, H = 1920) => ({
+export const frameOn = (box                                                , fill = 0.45, W = 1080, H = 1920) => ({
   s: Math.max(1, Math.min((W * fill) / box.w, (H * fill) / box.h)),
   x: box.x + box.w / 2,
   y: box.y + box.h / 2,
 });
 
-export type Entrance = "rise" | "focus" | "pop";
-export type Idle = "still" | "float";
+                                                
+                                     
 
 // Brand style presets. "clean" (default): fade + rise, nothing loops. "playful": pop entrances with
 // overshoot, elements float, made for illustrated or AI-generated 3D cartoon characters.
 // Explicit brand.motion.entrance / motion.idle values win over the preset.
-export const styleMotion = (style?: string, motion?: { entrance?: Entrance; idle?: Idle }) => ({
+export const styleMotion = (style         , motion                                       ) => ({
   entrance: motion?.entrance ?? (style === "playful" ? "pop" : "rise"),
   idle: motion?.idle ?? (style === "playful" ? "float" : "still"),
 });
@@ -128,20 +128,20 @@ export const SOUNDS = {
   powerdown: 0.38,
   check: 0.35,
   resolve: 0.42,
-} as const;
+}         ;
 
-export type SoundName = keyof typeof SOUNDS;
-export type SfxLevel = "off" | "subtle" | "medium" | "dramatic";
+                                            
+                                                                
 
-export const LEVELS: Record<SfxLevel, { gain: number; mute: SoundName[]; impactTrim: number }> = {
-  off: { gain: 0, mute: Object.keys(SOUNDS) as SoundName[], impactTrim: 0 },
+export const LEVELS                                                                            = {
+  off: { gain: 0, mute: Object.keys(SOUNDS)               , impactTrim: 0 },
   subtle: { gain: 0.7, mute: ["impact", "riser", "typing"], impactTrim: 1 },
   medium: { gain: 1, mute: ["riser"], impactTrim: 0.6 },
   dramatic: { gain: 1, mute: [], impactTrim: 1 },
 };
 
 // Final volume of a sound at a given intensity, or null when that intensity mutes it.
-export const sfxVolume = (name: SoundName, level: SfxLevel, volume?: number) => {
+export const sfxVolume = (name           , level          , volume         ) => {
   const l = LEVELS[level];
   if (l.mute.includes(name)) return null;
   return (volume ?? SOUNDS[name]) * l.gain * (name === "impact" ? l.impactTrim : 1);

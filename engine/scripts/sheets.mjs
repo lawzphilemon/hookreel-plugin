@@ -20,7 +20,8 @@ import fs from "fs";
 import path from "path";
 import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
-import { FPS, TIME } from "../src/motion.ts";
+import { FPS, TIME } from "../src/motion.mjs";
+import { ENGINE } from "./assemble.mjs";
 
 export const CRITERIA = ["Hook", "Phone readability", "Motion quality", "Variety", "Composition", "Brand accuracy", "Sound sync"];
 const PASS = 8;
@@ -77,7 +78,7 @@ const gate = (id, critique) => {
   const code = fs.readdirSync(path.join("reels", id), { recursive: true }).map((f) => path.join("reels", id, f)).filter((f) => fs.statSync(f).isFile() && !/(moves|style)\.json$/.test(f) && !/(^|[\\/])\.hyperframes[\\/]/.test(f));
   const errors = [];
   if (!sheets.length) errors.push(`no sheets in ${out}: run npm run sheets -- ${id}`);
-  else if (Math.min(...sheets.map((f) => fs.statSync(f).mtimeMs)) < newest([...code, path.join("kit", "kit.js")])) errors.push("the scenes changed after the sheets were made: run npm run sheets again and score the new sheets");
+  else if (Math.min(...sheets.map((f) => fs.statSync(f).mtimeMs)) < newest([...code, path.join(ENGINE, "kit", "kit.js")])) errors.push("the scenes changed after the sheets were made: run npm run sheets again and score the new sheets");
   if (!fs.existsSync(critique)) errors.push(`${critique} not found`);
   else {
     if (sheets.length && fs.statSync(critique).mtimeMs < newest(sheets)) errors.push("the critique is older than the sheets: score the current sheets");

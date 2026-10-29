@@ -12,8 +12,8 @@ import fs from "fs";
 import path from "path";
 import { execSync, spawnSync } from "child_process";
 import { downloadWhisperModel, installWhisperCpp, transcribe, toCaptions } from "@remotion/install-whisper-cpp";
-import { scriptWordTimes, splitWords } from "../src/align.ts";
-import { TIME } from "../src/motion.ts";
+import { scriptWordTimes, splitWords } from "../src/align.mjs";
+import { TIME } from "../src/motion.mjs";
 import { paceAudit } from "./pace.mjs";
 import { ffmpeg, duration, highpass, level, fade } from "./vo-audio.mjs";
 

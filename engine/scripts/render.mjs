@@ -7,7 +7,8 @@
 import fs from "fs";
 import path from "path";
 import { execSync, spawnSync } from "child_process";
-import { FPS } from "../src/motion.ts";
+import { fileURLToPath } from "url";
+import { FPS } from "../src/motion.mjs";
 import { layout } from "./assemble.mjs";
 import { measure, readWav } from "./loudness.mjs";
 
@@ -22,7 +23,7 @@ const run = (cmd, args) => {
   if (r.status !== 0) process.exit(r.status ?? 1);
 };
 
-run("node", ["scripts/assemble.mjs", id]);
+run("node", ["--no-warnings", `"${path.join(path.dirname(fileURLToPath(import.meta.url)), "assemble.mjs")}"`, id]);
 fs.mkdirSync("out", { recursive: true });
 const mp4 = path.join("out", `${id}${draft ? "-draft" : ""}.mp4`);
 const t0 = Date.now();

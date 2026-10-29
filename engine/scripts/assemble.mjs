@@ -15,9 +15,11 @@ import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
 import { fileURLToPath } from "url";
-import { TIME } from "../src/motion.ts";
+import { TIME } from "../src/motion.mjs";
 import { pcm } from "./vo-audio.mjs";
 
+// The engine folder (kit/, scripts/), wherever the studio installed it.
+export const ENGINE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const r3 = (n) => Math.round(n * 1000) / 1000;
 export const key = (scene) => `s${scene}`;
 // The clips are levelled for a stereo mix; at 0.8 a typical take lands near -16.5 LUFS with music and effects.
@@ -80,8 +82,8 @@ const copy = (from, to) => {
 // from public/<path>. Returns what is missing.
 export const syncAssets = (dir, htmlDir) => {
   const assets = path.join(dir, "assets"), missing = new Set();
-  for (const f of ["kit.js", "kit.css"]) copy(path.join("kit", f), path.join(assets, f));
-  for (const f of fs.readdirSync(path.join("kit", "fonts"))) copy(path.join("kit", "fonts", f), path.join(assets, "fonts", f));
+  for (const f of ["kit.js", "kit.css"]) copy(path.join(ENGINE, "kit", f), path.join(assets, f));
+  for (const f of fs.readdirSync(path.join(ENGINE, "kit", "fonts"))) copy(path.join(ENGINE, "kit", "fonts", f), path.join(assets, "fonts", f));
   for (const f of fs.readdirSync(htmlDir).filter((f) => f.endsWith(".html"))) {
     const html = fs.readFileSync(path.join(htmlDir, f), "utf8");
     for (const [, rel] of html.matchAll(/assets\/([\w\-./]+\.\w+)/g)) {

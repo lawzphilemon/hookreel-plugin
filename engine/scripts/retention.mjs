@@ -27,7 +27,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { TIME } from "../src/motion.ts";
+import { TIME } from "../src/motion.mjs";
 import { sceneOffsets } from "./fresh-check.mjs";
 
 const MAX_GAP = 1.2;

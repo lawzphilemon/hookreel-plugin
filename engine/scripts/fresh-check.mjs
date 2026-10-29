@@ -17,7 +17,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { camAt, frameOn, SHOT } from "../src/motion.ts";
+import { camAt, frameOn, SHOT } from "../src/motion.mjs";
 
 const MAX_HOLD = 5.5; // seconds a background or camera may hold (rule: about 5 s)
 const SHOTS = ["wide", "medium", "close"];
