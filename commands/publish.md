@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash
 
 # HKR-9 — Cover and Caption
 
-**Mission:** The reel goes out with a cover that still reads in the profile grid and a caption that earns the "more" tap. Run inside `hookreel-studio/<brand-slug>/` after `/hookreel:qa`: as the last step of `/hookreel:produce` (the user then gets preview, covers and caption in one message), or alone. Read the project's `CLAUDE_<CODE>.md` first: every ban applies to the cover and the caption too. Follow the `hookreel-rules` skill, and the `creator-os` skill (bundled with this plugin) for hooks and captions.
+**Mission:** The reel goes out with a cover that still reads in the profile grid and a caption that earns the "more" tap. Run inside `hookreel-studio/<brand>-studio/` after `/hookreel:qa`: as the last step of `/hookreel:produce` (the user then gets preview, covers and caption in one message), or alone. Read the project's `CLAUDE_<CODE>.md` first: every ban applies to the cover and the caption too. Follow the `hookreel-rules` skill, and the `creator-os` skill (bundled with this plugin) for hooks and captions.
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 

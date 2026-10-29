@@ -96,7 +96,33 @@ export const syncAssets = (dir, htmlDir) => {
   return [...missing];
 };
 
-export const rootHtml =(id, { scenes, total }, music, voiced = true) => {
+// Brand watermark over every scene, from brand.json "watermark" (a video can say "watermark": "off" only
+// when the brand allows it). "tile": the logo in offset rows across the whole frame, so cropping one corner
+// does not remove it; "corner": one small logo top right. Fades in after the hook (inAt) and steps aside
+// for the end card (the last scene, which carries the real logo). Defaults are the Truemission values:
+// 0.10 vanished after Instagram's re-encode, 0.13 survives.
+export const WATERMARK = { mode: "tile", opacity: 0.13, height: 58, stepX: 330, stepY: 300, offset: 165, margin: 40, inAt: 1.2 };
+export const watermarkHtml = (wm, { scenes, total }) => {
+  if (!wm?.src) return { html: "", js: "" };
+  const w = { ...WATERMARK, ...wm };
+  const outAt = r3(scenes.length > 1 ? scenes[scenes.length - 1].start : total - 0.3);
+  const img = (x, y) => `<img src="assets/${w.src}" style="position:absolute;left:${x}px;top:${y}px;height:${w.height}px;width:auto" />`;
+  let tiles;
+  if (w.mode === "corner") tiles = `<img src="assets/${w.src}" style="position:absolute;right:80px;top:132px;height:${w.height}px;width:auto" />`;
+  else {
+    const rows = Math.ceil(1920 / w.stepY) + 1, cols = Math.ceil(1080 / w.stepX) + 1, out = [];
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) out.push(img(c * w.stepX + (r % 2 ? w.offset : 0) - w.margin, r * w.stepY + w.margin));
+    tiles = out.join("");
+  }
+  const peak = w.mode === "corner" ? 0.55 : w.opacity;
+  return {
+    html: `\n      <div id="wm" class="clip" data-start="0" data-duration="${total}" data-track-index="4" data-layout-ignore style="position:absolute;inset:0;z-index:${scenes.length + 10};pointer-events:none"><div id="wm-in" style="position:absolute;inset:0;opacity:0">${tiles}</div></div>`,
+    js: `\n      tl.fromTo("#wm-in", { opacity: 0 }, { opacity: ${peak}, duration: 0.5, ease: "none" }, ${w.inAt});\n      tl.to("#wm-in", { opacity: 0, duration: 0.3, ease: "none" }, ${outAt});`,
+  };
+};
+
+export const rootHtml = (id, { scenes, total }, music, voiced = true, wm = null) => {
+  const mark = watermarkHtml(wm, { scenes, total });
   const hosts = scenes
     .map((s, i) => `      <div id="${key(s.id)}" data-composition-id="${key(s.id)}" data-composition-src="compositions/${s.id}.html" data-start="${s.start}" data-duration="${s.secs}" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: ${i + 1}"></div>`)
     .join("\n");
@@ -118,10 +144,11 @@ export const rootHtml =(id, { scenes, total }, music, voiced = true) => {
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="${total}" data-width="1080" data-height="1920">
 ${hosts}
-${vo}${bed}
+${vo}${bed}${mark.html}
     </div>
     <script>
-      window.__timelines["main"] = gsap.timeline({ paused: true });
+      const tl = gsap.timeline({ paused: true });${mark.js}
+      window.__timelines["main"] = tl;
     </script>
   </body>
 </html>
@@ -157,10 +184,17 @@ const main = (id) => {
   if (musicSrc && !fs.existsSync(musicSrc)) errors.push(`music not found: ${musicSrc}`);
   if (musicSrc && fs.existsSync(musicSrc)) duck(musicSrc, path.join(assets, "music.wav"), phrases(words), plan.total);
 
-  fs.writeFileSync(path.join(dir, "index.html"), rootHtml(id, plan, musicSrc, voiced));
+  const brand = fs.existsSync("brand.json") ? JSON.parse(fs.readFileSync("brand.json", "utf8")) : {};
+  const wm = video.watermark === "off" ? null : video.watermark && typeof video.watermark === "object" ? { ...brand.watermark, ...video.watermark } : brand.watermark;
+  if (wm?.src) {
+    const src = path.join("public", wm.src);
+    if (fs.existsSync(src)) copy(src, path.join(assets, wm.src));
+    else errors.push(`watermark not found: ${src}`);
+  }
+  fs.writeFileSync(path.join(dir, "index.html"), rootHtml(id, plan, musicSrc, voiced, wm));
   errors.forEach((e) => console.error(`error: ${e}`));
   if (errors.length) process.exit(1);
-  console.log(`assembled reels/${id}: ${plan.scenes.length} scenes, ${plan.total} s${voiced ? "" : " (no voiceover yet)"}${musicSrc ? ", music ducked" : ""}`);
+  console.log(`assembled reels/${id}: ${plan.scenes.length} scenes, ${plan.total} s${voiced ? "" : " (no voiceover yet)"}${musicSrc ? ", music ducked" : ""}${wm?.src ? `, watermark ${wm.mode ?? WATERMARK.mode}` : video.watermark === "off" ? ", watermark off (videos json)" : ""}`);
 };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -173,6 +207,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (sp.length !== 2 || sp[0][0] !== TIME.leadIn) throw new Error(`self-test phrases: ${JSON.stringify(sp)}`);
     if (Math.abs(duckGain(1, sp, plan.total) - TIME.music.underVoice) > 1e-9) throw new Error("self-test duck under voice");
     if (!rootHtml("x", plan, "m").includes('data-composition-id="s02-why"')) throw new Error("self-test root");
+    const tiled = rootHtml("x", plan, null, true, { src: "brand/logo.png" });
+    if ((tiled.match(/assets\/brand\/logo\.png/g) || []).length < 20 || !tiled.includes(`}, ${plan.scenes[1].start});`)) throw new Error("self-test watermark tile");
+    if (rootHtml("x", plan, null, true, null).includes('id="wm"')) throw new Error("self-test watermark off");
     console.log("self-test ok");
   } else if (!id) {
     console.error("Usage: node scripts/assemble.mjs <video id>");

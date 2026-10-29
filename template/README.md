@@ -1,23 +1,27 @@
-# hookreel studio
+# hookreel brand studio
 
-HyperFrames studio for short vertical videos, made by `/hookreel:build`. One studio per brand; every video is its own HyperFrames project in `reels/<id>/`.
+A brand studio for short vertical videos, made by `/hookreel:build`. It holds brand data only. Every tool comes from **hookreel-engine** (the hookreel plugin repository), installed as a dependency, so the studio is always on the latest engine without copying or merging code.
 
-Needs Node 22.18+ and FFmpeg + FFprobe on PATH (Windows: `winget install --id Gyan.FFmpeg -e`). HyperFrames fetches its own Chrome; `npx hyperframes doctor` shows what is missing.
-
-- `reels/<id>/compositions/<scene id>.html`: the scenes, written new for every video (HTML + a paused GSAP timeline, `window.__timelines["s<scene id>"]`), on the kit in `kit/`: `kit.js` (global `HR`: spoken-word times `HR.at`, `life`, focus-in `word`, springs, camera with shot sizes, shake, squash, grain, transitions) and `kit.css` (font library Open Sans 800, Rubik, Instrument Serif italic; grain; source lines).
-- `reels/<id>/words.json`, `moves.json`, `style.json`: word times, freshness log, style brief.
-- `npm run assemble -- <id>` writes `reels/<id>/index.html` (scenes back to back, voice clips, ducked music) and `reels/<id>/assets/`. Never edit those by hand.
-- `videos/<id>.json`: scenes with their voiceover lines (`vo`, `say`), `tts`, `cta`, `music`. Drives `npm run vo`, `tts` and `words`.
-- `brand.json`: colour tokens and logo.
+Needs Node 22.18+ and FFmpeg + FFprobe on PATH (Windows: `winget install --id Gyan.FFmpeg -e`). HyperFrames fetches its own Chrome; `npm run hf -- doctor` shows what is missing. `.npmrc` sets `allow-git=root`: npm 12 blocks git dependencies unless allowed, and `root` allows only this studio's direct ones (the engine).
 
 ```bash
-npm install                        # also generates the sound effects
+npm install            # engine from GitHub + the synthesised sound effects
+npm run update-engine  # the newest engine (main)
+```
+
+- `brand.json`: colour tokens, logo, `watermark` (drawn over every scene by `npm run assemble`).
+- `BRAND.md`: voice, compliance rules, disclaimers, CTA shape, pacing; `CLAUDE.md` imports it and one `CLAUDE_<CODE>.md` per project.
+- `reels/<id>/compositions/<scene id>.html`: the scenes, new for every video (HTML + a paused GSAP timeline on the engine's kit, global `HR`). `reels/<id>/words.json`, `moves.json`, `style.json` beside them. `index.html` and `assets/` are written by `npm run assemble`.
+- `videos/<id>.json`: the voiceover lines (`vo`, `say`), `tts`, `cta`, `music`, `watermark`.
+- `public/`: logo, characters, licensed sound effects (`sfx/lib/`), licensed music, voice clips.
+
+```bash
 npm run words -- <id> [--estimate] # reels/<id>/words.json, character-aligned
 npm run tts -- <id> [--dry]        # ElevenLabs take with character times (key in .env.local)
-npm run vo -- <id> "<recording>"   # a recorded take → per-scene clips (trim loose pauses first: npm run trim)
-npm run music -- <id> --mood chill # original music from code → public/music/<id>-synth.wav; set "music" in videos/<id>.json
+npm run vo -- <id> "<recording>"   # a recorded take → per-scene clips (npm run trim first for loose pauses)
+npm run music -- <id> --mood chill # original music → public/music/<id>-synth.wav; set "music" in videos/<id>.json
 npm run assemble -- <id>           # root page and assets for reels/<id>
-npm run dev                        # HyperFrames preview
+npm run dev -- reels/<id>          # HyperFrames preview
 npm run hf -- check reels/<id>     # lint, runtime and layout checks
 npm run fresh -- <id>              # no repeated moves, no hold over ~5 s, shot sizes change, style brief new
 npm run retention -- <id>          # no dead air, first beat within 1 s, every transition heard, no stretched image, no slide text
@@ -29,5 +33,3 @@ npm run preview -- <id>            # out/<id>-preview.mp4 + out/<id>-ig-test.mp4
 npm run cover -- <id>              # reels/<id>-cover-<n>/ → out/<id>-cover-<n>.png + 3:4 grid preview
 npm run refcuts -- "<reference>"   # cut rhythm of a reference reel
 ```
-
-Fonts in `kit/fonts/` are from Google Fonts under the SIL Open Font License.

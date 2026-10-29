@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Agent, Skill
 
 # HKR-6+ — Produce
 
-**Mission:** The same video as `/hookreel:build` Step 5 → `/hookreel:voice` → `/hookreel:qa` → `/hookreel:publish` give, in one run and in the same session, without waiting for the user between stages, and with the first full render as the final one. This is the last of the four stops: the user gets the preview, the covers and the caption together. Nothing a gate protects changes: the script, the claims and the approved look stay exactly as approved. Run inside `hookreel-studio/<brand-slug>/`. Read `<project>/CLAUDE_<CODE>.md` and the studio's `CLAUDE_<CODE>.md` first; follow the `hookreel-rules` skill.
+**Mission:** The same video as `/hookreel:build` Step 5 → `/hookreel:voice` → `/hookreel:qa` → `/hookreel:publish` give, in one run and in the same session, without waiting for the user between stages, and with the first full render as the final one. This is the last of the four stops: the user gets the preview, the covers and the caption together. Nothing a gate protects changes: the script, the claims and the approved look stay exactly as approved. Run inside `hookreel-studio/<brand>-studio/`. Read `<project>/CLAUDE_<CODE>.md` and the studio's `CLAUDE_<CODE>.md` first; follow the `hookreel-rules` skill.
 
 Argument: $ARGUMENTS (the video id, and the path of a recording if there is one).
 

@@ -100,7 +100,7 @@ Approved script: [date]. Read every line exactly as written: on-screen words and
 - Changing a word? Ask first: the script must be re-approved, because on-screen words and cue timings use the text.
 
 ## After recording
-npm run vo -- <id> "<path to recording>"   (in hookreel-studio/<brand>/, or run /hookreel:voice)
+npm run vo -- <id> "<path to recording>"   (in hookreel-studio/<brand>-studio/, or run /hookreel:voice)
 What it does: [normalise -16 LUFS / -3 dBTP, local Whisper, cut per scene at the pauses, word timings]. Check each printed "heard:" line; fix a bad cut with ranges in seconds: npm run vo -- <id> "<file>" "1.7-6.9,7.7-14.0,…"
 
 ## Pronunciation

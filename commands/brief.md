@@ -18,12 +18,12 @@ Look for a brand context profile before asking anything: a `*context-profile*.js
 
 - Found: read it fully. Extract brand name, voice and tone rules, hard rules and forbidden claims, colours, fonts, logo file, motion rules, and any proof points. These answers are now known; do not ask them again.
 - Several found: ask which one this video uses, as one of the Step 2 questions.
-- **A shipped preset** in `${CLAUDE_PLUGIN_ROOT}/brands/<brand>/` (for example `brands/truemission/`: a `brand.json` plus a `CLAUDE.md` with the brand's voice, compliance hard rules, end-card disclaimers, CTA shape and measured pacing): read both before asking anything and treat them as a found context profile, saying which preset you used. A preset is a starting point, never a reason to skip the evidence questions — the topic, the numbers and their sources still come from the user for this video.
+- **The brand studio** `hookreel-studio/<brand>-studio/` (for example `hookreel-studio/truemission-studio/`: its `BRAND.md` holds the brand's voice, compliance hard rules, end-card disclaimers, CTA shape and measured pacing; its `brand.json` the colours, logo and watermark): find it from the studio named in the conversation, or ask which studio this video belongs to (or whether to make a new one; `/hookreel:build` Step 1 creates it, and `BRAND.md` is written from this interview or the brandcore profile). Read both before asking anything and treat them as a found context profile, saying which studio you used. A studio is a starting point, never a reason to skip the evidence questions — the topic, the numbers and their sources still come from the user for this video.
 - None: ask whether one exists. If not, offer to build one first with the `brandcore` skill if it is available, or continue with a short brand block (name, voice in one line, colours, font, logo file, hard rules) asked as one of the Step 2 questions (it counts toward the six).
 
 ## Step 2 — One message: questions and the pre-filled brief
 
-Ask **once**, in **one message**, at most **six** numbered questions, and only what the context profile, the shipped preset or the conversation does not already answer. Pick them in this order of priority, skipping any that are known:
+Ask **once**, in **one message**, at most **six** numbered questions, and only what the context profile, the brand studio's `BRAND.md` or the conversation does not already answer. Pick them in this order of priority, skipping any that are known:
 
 1. Topic and pain: what is the video about, what does the viewer struggle with, and what happens if they ignore it? (If they already have a storyline or beats, paste them; the story stage sharpens it, not replaces it.)
 2. Audience and awareness: who watches, and how much do they know? (never heard of it / know it, don't use it / already use it)
@@ -34,11 +34,11 @@ Ask **once**, in **one message**, at most **six** numbered questions, and only w
 
 Anything that becomes a claim on screen (numbers, sources, proof, must-not-claim) stays among the questions while it is unknown; never fill it with a default.
 
-**Every other field gets a stated default**, from the preset or profile where it has one, else:
+**Every other field gets a stated default**, from `BRAND.md` or the profile where it has one, else:
 - Platform: Instagram Reels · Language: the language of the brief · Length: 45–75 s · Format: single video.
-- Voiceover: ElevenLabs/TTS when the studio has it (`ELEVENLABS_API_KEY` in `.env.local` or a voice in the preset), else recorded by the user, one take per video.
+- Voiceover: ElevenLabs/TTS when the studio has it (`ELEVENLABS_API_KEY` in `.env.local` or a voice in `BRAND.md`), else recorded by the user, one take per video.
 - Music: synthesised (`npm run music`), mood by the brand's tone (energetic, cheerful, chill or dramatic) · SFX: medium.
-- Visual assets: the logo from the profile or preset; recreated mockups only, no real screenshots or photos of people until their owner's permission is recorded · Dislikes: the preset's bans, else none.
+- Visual assets: the logo from the profile or `brand.json`; recreated mockups only, no real screenshots or photos of people until their owner's permission is recorded · Dislikes: the bans in `BRAND.md`, else none.
 - Slug: a proposed kebab-case slug.
 
 In the **same message**, below the questions, show the brief as it will be saved (Step 3 format) with every default filled in and every open field marked `[Q1]`, `[Q2]`…, headed "Reply to change any line." List which questions you skipped and why in one line.
@@ -115,7 +115,7 @@ So the project can be recalled by its code later (`/hookreel:resume <CODE>`):
   "title": "…",
   "brand": "…",
   "contextProfile": "path/to/profile.json",
-  "studio": "hookreel-studio/<brand-slug>",
+  "studio": "hookreel-studio/<brand>-studio",
   "videos": ["HKR-261012-7QF3-teaser"],
   "created": "2026-10-12",
   "stages": { "brief": "confirmed", "facts": null, "story": null, "script": null, "storyboard": null, "prototype": null, "build": null, "voice": {}, "qa": {}, "critique": {} }

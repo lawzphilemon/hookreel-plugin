@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Bash
 
 # HKR-7 — Voice
 
-**Mission:** One recorded take per video in, word-synced scenes and a clean mix out. Run inside `hookreel-studio/<brand-slug>/`. Read the project's `<project>/CLAUDE_<CODE>.md` and the studio's `CLAUDE_<CODE>.md` first. Follow the `hookreel-rules` skill.
+**Mission:** One recorded take per video in, word-synced scenes and a clean mix out. Run inside `hookreel-studio/<brand>-studio/`. Read the project's `<project>/CLAUDE_<CODE>.md` and the studio's `CLAUDE_<CODE>.md` first. Follow the `hookreel-rules` skill.
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
@@ -86,6 +86,6 @@ It assembles the reel (voice clips at `data-volume` 0.8, music ducked under the 
 
 Update `<project>/project.json` (`stages.voice.<id>`), `PROJECTS.md`, and, when a human recorded, the Status table in `<project>/VOICEOVER_<CODE>.md` (recorded, date, file).
 
-Targets: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP. If the mix is too loud or too quiet, adjust `data-volume` (the voice clips' gain is `VO_GAIN` in `scripts/assemble.mjs`, sound effects on their `<audio>` in the scene) rather than re-levelling the clips, then render again. If the peak is higher, find when it happens (scan the WAV samples) and lower the sound effect or music level at that moment rather than the voice. Inside `/hookreel:make` or `/hookreel:produce` these checks run automatically and the user hears the mix in the final preview; there is no separate listening stop.
+Targets: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP. If the mix is too loud or too quiet, adjust `data-volume` (the voice clips' gain is `VO_GAIN` in the engine's `engine/scripts/assemble.mjs`, sound effects on their `<audio>` in the scene) rather than re-levelling the clips, then render again. If the peak is higher, find when it happens (scan the WAV samples) and lower the sound effect or music level at that moment rather than the voice. Inside `/hookreel:make` or `/hookreel:produce` these checks run automatically and the user hears the mix in the final preview; there is no separate listening stop.
 
 End: go straight on to `/hookreel:qa`. Run alone, send the mix file and end with: "Mix checked. Next: /hookreel:qa."

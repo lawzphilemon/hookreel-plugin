@@ -2,7 +2,7 @@
 
 **`/hookreel:build` reads this whole file before designing any scene**, together with the user's own reference reels for the video. It is the shared library for every brand: the same moves, rules and fonts apply to all brands alike (only a 3D character is brand-specific, and it is opt-in).
 
-Everything here is **ideas on composition and motion only**: never copy a creator's artwork, footage, music or wording, and never name or tag them in a client video. Recreate every move in code (the studio kit `HR` in `kit/kit.js` and new HTML and GSAP per scene), with the brand's own words and colours.
+Everything here is **ideas on composition and motion only**: never copy a creator's artwork, footage, music or wording, and never name or tag them in a client video. Recreate every move in code (the kit `HR` in the engine's `engine/kit/kit.js` and new HTML and GSAP per scene), with the brand's own words and colours.
 
 How to use it: for each beat, pick a move here (or from the user's reels) that carries the beat's one idea, then change it enough that it is new for this video: a different prop, a different direction, a different reveal. Do not reuse the same move twice in a row, and do not repeat a scene from the brand's previous video.
 
@@ -123,7 +123,7 @@ No background or camera holds longer than about 5 s. Change it with a transition
 
 ## D. Font library (every brand)
 
-The same three fonts for every brand's creative motion, bundled as woff2 in the studio's `kit/fonts/` and declared in `kit/kit.css`:
+The same three fonts for every brand's creative motion, bundled as woff2 in the engine's `engine/kit/fonts/` and declared in `engine/kit/kit.css`:
 
 | Font | Weights | Use | Kit CSS |
 |---|---|---|---|

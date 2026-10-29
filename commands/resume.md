@@ -21,7 +21,7 @@ If `PROJECTS.md` is missing or out of date, rebuild it from the `project.json` f
 
 ## Step 2 — Load it
 
-Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, `VOICEOVER_<CODE>.md` (only when a human records), `06-motion-<id>.md`, any storyboards, and the studio's `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports the studio's coded file; restore the import line if it is missing.
+Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, `VOICEOVER_<CODE>.md` (only when a human records), `06-motion-<id>.md`, any storyboards, and the studio's `BRAND.md` and `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports `@BRAND.md` and the studio's coded file; restore the import line if it is missing.
 
 ## Step 3 — Show where it stands
 
@@ -41,7 +41,7 @@ Ask what the user wants, then route:
 
 | Change | Do | Then |
 |---|---|---|
-| A rule or ban | Edit `CLAUDE_<CODE>.md` (and the studio's coded file for brand-level rules) | Re-check the script and the built scenes against it |
+| A rule or ban | Edit `CLAUDE_<CODE>.md` (and the studio's `BRAND.md` for brand-level rules, with the user's yes) | Re-check the script and the built scenes against it |
 | Facts | `/hookreel:facts` | Everything after it needs re-approval |
 | Hook or beats | `/hookreel:story` | Flows into `/hookreel:script`: one review picks the hook and re-approves the script; build needs re-approval |
 | A line or a beat idea | Edit `04-script.md` | Republish the script for approval, update its pronunciation table and, when a human records, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then update `videos/<id>.json`, `npm run words` and the affected scenes |

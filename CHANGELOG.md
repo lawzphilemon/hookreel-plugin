@@ -47,6 +47,28 @@ stills) and the self-critique.
 - `template-remotion/`: the old Remotion template, kept for studios made before 0.18.0 and for the
   template look (data-driven slides, storyboard).
 
+**Engine and brand studios**
+- The repo is also the npm package **`hookreel-engine`**.
+  - Every tool lives in `engine/`: kit, scripts, and `src/motion.mjs` / `align.mjs`, now plain JS because
+    Node does not strip TypeScript types inside `node_modules`.
+  - The tools run through the `hookreel` CLI (`engine/cli.mjs`).
+- `template/` is now a thin brand studio.
+  - Its `package.json` depends on `github:lawzphilemon/hookreel-plugin#main`, and every npm script calls
+    `hookreel <command>`.
+  - `npm run update-engine` pulls the newest engine.
+  - `.npmrc` sets `allow-git=root`, because npm 12 refuses git dependencies by default.
+  - No engine code is copied into a studio any more, so a studio never needs a merge.
+- Tested end to end with a thin studio installed from the GitHub branch (10 s install): retention,
+  render (1.0 min, 566 frames, -16.5 LUFS) and sweep all ran through the CLI.
+- **Watermark**: `brand.json` → `watermark` (`tile` or `corner`) is drawn over every scene by
+  `assemble`. It fades in after the hook and steps aside for the end card. `"watermark": "off"` per
+  video only where the brand allows it. The defaults are the Truemission values (0.13 opacity, 58 px,
+  offset rows).
+- `brands/truemission/` is removed from this public repo. Brand rules now live in each brand's own
+  studio repository: `BRAND.md` plus `brand.json`, which `/hookreel:brief` reads as the context profile.
+  Truemission's is the private `lawzphilemon/truemission-studio`, with its logo, character, licensed
+  sound effects and music.
+
 **Naming and disclaimer**
 - The bundled hook skills are renamed to **HookLab**:
   - `wtf-hook-999*` → `hooklab`, `hooklab-generator`, `hooklab-auditor`, `hooklab-optimizer`.
