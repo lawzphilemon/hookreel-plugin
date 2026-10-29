@@ -23,8 +23,8 @@ Rules of play for this video project. This file is imported by the folder's `CLA
 ### Motion and time
 - 1080×1920, **30 fps**, every time written in seconds and converted with **frame = f(t) = round(t × 30)**.
 - Every animated property is a function of the current frame (interpolate with clamped input, ease-out cubic-bezier(0.16, 1, 0.3, 1)). No CSS transitions or keyframe animations.
-- Look: [custom motion (default) | template clean | template playful]. Custom motion = new motion design per video, invented per beat from all the reference reels (`hookreel-rules` → Custom motion), built in the studio's `src/proto/<id>/`; never the template's infographic slides unless chosen here.
-- Beats land on the spoken words (`src/proto/<id>/words.json`), and each beat finishes its animation before the next.
+- Look: [custom motion (default) | template clean | template playful]. Custom motion = new motion design per video, invented per beat from all the reference reels (`hookreel-rules` → Custom motion), built in the studio's `reels/<id>/`; never the template's infographic slides unless chosen here.
+- Beats land on the spoken words (`reels/<id>/words.json`), and each beat finishes its animation before the next.
 - Safe area: text inside x 80–1000 and above y 1500 (platform UI).
 
 ### Sound

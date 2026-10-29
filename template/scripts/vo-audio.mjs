@@ -4,11 +4,11 @@
 import fs from "fs";
 import { execSync, spawnSync } from "child_process";
 
-export const ffmpeg = (args) => execSync(`npx remotion ffmpeg -y -loglevel error ${args}`, { stdio: "inherit" });
+export const ffmpeg = (args) => execSync(`ffmpeg -y -loglevel error ${args}`, { stdio: "inherit" });
 
 export const duration = (file) =>
   Number(
-    spawnSync("npx", ["remotion", "ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", file], {
+    spawnSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", file], {
       shell: true,
       encoding: "utf8",
     }).stdout.trim().split(/\s+/).pop(),
@@ -56,7 +56,7 @@ export const highpass = (file, hz = 90) => {
 
 // Integrated loudness (LUFS) of a file, from ffmpeg's loudnorm measurement.
 export const loudness = (file) => {
-  const res = spawnSync("npx", ["remotion", "ffmpeg", "-hide_banner", "-i", `"${file}"`, "-af", "loudnorm=print_format=json", "-f", "null", "-"], {
+  const res = spawnSync("ffmpeg", ["-hide_banner", "-i", `"${file}"`, "-af", "loudnorm=print_format=json", "-f", "null", "-"], {
     shell: true,
     encoding: "utf8",
   });

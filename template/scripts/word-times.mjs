@@ -1,8 +1,8 @@
 // Usage: node scripts/word-times.mjs <video id> [--estimate]   (npm run words -- <video id>, after npm run vo)
 // --estimate: no recording yet; every word at 2.1 words per second, so a prototype scene can be built
 // before recording. Rerun without it after npm run vo and the scenes follow the real voice.
-// Writes src/proto/<video id>/words.json: every script word with the second it is spoken in its clip,
-// for the custom motion scenes (src/proto/kit.tsx wordsOf). Aligns characters, not words: Whisper
+// Writes reels/<video id>/words.json: every script word with the second it is spoken in its clip,
+// for the custom motion scenes (kit/kit.js wordsOf). Aligns characters, not words: Whisper
 // splits words ("K", "laim") and writes numbers its own way ("900 juta" for "Rp900 juta"), which
 // makes whole-word matching slip by up to a second. Each script word gets the start of the heard
 // fragment holding its first matched character; words with no match are interpolated.
@@ -89,7 +89,7 @@ const main = (id, estimate) => {
     out.scenes[s.id] = { secs, words };
     console.log(s.id, `${secs}s`, words.map(([w, t]) => `${w}@${t}`).join(" "));
   }
-  const file = `src/proto/${id}/words.json`;
+  const file = `reels/${id}/words.json`;
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, JSON.stringify(out));
   console.log(`wrote ${file}${estimate ? " (estimated: rerun without --estimate after npm run vo)" : ""}`);

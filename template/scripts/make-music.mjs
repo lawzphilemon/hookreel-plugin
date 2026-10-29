@@ -2,7 +2,7 @@
 //   (npm run music -- <video id> --mood chill, after npm run words)
 // Original background music synthesised from code, so no track needs a licence: kick, clap, hats, bass,
 // plucked arpeggio and pad on a four-chord loop, with sidechain ducking on the kick. The length and the
-// lift come from src/proto/<id>/words.json: one sparse intro bar, the full groove, a riser into the last
+// lift come from reels/<id>/words.json: one sparse intro bar, the full groove, a riser into the last
 // scene and a closing chord. Writes public/music/<id>-synth.wav (48 kHz stereo, about -14 LUFS, peaks at
 // most -1.5 dBFS). It is not ducked here: the kit's `Music` (or the template's BackgroundMusic) dips it
 // under the voice, so after a new recording run `npm run words`, then this again.
@@ -119,7 +119,7 @@ const arg = (name) => { const i = process.argv.indexOf(`--${name}`); return i > 
 const main = (id) => {
   const mood = arg("mood") ?? "energetic";
   if (!MOODS[mood]) throw new Error(`mood "${mood}": pick ${Object.keys(MOODS).join(", ")}`);
-  const words = JSON.parse(fs.readFileSync(path.join("src", "proto", id, "words.json"), "utf8"));
+  const words = JSON.parse(fs.readFileSync(path.join("reels", id, "words.json"), "utf8"));
   const { offsets, length } = sceneOffsets(words);
   const last = Object.values(offsets).pop();
   const chans = compose({ length, last, mood, bpm: Number(arg("bpm")) || undefined, seed: Number(arg("seed")) || 7 });

@@ -56,7 +56,7 @@ Write `<dir>/carousel.html`, one self-contained file the user can edit:
 node <hookreel-rules skill folder>/scripts/carousel.mjs <dir>/carousel.html --out <dir>
 ```
 
-Run it inside a hookreel studio (it uses the Chrome that Remotion downloads) or pass `--chrome <path>`. It writes `slide-NN.png` per slide and `verification.json`, and fails on a wrong PNG size, broken numbering, text below 24 px (`--min-font` to change), or any element that sticks out of its slide. Fix and re-run until it passes.
+It uses `--chrome <path>`, `CHROME_PATH`, the Chrome a Remotion studio downloaded (found from the current folder upwards) or an installed Chrome; pass `--chrome <path>` when none is found. It writes `slide-NN.png` per slide and `verification.json`, and fails on a wrong PNG size, broken numbering, text below 24 px (`--min-font` to change), or any element that sticks out of its slide. Fix and re-run until it passes.
 
 Then look at every PNG yourself: hierarchy, orphan words, awkward line breaks, contrast (`npm run contrast` in the studio for the colour pairs), anything the script cannot judge. Fix and re-render.
 

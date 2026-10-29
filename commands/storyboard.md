@@ -18,13 +18,13 @@ The storyboard is written for a perfectionist: nothing is left to "and then it a
 
 Write the draft that the storyboard is computed from, inside the project folder (this is not the studio, and not yet the released JSON):
 
-- `<project>/draft/brand.json` from the context profile, following the template's `src/schema.ts` (semantic colour tokens as 6-digit hex, Google Fonts names, logo path, `motion.entranceMs`, and `style` from the brief: `clean` or `playful`).
+- `<project>/draft/brand.json` from the context profile, following the legacy Remotion template's `src/schema.ts` (`template-remotion/`) (semantic colour tokens as 6-digit hex, Google Fonts names, logo path, `motion.entranceMs`, and `style` from the brief: `clean` or `playful`).
 - `<project>/draft/videos/<id>.json` per video from the approved script: `vo` copied exactly, the visual and its cues, `cta`, `language`, `audio.sfx`, `audio.music`.
 
 Validate the draft from its folder:
 
 ```bash
-cd <project>/draft && node "${CLAUDE_PLUGIN_ROOT}/template/scripts/check-video.mjs" --no-files
+cd <project>/draft && node "${CLAUDE_PLUGIN_ROOT}/template-remotion/scripts/check-video.mjs" --no-files
 ```
 
 Fix every error. Every cue must be an exact phrase from its line.
@@ -34,7 +34,7 @@ Fix every error. Every cue must be an exact phrase from its line.
 Generate the timed storyboard from the same planners the render uses (Node 22.18+, no install needed):
 
 ```bash
-node --no-warnings "${CLAUDE_PLUGIN_ROOT}/template/scripts/storyboard.mjs" --video <project>/draft/videos/<id>.json --brand <project>/draft/brand.json --out <project>/05-storyboard-<id>.md
+node --no-warnings "${CLAUDE_PLUGIN_ROOT}/template-remotion/scripts/storyboard.mjs" --video <project>/draft/videos/<id>.json --brand <project>/draft/brand.json --out <project>/05-storyboard-<id>.md
 ```
 
 It writes, per scene: start and end in seconds and frames; a row for every event (element entering, highlight, typing, strike, swap, dim, scene fade, caption line, voiceover start) with its movement, end time and sound effect at its final volume; and a second-by-second table of what is said, which caption is showing and what is moving. Times are **estimates at 2.1 words per second** until the voiceover is recorded; the file says so at the top.
@@ -81,7 +81,7 @@ On approval, put `Status: approved — [date]` as the first line of each `05-sto
 
 Update `<project>/project.json` (`stages.storyboard`) and the Status column in `hookreel-output/PROJECTS.md`.
 
-End: "Storyboard approved. To save tokens, start a new session for production: /hookreel:resume <CODE>, then /hookreel:build."
+End: "Storyboard approved. Next: /hookreel:build (same session; if the context runs low, /hookreel:resume <CODE>)."
 
 ## Rules
 - The storyboard plans; it never blocks `/hookreel:build`.

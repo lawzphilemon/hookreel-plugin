@@ -9,7 +9,7 @@ if (!id) {
   console.error("Usage: node scripts/preview.mjs <video id>");
   process.exit(1);
 }
-const ff = (args) => spawnSync("npx", ["remotion", "ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", `out/${id}.mp4`, ...args], { shell: true, stdio: "inherit" }).status;
+const ff = (args) => spawnSync("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-i", `out/${id}.mp4`, ...args], { shell: true, stdio: "inherit" }).status;
 const a = ff(["-c:v", "libx264", "-crf", "27", "-preset", "slow", "-c:a", "copy", `out/${id}-preview.mp4`]);
 const b = ff(["-c:v", "libx264", "-b:v", "3500k", "-maxrate", "3500k", "-bufsize", "7000k", "-r", "30", "-c:a", "aac", "-b:a", "128k", `out/${id}-ig-test.mp4`]);
 if (a || b) process.exit(1);

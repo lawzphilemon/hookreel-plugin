@@ -19,7 +19,7 @@ const files = fs.readdirSync(src, { recursive: true }).filter((f) => f.toLowerCa
 for (const f of files) {
   const out = path.join(outDir, path.basename(f));
   // 16-bit PCM at 48 kHz, channels kept, so the samples can be scaled in place.
-  execSync(`npx remotion ffmpeg -y -loglevel error -i "${path.join(src, f)}" -ar 48000 -c:a pcm_s16le "${out}"`, { stdio: "inherit" });
+  execSync(`ffmpeg -y -loglevel error -i "${path.join(src, f)}" -ar 48000 -c:a pcm_s16le "${out}"`, { stdio: "inherit" });
   const buf = fs.readFileSync(out);
   let at = 12;
   while (at < buf.length - 8 && buf.toString("ascii", at, at + 4) !== "data") at += 8 + buf.readUInt32LE(at + 4);

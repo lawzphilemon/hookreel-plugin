@@ -35,8 +35,9 @@ for (const file of files) {
   const video = JSON.parse(fs.readFileSync(path.join("videos", file), "utf8"));
   const tag = `videos/${file}`;
   if (`${video.id}.json` !== file) errors.push(`${tag}: id "${video.id}" must match the file name`);
-  if (checkFiles && video.audio?.music?.src && !fs.existsSync(path.join("public", video.audio.music.src))) {
-    errors.push(`${tag}: music not found: public/${video.audio.music.src}`);
+  const music = video.music ?? video.audio?.music?.src; // "music" is what npm run assemble reads
+  if (checkFiles && music && !fs.existsSync(path.join("public", music))) {
+    errors.push(`${tag}: music not found: public/${music}`);
   }
   const ids = new Set();
   let words = 0;

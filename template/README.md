@@ -1,33 +1,33 @@
 # hookreel studio
 
-Remotion project for short vertical videos, made by `/hookreel:build`.
+HyperFrames studio for short vertical videos, made by `/hookreel:build`. One studio per brand; every video is its own HyperFrames project in `reels/<id>/`.
 
-- **Custom motion (default):** every video gets its own per-beat scenes in `src/proto/<id>/`, invented from the user's reference reels and the plugin's motion library, built on `src/proto/kit.tsx` (font library `FONT`: Open Sans 800, Rubik 500–700, Instrument Serif italic; focus-in words, grain, glow, sounds, voiceover clips, source lines, spoken-word times, `protoReel`). Registered in `src/Root.tsx` as `<id>-motion`.
-- `brand.json`: colours (semantic tokens, 6-digit hex), Google Fonts by name, logo, radius, entrance timing.
-- `videos/<id>.json`: scenes with their voiceover lines (drives `npm run vo` and `npm run words`). The template's data-driven visuals (`src/schema.ts`, composition `<id>`) are used only when the template look is chosen.
+Needs Node 22.18+ and FFmpeg + FFprobe on PATH (Windows: `winget install --id Gyan.FFmpeg -e`). HyperFrames fetches its own Chrome; `npx hyperframes doctor` shows what is missing.
+
+- `reels/<id>/compositions/<scene id>.html`: the scenes, written new for every video (HTML + a paused GSAP timeline, `window.__timelines["s<scene id>"]`), on the kit in `kit/`: `kit.js` (global `HR`: spoken-word times `HR.at`, `life`, focus-in `word`, springs, camera with shot sizes, shake, squash, grain, transitions) and `kit.css` (font library Open Sans 800, Rubik, Instrument Serif italic; grain; source lines).
+- `reels/<id>/words.json`, `moves.json`, `style.json`: word times, freshness log, style brief.
+- `npm run assemble -- <id>` writes `reels/<id>/index.html` (scenes back to back, voice clips, ducked music) and `reels/<id>/assets/`. Never edit those by hand.
+- `videos/<id>.json`: scenes with their voiceover lines (`vo`, `say`), `tts`, `cta`, `music`. Drives `npm run vo`, `tts` and `words`.
+- `brand.json`: colour tokens and logo.
 
 ```bash
-npm install          # also generates sound effects and registers videos
-npm run check        # cues, colours, files
-npm run dev          # Remotion Studio
-npm run vo -- <id> "<recording>"   # one take per video → per-scene clips + heard fragments
-npm run tts -- <id> [--dry]        # ElevenLabs take with character times → per-scene clips, no Whisper (key in .env.local)
-npm run words -- <id>              # src/proto/<id>/words.json, character-aligned (--estimate before recording)
-npm run sweep -- <id>              # 6 frames per scene at quarter scale on one image, safe area in red
-npm run fresh -- <id>              # moves.json + style.json: no repeats, no hold over ~5 s, shot sizes change, one special beat, style brief new
-npm run retention -- <id>          # no dead air over 1.2 s, first beat within 1 s, every transition heard, no stretched image, no slide text
-npm run trim -- "<recording>"      # cap the pauses in a take (0.3 s) before npm run vo, no retake
-npm run music -- <id> --mood chill  # original music from code (energetic, cheerful, chill, dramatic), ducked by the kit's Music
-npm run refcuts -- "<reference>"   # cut rhythm of a reference reel + one frame per shot in out/refs/<name>/
-npm run contrast -- "#text" "#bg" 28   # WCAG ratio per text colour pair (4.5:1 below 84 px, 3:1 above)
-npx remotion render <id>-motion out/<id>.mp4
-npm run preview -- <id>            # out/<id>-preview.mp4 (crf 27) + out/<id>-ig-test.mp4 (Instagram-like)
-npm run sheets -- <id>             # critique sheets: contact (0.5 s), transition strips, phone-size tiles; --gate <critique.md>
-npm run chunks -- <id> --audio-only && npm run loudness -- out/<id>-mix.wav
-npm run chunks -- <id>             # out/<id>.mp4 scene by scene, unchanged scenes reused (--check: determinism)
-npm run cover -- <id>              # cover variants → out/<id>-cover-<n>.png + 3:4 grid preview
+npm install                        # also generates the sound effects
+npm run words -- <id> [--estimate] # reels/<id>/words.json, character-aligned
+npm run tts -- <id> [--dry]        # ElevenLabs take with character times (key in .env.local)
+npm run vo -- <id> "<recording>"   # a recorded take → per-scene clips (trim loose pauses first: npm run trim)
+npm run music -- <id> --mood chill # original music from code → public/music/<id>-synth.wav; set "music" in videos/<id>.json
+npm run assemble -- <id>           # root page and assets for reels/<id>
+npm run dev                        # HyperFrames preview
+npm run hf -- check reels/<id>     # lint, runtime and layout checks
+npm run fresh -- <id>              # no repeated moves, no hold over ~5 s, shot sizes change, style brief new
+npm run retention -- <id>          # no dead air, first beat within 1 s, every transition heard, no stretched image, no slide text
+npm run contrast -- "#text" "#bg" 28
+npm run sweep -- <id>              # out/<id>-sweep.png: 6 frames per scene, safe area in red
+npm run sheets -- <id>             # critique sheets in out/sheets/<id>/; --gate <critique.md>
+npm run render -- <id> [--draft]   # out/<id>.mp4, frame count checked, mix loudness printed
+npm run preview -- <id>            # out/<id>-preview.mp4 + out/<id>-ig-test.mp4
+npm run cover -- <id>              # reels/<id>-cover-<n>/ → out/<id>-cover-<n>.png + 3:4 grid preview
+npm run refcuts -- "<reference>"   # cut rhythm of a reference reel
 ```
 
-`word-times.mjs`, `loudness.mjs`, `fresh-check.mjs`, `retention.mjs` and `contrast.mjs` each take `--self-test`.
-
-Recordings (`public/vo/`), music (`public/music/`) and sound effects (`public/sfx/`, including licensed private-library sounds in `public/sfx/lib/`) are git-ignored on purpose.
+Fonts in `kit/fonts/` are from Google Fonts under the SIL Open Font License.

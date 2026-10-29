@@ -1,0 +1,25 @@
+{
+  "name": "Your Brand",
+  "logo": null,
+  "logoTreatment": "none",
+  "colors": {
+    "bg": "#111318",
+    "text": "#FFFFFF",
+    "muted": "#9AA0A6",
+    "surface": "#1F232B",
+    "track": "#343A45",
+    "accent": "#4F8CFF",
+    "onAccent": "#FFFFFF",
+    "panel": "#FFFFFF",
+    "panelText": "#111318",
+    "panelMuted": "#5F6368",
+    "panelSoft": "#F3F4F6",
+    "panelLine": "#E3E5E8",
+    "error": "#D93025",
+    "errorText": "#F28B82"
+  },
+  "fonts": { "sans": "Inter", "mono": "JetBrains Mono" },
+  "radius": { "card": 28, "pill": 999 },
+  "motion": { "entranceMs": 360 },
+  "headlineCase": "as-written"
+}

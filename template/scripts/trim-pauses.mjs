@@ -76,7 +76,7 @@ const main = (input, cap) => {
   fs.mkdirSync("out", { recursive: true });
   const name = path.basename(input, path.extname(input));
   const pcm = path.join("out", `${name}-pcm.wav`);
-  execSync(`npx remotion ffmpeg -y -loglevel error -i "${input}" -ar 48000 -c:a pcm_s16le "${pcm}"`, { stdio: "inherit" });
+  execSync(`ffmpeg -y -loglevel error -i "${input}" -ar 48000 -c:a pcm_s16le "${pcm}"`, { stdio: "inherit" });
   const { rate, chans } = readWav(fs.readFileSync(pcm));
   const list = pauses(chans, rate, cap);
   const ranges = cuts(list, rate, cap);

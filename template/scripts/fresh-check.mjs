@@ -1,16 +1,16 @@
 // Usage: node scripts/fresh-check.mjs <video id>   (npm run fresh -- <video id>)
-// Freshness log check. src/proto/<id>/moves.json lists every beat's move and every scene change:
+// Freshness log check. reels/<id>/moves.json lists every beat's move and every scene change:
 //   [{ "scene": "01-hook", "at": 1.35, "move": "counter assembled from dots", "shot": "close" },
 //    { "scene": "01-hook", "at": 4.2, "move": "stamp lands on receipt", "transition": "circle wipe", "shot": "wide", "special": true }, …]
 // `at` is scene seconds; `transition` marks a background or camera change (wipe, flood, zoom-through, cut to
 // a new colour); `shot` is the camera's shot size on that beat (wide, medium, close); `special` marks the one
-// beat that gets the most expensive effect. src/proto/<id>/style.json is the video's style brief:
+// beat that gets the most expensive effect. reels/<id>/style.json is the video's style brief:
 //   { "background": "<background motion>", "surface": ["<layer>", "<layer>"], "render": "<object render family>",
 //     "signature": "<signature move>", "opener": "<first 3 s>", "closing": "<closing>" }
 // Fails on a move or transition used twice in this video, a background or camera held longer than 5.5 s, a
 // beat without a shot size, three beats in a row at the same shot size, more than one special beat, a
 // missing or incomplete style.json (surface needs 2+ layers), or a style brief that shares 3+ of its 6 lines
-// with one of the last 3 other videos in src/proto/. Warns on moves, transitions and style lines also used
+// with one of the last 3 other videos in reels/. Warns on moves, transitions and style lines also used
 // there, on a video with no special beat, and on a figure (a number or percentage in a beat's on-screen text)
 // that a sibling video of the same project also shows: the reels of one series never share a scene design,
 // and the same figure is where they drift into the same idea (an umbrella and a canopy for "105%").
@@ -89,7 +89,7 @@ export const checkSiblings = (moves, siblings = []) => {
   return warnings;
 };
 
-// Scene id → start second in the video, and the video's length, from src/proto/<id>/words.json.
+// Scene id → start second in the video, and the video's length, from reels/<id>/words.json.
 export const sceneOffsets = (words) => {
   const offsets = {};
   let at = 0;
@@ -101,7 +101,7 @@ export const sceneOffsets = (words) => {
 };
 
 const main = (id) => {
-  const dir = "src/proto";
+  const dir = "reels";
   const moves = JSON.parse(fs.readFileSync(`${dir}/${id}/moves.json`, "utf8"));
   const words = JSON.parse(fs.readFileSync(`${dir}/${id}/words.json`, "utf8"));
   const { offsets, length: at } = sceneOffsets(words);

@@ -24,7 +24,7 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const decode = (src) => {
   const tmp = path.join(os.tmpdir(), `hookreel-sound-${process.pid}.wav`);
-  execSync(`npx remotion ffmpeg -y -loglevel error -i "${src}" -ac 1 -ar ${RATE} -c:a pcm_s16le "${tmp}"`, { stdio: "inherit" });
+  execSync(`ffmpeg -y -loglevel error -i "${src}" -ac 1 -ar ${RATE} -c:a pcm_s16le "${tmp}"`, { stdio: "inherit" });
   const buf = fs.readFileSync(tmp);
   fs.rmSync(tmp, { force: true });
   let at = 12;

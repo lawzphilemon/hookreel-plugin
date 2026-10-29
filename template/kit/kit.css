@@ -1,0 +1,39 @@
+/* hookreel kit: the font library (same for every brand), the stage, grain and source lines.
+   Copied into every reel's assets/ by `npm run assemble`; scenes link it through the root page. */
+@font-face { font-family: "HR Display"; src: url("fonts/open-sans-800.woff2") format("woff2"); font-weight: 800; }
+@font-face { font-family: "HR Sans"; src: url("fonts/rubik.woff2") format("woff2"); font-weight: 300 900; }
+@font-face { font-family: "HR Serif"; src: url("fonts/instrument-serif-italic.woff2") format("woff2"); font-style: italic; }
+
+:root {
+  --display: "HR Display", sans-serif;
+  --sans: "HR Sans", sans-serif;
+  --serif: "HR Serif", serif;
+  /* platform UI: keep text inside x 80–1000 and above y 1500 */
+  --safe-left: 80px;
+  --safe-right: 80px;
+  --safe-bottom: 420px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+
+.hr-display { font-family: var(--display); font-weight: 800; letter-spacing: -0.03em; line-height: 0.95; }
+.hr-sans { font-family: var(--sans); font-weight: 600; }
+.hr-serif { font-family: var(--serif); font-style: italic; font-weight: 400; }
+
+/* full-bleed layer */
+.hr-fill { position: absolute; inset: 0; }
+
+/* film grain: a fixed noise tile; HR.grain() steps its position, so every frame is a function of time */
+.hr-grain {
+  position: absolute; inset: -64px; pointer-events: none; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/></filter><rect width='256' height='256' filter='url(%23n)'/></svg>");
+  background-size: 256px 256px;
+}
+
+/* source line: small, on a backing so it reads over any prop (4.5:1 needs a dark or light chip) */
+.hr-source {
+  position: absolute; left: var(--safe-left); max-width: 920px;
+  font-family: var(--sans); font-weight: 500; font-size: 28px; line-height: 1.25;
+  padding: 6px 12px; border-radius: 8px; background: rgba(250, 246, 240, 0.92); color: #3a2f2c;
+}

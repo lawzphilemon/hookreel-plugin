@@ -18,7 +18,7 @@ If the user did not say, identify the take: transcribe it once (the `vo` script 
 
 When the user chooses a synthetic voice (for example their own ElevenLabs voice clone) over recording:
 
-**ElevenLabs with an API key (the fast path).** `ELEVENLABS_API_KEY` in the studio's `.env.local` (ask the user to put it there; never in code, `videos/` or chat), the voice in `videos/<id>.json` → `"tts": { "voice": "<voice id>", "model": "eleven_multilingual_v2", "settings": { … } }` or `ELEVENLABS_VOICE_ID` in `.env.local`. For every number, date, amount or short form, add the scene's `say`: the `vo` with `{shown|spoken}` spans from the pronunciation table of `VOICEOVER_<CODE>.md`, e.g. `"say": "Premi mulai {USD 2.500|dua ribu lima ratus dolar} per tahun."` (`npm run check` fails when `say` does not read as the `vo` once each span is replaced by its shown text). Then:
+**ElevenLabs with an API key (the fast path).** `ELEVENLABS_API_KEY` in the studio's `.env.local` (ask the user to put it there; never in code, `videos/` or chat), the voice in `videos/<id>.json` → `"tts": { "voice": "<voice id>", "model": "eleven_multilingual_v2", "settings": { … } }` or `ELEVENLABS_VOICE_ID` in `.env.local`. For every number, date, amount or short form, add the scene's `say`: the `vo` with `{shown|spoken}` spans from the pronunciation table in `04-script.md`, e.g. `"say": "Premi mulai {USD 2.500|dua ribu lima ratus dolar} per tahun."` (`npm run check` fails when `say` does not read as the `vo` once each span is replaced by its shown text). Then:
 
 ```bash
 npm run tts -- <id> --dry
@@ -29,7 +29,7 @@ npm run words -- <id>
 `--dry` prints the text and its character count and spends nothing. The real run asks for the whole video as one take (one delivery) with a time for every character, levels it like a recording, cuts every scene at the middle of the silence between scenes, and writes `public/vo/<id>/` with exact word times: no Whisper, no pause detection, no ranges. Each shown form becomes the word in `words.json`, so a cue on "USD 2.500" lands where it is spoken. The take and its times are cached in `out/<id>-tts.*`; a rerun of an unchanged script costs no credits. The pace gate runs as in Step 2. Go on with Step 2's re-time check and music, then Step 4.
 
 **Any other TTS (no API key, or another tool):** generate one take per video and treat it like a recording from Step 2 on:
-- **Prompt:** the approved lines in order, unchanged, with the spoken forms from the pronunciation table of `VOICEOVER_<CODE>.md`: numbers, dates and amounts written as words ("dua puluh lima ribu dolar", not "USD 25.000"), acronyms spelled the way they should be heard. Put `[pause]` (or the model's own break tag) between scenes: pause detection then cuts every scene without ranges.
+- **Prompt:** the approved lines in order, unchanged, with the spoken forms from the pronunciation table in `04-script.md`: numbers, dates and amounts written as words ("dua puluh lima ribu dolar", not "USD 25.000"), acronyms spelled the way they should be heard. Put `[pause]` (or the model's own break tag) between scenes: pause detection then cuts every scene without ranges.
 - **Expect expansions:** TTS reads short forms in full ("AS" → "Amerika Serikat"). Write the form you want heard in the prompt; if the audio still differs from the script, keep the meaning, set `vo` in `videos/<id>.json` to what is said (so cues and word times match) and keep the on-screen text from the script. Record the change in `DECISIONS.md`.
 - **Pace:** TTS can read slower than the 2.1 words a second estimate (1.9–2.15 measured): check the length against the target before syncing, then `npm run trim` or the model's speed setting (about 1.1), with the user's OK since both change the voice.
 - **Files:** a restricted connector may generate the audio but expose no download; ask the user to save each take (MP3 or WAV) and give you the paths. Log the tool, voice and model in `CLAUDE_<CODE>.md` (voice ids stay in the project, never in a public repository).
@@ -62,11 +62,11 @@ Then write the word times the custom scenes run on:
 npm run words -- <id>
 ```
 
-It aligns each script word to the Whisper fragments character by character (so "K" + "laim" still gives "Klaim" its time, and "900 juta rupiah" still finds "Rp900 juta") and writes `src/proto/<id>/words.json`, replacing any `--estimate` version. Read the printed times against the recording for the beat words; every scene re-times itself through `wordsOf()`. Then check each beat still has time to finish its animation before the next one (scenes may now be shorter or longer than estimated) and adjust the scenes that are too tight. If the video uses synthesised music, make it again so its length and riser follow the recording: `npm run music -- <id> --mood <mood>`.
+It aligns each script word to the Whisper fragments character by character (so "K" + "laim" still gives "Klaim" its time, and "900 juta rupiah" still finds "Rp900 juta") and writes `reels/<id>/words.json`, replacing any `--estimate` version. Read the printed times against the recording for the beat words; every scene re-times itself through `HR.at()` once `npm run assemble -- <id>` has written the new words and voice clips into the reel. Then check each beat still has time to finish its animation before the next one (scenes may now be shorter or longer than estimated) and adjust the scenes that are too tight. If the video uses synthesised music, make it again so its length and riser follow the recording: `npm run music -- <id> --mood <mood>`.
 
 ## Step 3 — Storyboard as recorded (only if a storyboard was made)
 
-Skip unless the project has an approved `05-storyboard-<id>.md`. Regenerate it from the recording, so it is exact to the frame:
+Skip unless the project has an approved `05-storyboard-<id>.md` (template look, in a Remotion studio from `template-remotion/`). Regenerate it from the recording, so it is exact to the frame:
 
 ```bash
 npm run storyboard -- <id>
@@ -76,17 +76,16 @@ The director's layer is merged in from `director/<id>.json`. Copy `storyboard/<i
 
 ## Step 4 — Mix check
 
-Render the audio alone and measure it:
+There is no separate audio render: the mix is measured from the video render, which takes minutes.
 
 ```bash
-npm run chunks -- <id> --audio-only
-npm run loudness -- out/<id>-mix.wav
+npm run render -- <id> --draft
 ```
 
-(`npm run chunks` renders the custom composition `<id>-motion` and caches the WAV for the final render; for a template-look video use `npx remotion render <id> out/<id>-mix.wav --codec=wav --log=error`. `npm run loudness` measures BS.1770 integrated loudness and peaks in plain Node, because Remotion's ffmpeg has no ebur128 filter.)
+It assembles the reel (voice clips at `data-volume` 0.8, music ducked under the voice), renders, writes `out/<id>-mix.wav` and prints its integrated loudness and true peak (BS.1770, measured in plain Node; `npm run loudness -- <file.wav>` measures any WAV). For a template-look video in a Remotion studio, use that studio's own audio render (`template-remotion/README.md`).
 
-Update `<project>/project.json` (`stages.voice.<id>`), `PROJECTS.md`, and the Status table in `<project>/VOICEOVER_<CODE>.md` (recorded, date, file).
+Update `<project>/project.json` (`stages.voice.<id>`), `PROJECTS.md`, and, when a human recorded, the Status table in `<project>/VOICEOVER_<CODE>.md` (recorded, date, file).
 
-Targets: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP. If the voice alone is too loud, trim it with the kit's `<Vo volume={…} />` rather than re-levelling the clips. If the peak is higher, find when it happens (scan the WAV samples) and lower the sound effect or music level at that moment rather than the voice. Send the user the mix file to listen to.
+Targets: integrated about -16 to -17 LUFS, true peak at or below -0.5 dBTP. If the mix is too loud or too quiet, adjust `data-volume` (the voice clips' gain is `VO_GAIN` in `scripts/assemble.mjs`, sound effects on their `<audio>` in the scene) rather than re-levelling the clips, then render again. If the peak is higher, find when it happens (scan the WAV samples) and lower the sound effect or music level at that moment rather than the voice. Inside `/hookreel:make` or `/hookreel:produce` these checks run automatically and the user hears the mix in the final preview; there is no separate listening stop.
 
-End: "Listen to the mix. When it sounds right, run /hookreel:qa."
+End: go straight on to `/hookreel:qa`. Run alone, send the mix file and end with: "Mix checked. Next: /hookreel:qa."

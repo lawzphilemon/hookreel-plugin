@@ -56,7 +56,7 @@ const main = (input) => {
   const dir = path.join("out", "refs", name), tmp = path.join(dir, "tmp");
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.mkdirSync(tmp, { recursive: true });
-  const ff = (args) => execSync(`npx remotion ffmpeg -hide_banner -loglevel error -y -i "${input}" ${args}`, { stdio: ["ignore", "ignore", "inherit"] });
+  const ff = (args) => execSync(`ffmpeg -hide_banner -loglevel error -y -i "${input}" ${args}`, { stdio: ["ignore", "ignore", "inherit"] });
   ff(`-r ${RATE} -vf scale=72:128 -pix_fmt gray "${tmp}/g%05d.png"`);
   ff(`-r ${RATE} -vf scale=270:-2 "${tmp}/c%05d.png"`);
   const files = fs.readdirSync(tmp).filter((f) => f.startsWith("g")).sort();

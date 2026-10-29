@@ -1,5 +1,5 @@
 // Usage: node scripts/retention.mjs <video id>   (npm run retention -- <video id>, after npm run words)
-// Retention lint for a custom motion video in src/proto/<id>/. Fails the build on:
+// Retention lint for a custom motion video in reels/<id>/. Fails the build on:
 //   - dead air: more than 1.2 s of voice with no beat's hero on screen, from moves.json. A beat is on
 //     screen from its `at` until its `until` (scene seconds, when its hero leaves); that is where viewers skip.
 //   - a beat without a numeric `until`, or one before its `at`: without it a gap cannot be seen.
@@ -184,10 +184,11 @@ export const imgElements = (src) => {
 
 // One <Img> element → { error } | { warn } | null. sizeOf(file in public/) → { w, h } | null.
 export const checkImg = (text, sizeOf) => {
-  const prop = (name) => new RegExp(`\\b${name}\\s*[:=]\\s*\\{?\\s*(["'\`]?)([^,}\\s"'\`]+)\\1`).exec(text)?.[2];
-  const w = prop("width"), h = prop("height"), fit = prop("objectFit");
+  const prop = (name) => new RegExp(`\\b${name}\\s*[:=]\\s*\\{?\\s*(["'\`]?)([^,;}\\s"'\`]+)\\1`).exec(text)?.[2];
+  const w = prop("width"), h = prop("height"), fit = prop("objectFit") ?? prop("object-fit");
   if (!w || !h) return null; // one side auto keeps the image's ratio
-  const file = /staticFile\(\s*(["'`])([^"'`$]+)\1\s*\)/.exec(text)?.[2];
+  // a Remotion staticFile("x") or a HyperFrames src="assets/x" (npm run assemble copies public/x there)
+  const file = /staticFile\(\s*(["'`])([^"'`$]+)\1\s*\)/.exec(text)?.[2] ?? /\bsrc\s*=\s*["']assets\/([^"']+)["']/.exec(text)?.[1];
   const num = (x) => (/^\d+(\.\d+)?(px)?$/.test(x) ? parseFloat(x) : null);
   const size = file ? sizeOf(file) : null;
   const box = num(w) && num(h) ? num(w) / num(h) : null;
@@ -207,7 +208,7 @@ export const checkImg = (text, sizeOf) => {
 };
 
 const main = (id) => {
-  const dir = path.join("src", "proto", id);
+  const dir = path.join("reels", id);
   const errors = [], warnings = [];
   let askClean = false;
   const read = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
@@ -230,7 +231,7 @@ const main = (id) => {
     const p = path.join("public", f);
     return fs.existsSync(p) ? imageSize(fs.readFileSync(p)) : null;
   };
-  for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir, { recursive: true }) : []).filter((f) => /\.(tsx|jsx)$/.test(f))) {
+  for (const f of (fs.existsSync(dir) ? fs.readdirSync(dir, { recursive: true }) : []).filter((f) => /\.(tsx|jsx|html)$/.test(f) && !/(^|[\\/])assets[\\/]/.test(f))) {
     for (const el of imgElements(fs.readFileSync(path.join(dir, f), "utf8"))) {
       const r = checkImg(el.text, sizeOf);
       if (r?.error) errors.push(`${f}:${el.line} ${r.error}`);
@@ -260,6 +261,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 300, height: 300 }} />`, sizeOf)?.error?.startsWith("stretched"),
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 300, height: 300, objectFit: "cover" }} />`, sizeOf)?.warn?.includes("18 %"),
       checkImg(`<Img src={staticFile("esim.png")} style={{ height: 70 }} />`, sizeOf) === null,
+      checkImg(`<img src="assets/esim.png" style="width: 300px; height: 300px" />`, sizeOf)?.error?.startsWith("stretched"),
+      checkImg(`<img src="assets/esim.png" style="width: 300px; height: 300px; object-fit: cover" />`, sizeOf)?.warn?.includes("18 %"),
       checkImg(`<Img src={staticFile("esim.png")} style={{ width: 540, height: 660 }} />`, sizeOf) === null,
       imgElements(`a\n<Img src={x} style={{ w: a > b ? 1 : 2 }} />`)[0]?.line === 2,
       JSON.stringify(imageSize(Buffer.from("89504e470d0a1a0a0000000d494844520000021c00000294", "hex"))) === '{"w":540,"h":660}',

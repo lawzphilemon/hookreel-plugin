@@ -5,7 +5,7 @@ rules instead of a blank interview.
 
 | File | What it is |
 |---|---|
-| `brand.json` | Colour tokens, fonts, radius, motion for the studio (`Brand` in `src/schema.ts`). `logo` is `null` because the real logo is private: set `"logo": "brand/truemission-logo.png"` after copying it into the studio's `public/brand/`. |
+| `brand.json` | Colour tokens, fonts, radius, motion for the studio (`Brand` in `template-remotion/src/schema.ts`; HyperFrames scenes use its colours and logo). `logo` is `null` because the real logo is private: set `"logo": "brand/truemission-logo.png"` after copying it into the studio's `public/brand/`. |
 | `CLAUDE.md` | The brand law: voice, compliance hard rules, end-card disclaimers, the CTA shape, measured pacing, look, bans. |
 
 ## Using it

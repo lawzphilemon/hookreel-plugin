@@ -61,7 +61,7 @@ const hear = async (file) => {
 };
 
 const silences = (file) => {
-  const res = spawnSync("npx", ["remotion", "ffmpeg", "-hide_banner", "-i", `"${file}"`, "-af", "silencedetect=noise=-30dB:d=0.2", "-f", "null", "-"], {
+  const res = spawnSync("ffmpeg", ["-hide_banner", "-i", `"${file}"`, "-af", "silencedetect=noise=-30dB:d=0.2", "-f", "null", "-"], {
     shell: true,
     encoding: "utf8",
   });
