@@ -6,7 +6,7 @@ allowed-tools: Read, Write, WebSearch, WebFetch, Bash
 
 # HKR-2 — Fact Gate
 
-**Mission:** Nothing reaches the screen or the voiceover unless it can be defended. Requires a confirmed `<project>/01-brief.md`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill.
+**Mission:** Nothing reaches the screen or the voiceover unless it can be defended. Requires a confirmed `<project>/01-brief.md`. Runs automatically after `/hookreel:brief`. Read `<project>/CLAUDE_<CODE>.md` first and follow it. Follow the `hookreel-rules` skill.
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
@@ -24,7 +24,7 @@ For each claim, in this order of preference:
 
 Record for each: the exact wording the source supports, the source, its date, and what it measures (visits are not people; a survey of internet users aged 16+ is not the whole population; a run rate is not booked revenue).
 
-When a number the user wants does not exist in any credible source, say so plainly and offer the closest defensible alternatives (a percentage instead of an absolute count, a ranking instead of a user number, or a labelled estimate). Let the user choose.
+When a number the user wants does not exist in any credible source, say so plainly and offer the closest defensible alternatives (a percentage instead of an absolute count, a ranking instead of a user number, or a labelled estimate). Let the user choose (Step 4).
 
 ## Step 3 — Make it age well
 
@@ -47,13 +47,17 @@ Goes stale: [claim → recheck before posting after …]
 Sources: [markdown links]
 ```
 
-Show the table in chat with the sources, and ask the user to confirm or pick alternatives. On confirmation add `Status: confirmed` as the first line.
+**No stop unless a claim failed.** This stage runs straight after the brief without waiting for the user:
+- Every claim VERIFIED or ESTIMATE (labelled), nothing for the user to choose: add `Status: confirmed (auto)` as the first line, show the table with its sources in chat in one short message, and continue.
+- Any claim NOT FOUND or CONTRADICTED, or an alternative the user must pick: show only those rows with the alternatives and ask. Apply the answer, then add `Status: confirmed` as the first line.
+
+The verification itself is the same either way.
 
 Then update `<project>/CLAUDE_<CODE>.md`: copy every NOT FOUND and CONTRADICTED claim, word for word, into **Bans → Claims**, and add any stale-fact recheck date to **Rules for this video**.
 
 Update `<project>/project.json` (`stages.facts`) and the Status column in `hookreel-output/PROJECTS.md`.
 
-End: "Confirm the facts, then run /hookreel:story."
+End: go straight on to `/hookreel:story` (no stop unless a claim failed). Run alone, end with: "Facts saved. Next: /hookreel:story."
 
 ## Rules
 - Never compute a new number by combining sources with different bases (for example a percentage of 16+ users times the total population).

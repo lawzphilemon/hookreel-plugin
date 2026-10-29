@@ -1,6 +1,6 @@
 ---
 name: brief
-description: Interview the user about the video (brand context, topic, pain and why, audience, evidence, format, CTA, audio, visuals) and lock a video brief before any story or script
+description: One message of at most six questions plus a pre-filled brief (brand context, topic, pain and why, audience, evidence, CTA, references; format, audio and visuals defaulted) — the reply locks the video brief before any story or script
 allowed-tools: Read, Write, Glob, AskUserQuestion
 ---
 
@@ -17,50 +17,45 @@ Talk to the user in their language. The brief file itself is written in English 
 Look for a brand context profile before asking anything: a `*context-profile*.json`, `*context_profile*.json`, `brand*.json` or similar in the working directory or attached to the conversation.
 
 - Found: read it fully. Extract brand name, voice and tone rules, hard rules and forbidden claims, colours, fonts, logo file, motion rules, and any proof points. These answers are now known; do not ask them again.
-- Several found: ask which one this video uses.
-- **A shipped preset** in `${CLAUDE_PLUGIN_ROOT}/brands/<brand>/` (for example `brands/truemission/`: a `brand.json` plus a `CLAUDE.md` with the brand's voice, compliance hard rules, end-card disclaimers, CTA shape and measured pacing): read both before the interview and treat them as a found context profile, saying which preset you used. A preset is a starting point, never a reason to skip the evidence round — the topic, the numbers and their sources still come from the user for this video.
-- None: ask whether one exists. If not, offer to build one first with the `brandcore` skill if it is available, or continue with a short brand block (name, voice in one line, colours, font, logo file, hard rules) collected in Step 2.
+- Several found: ask which one this video uses, as one of the Step 2 questions.
+- **The brand studio** `hookreel-studio/<brand>-studio/` (for example `hookreel-studio/truemission-studio/`: its `BRAND.md` holds the brand's voice, compliance hard rules, end-card disclaimers, CTA shape and measured pacing; its `brand.json` the colours, logo and watermark): find it from the studio named in the conversation, or ask which studio this video belongs to (or whether to make a new one; `/hookreel:build` Step 1 creates it, and `BRAND.md` is written from this interview or the brandcore profile). Read both before asking anything and treat them as a found context profile, saying which studio you used. A studio is a starting point, never a reason to skip the evidence questions — the topic, the numbers and their sources still come from the user for this video.
+- None: ask whether one exists. If not, offer to build one first with the `brandcore` skill if it is available, or continue with a short brand block (name, voice in one line, colours, font, logo file, hard rules) asked as one of the Step 2 questions (it counts toward the six).
 
-## Step 2 — Interview
+## Step 2 — One message: questions and the pre-filled brief
 
-Ask in **four rounds**, one message per round, numbered questions, with a recommended default in brackets where one is sensible. Skip any question the context profile or the conversation already answers, and say which ones you skipped and why. Never ask more than six questions in one round.
+Ask **once**, in **one message**, at most **six** numbered questions, and only what the context profile, the brand studio's `BRAND.md` or the conversation does not already answer. Pick them in this order of priority, skipping any that are known:
 
-**Round A — the story**
-1. Main topic: what is this video about, in one sentence?
-2. Why does this video exist? What pain or problem does the viewer have that this video helps solve, and what happens to them if they ignore it?
-3. Who watches it, and how much do they already know? (never heard of it / know it, don't use it / already use it)
-4. Do you already have a storyline or list of beats you want to follow? If yes, paste it; the story stage will sharpen it, not replace it. If no, the story stage builds one.
+1. Topic and pain: what is the video about, what does the viewer struggle with, and what happens if they ignore it? (If they already have a storyline or beats, paste them; the story stage sharpens it, not replaces it.)
+2. Audience and awareness: who watches, and how much do they know? (never heard of it / know it, don't use it / already use it)
+3. Sources and numbers: source material (guide, report, PDF, link, own experience), and every number to show with where it comes from.
+4. Proof and must-not-claim: own experience or a client's (named? results allowed?), and anything that must not be claimed or shown (results, prices, client names, competitors, regulated claims).
+5. Call to action: the exact action (comment a keyword, link in bio, DM, page) and what the viewer gets.
+6. Reference reels: the reels whose look you want (files or links) and what to take from each. None: say so, and I propose a direction from a few public examples. (Template infographic look only if asked: clean, or playful with AI 3D cartoon characters.)
 
-**Round B — evidence**
-5. Source material: a guide, article, report, PDF, link, or your own experience? Attach or link it.
-6. Numbers you want on screen, and where each comes from. Numbers without a source go through `/hookreel:facts`.
-7. Proof: is the experience your own (your own account, your own business) or a client's? May the client be named? May results be shown?
-8. Anything that must not be claimed or shown (results, prices, client names, competitors, regulated claims)?
+Anything that becomes a claim on screen (numbers, sources, proof, must-not-claim) stays among the questions while it is unknown; never fill it with a default.
 
-**Round C — format and call to action**
-9. Platform and language of the voiceover. (Instagram Reels, English)
-10. One video or a series? For a series: how many, and the job of each (for example teaser, then one per step).
-11. Target length per video. (45–75 seconds)
-12. Call to action: the exact action (comment a keyword, link in bio, DM, visit a page) and what the viewer gets.
+**Every other field gets a stated default**, from `BRAND.md` or the profile where it has one, else:
+- Platform: Instagram Reels · Language: the language of the brief · Length: 45–75 s · Format: single video.
+- Voiceover: ElevenLabs/TTS when the studio has it (`ELEVENLABS_API_KEY` in `.env.local` or a voice in `BRAND.md`), else recorded by the user, one take per video.
+- Music: synthesised (`npm run music`), mood by the brand's tone (energetic, cheerful, chill or dramatic) · SFX: medium.
+- Visual assets: the logo from the profile or `brand.json`; recreated mockups only, no real screenshots or photos of people until their owner's permission is recorded · Dislikes: the bans in `BRAND.md`, else none.
+- Slug: a proposed kebab-case slug.
 
-**Round D — sound and look**
-13. Voiceover: recorded by you or a team member (one take per video), or none? (recorded by you)
-14. Background music: original music synthesised in the studio (`npm run music`; pick a mood: energetic, cheerful, chill or dramatic), a track you have the rights to use (note its source and licence), or none?
-15. Sound effects: off, subtle, medium or dramatic? (medium)
-16. Reference reels: send the reels whose look you want (screen recordings or video files; links if they can be opened). Every video gets new motion design invented from all of them, never a fixed template. What do you like in each (pacing, type, props, transitions)? If you have none, I will propose a direction from a few public examples for you to pick from. (Only if you explicitly want the template's infographic slides instead, say so: clean, or playful with AI-generated 3D cartoon characters.)
-17. Visual assets and dislikes: logo file, product screenshots allowed or recreated mockups only (and who gives permission for each real screenshot or photo of a person), and anything you do not want to see (for example a story-style progress bar, emoji, stock photos).
+In the **same message**, below the questions, show the brief as it will be saved (Step 3 format) with every default filled in and every open field marked `[Q1]`, `[Q2]`…, headed "Reply to change any line." List which questions you skipped and why in one line.
+
+The user's answer **is** the confirmation: apply the answers and any changed lines, then go on to Step 3 without asking again. Ask a follow-up only when an answer leaves a claim on screen still unknown or contradicts the profile's hard rules.
 
 ## Step 3 — Project code, folder and brief
 
 **Project code.** Every new project gets a unique code so it can be found, reopened and edited later: `HKR-YYMMDD-XXXX`, today's date plus four random characters from `23456789ABCDEFGHJKMNPQRSTVWXYZ` (no 0, 1, I, L, O, U), for example `HKR-261012-7QF3`. Make sure it is not already in `hookreel-output/PROJECTS.md`.
 
-**Slug.** A short kebab-case name for humans (for example `chatgpt-ads-wa`), confirmed with the user.
+**Slug.** A short kebab-case name for humans (for example `chatgpt-ads-wa`), proposed in the Step 2 message; the user may change it in the same reply.
 
 **Folder.** Everything for this project lives in `<project>` = `hookreel-output/<CODE>_<slug>/`. Nothing is ever written outside it except the studio (at build).
 
 **Video ids.** Every video id is `<CODE>-<name>` (for example `HKR-261012-7QF3-teaser`), so two projects for the same brand never collide in one studio, in `public/vo/`, or in rendered file names.
 
-Save `<project>/01-brief.md` (overwrite if it exists), show it in chat, and ask for confirmation. On confirmation, apply changes and add `Status: confirmed` as the first line.
+Save `<project>/01-brief.md` (overwrite if it exists) with the user's answers applied, and `Status: confirmed` as the first line: the reply to the Step 2 message is the confirmation, so there is no separate confirmation round.
 
 ```text
 Project code: [HKR-YYMMDD-XXXX]
@@ -120,7 +115,7 @@ So the project can be recalled by its code later (`/hookreel:resume <CODE>`):
   "title": "…",
   "brand": "…",
   "contextProfile": "path/to/profile.json",
-  "studio": "hookreel-studio/<brand-slug>",
+  "studio": "hookreel-studio/<brand>-studio",
   "videos": ["HKR-261012-7QF3-teaser"],
   "created": "2026-10-12",
   "stages": { "brief": "confirmed", "facts": null, "story": null, "script": null, "storyboard": null, "prototype": null, "build": null, "voice": {}, "qa": {}, "critique": {} }
@@ -138,7 +133,7 @@ Every later stage updates `stages` in `project.json` and the Status column in `P
 
 Show the code prominently and tell the user: "Your project code is <CODE>. Use /hookreel:resume <CODE> to come back to it."
 
-End: "Confirm the brief and CLAUDE_<CODE>.md, then run /hookreel:facts."
+End: go straight on to `/hookreel:facts` (no stop). Run alone, end with: "Brief saved. Next: /hookreel:facts."
 
 ## Rules
 - Ask, never assume, for anything that would end up as a claim on screen.

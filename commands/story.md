@@ -1,6 +1,6 @@
 ---
 name: story
-description: Build the story with the WTF Hook 999 framework, three hook options across Gain, Pain and Curiosity, then a beat sheet per video that keeps the user's own storyline
+description: Build the story with the HookLab framework, three hook options across Gain, Pain and Curiosity, then a beat sheet per video that keeps the user's own storyline
 allowed-tools: Read, Write, Skill
 ---
 
@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Skill
 
 ## Step 1 — Load the framework
 
-Load the WTF Hook 999 skill (`wtf-hook-999`, bundled with this plugin) and follow its workflow and hook types. Use `wtf-hook-999-auditor` to score and tighten the chosen hooks before the user picks one.
+Load the HookLab skill (`hooklab`, bundled with this plugin) and follow its workflow and hook types. Use `hooklab-auditor` to score and tighten the hooks before they are shown.
 
 Use only the **allowed claims** from `02-facts.md`. Apply the brand voice and hard rules from the context profile, not the framework author's personal voice rules.
 
@@ -55,13 +55,13 @@ Budget about 2.1 spoken words per second. Keep each video within the brief's tar
 
 ## Step 5 — Save
 
-Save `<project>/03-story.md` with the hook options, the recommendation, and the beat sheets. Show it and ask the user to pick hooks and confirm the beats. Revising here is cheap; revising after the build is not. On confirmation add `Status: confirmed` as the first line, with the chosen hook per video.
+Save `<project>/03-story.md` with the hook options, the recommendation, and the beat sheets, first line `Status: draft — reviewed with the script`. **No separate approval:** go straight on to `/hookreel:script`, which writes the recommended hook into scene 1 and shows all three hooks at the top of the script review. The user picks the hook and approves the beats there, in one reply (revising on paper is still cheap; revising after the build is not).
 
-Record the chosen hook per video under **Rules for this video** in `CLAUDE_<CODE>.md`.
+When the script is approved, `/hookreel:script` sets `Status: confirmed` here with the chosen hook per video, and records the chosen hook under **Rules for this video** in `CLAUDE_<CODE>.md`.
 
 Update `<project>/project.json` (`stages.story`) and the Status column in `hookreel-output/PROJECTS.md`.
 
-End: "Confirm the story, then run /hookreel:script."
+End: go straight on to `/hookreel:script` (no stop). Run alone, end with: "Story saved. Next: /hookreel:script — the hooks are picked on the script review."
 
 ## Rules
 - A hook whose claim the video does not pay off is clickbait. Every hook names its payoff beat.

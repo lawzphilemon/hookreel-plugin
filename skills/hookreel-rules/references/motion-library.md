@@ -2,7 +2,7 @@
 
 **`/hookreel:build` reads this whole file before designing any scene**, together with the user's own reference reels for the video. It is the shared library for every brand: the same moves, rules and fonts apply to all brands alike (only a 3D character is brand-specific, and it is opt-in).
 
-Everything here is **ideas on composition and motion only**: never copy a creator's artwork, footage, music or wording, and never name or tag them in a client video. Recreate every move in code (`src/proto/kit.tsx` and new components), with the brand's own words and colours.
+Everything here is **ideas on composition and motion only**: never copy a creator's artwork, footage, music or wording, and never name or tag them in a client video. Recreate every move in code (the kit `HR` in the engine's `engine/kit/kit.js` and new HTML and GSAP per scene), with the brand's own words and colours.
 
 How to use it: for each beat, pick a move here (or from the user's reels) that carries the beat's one idea, then change it enough that it is new for this video: a different prop, a different direction, a different reveal. Do not reuse the same move twice in a row, and do not repeat a scene from the brand's previous video.
 
@@ -22,7 +22,7 @@ Moves from the user's own reference reels, described in words only. These set th
 | Calendar and checklist cards in 3D tilt, with a chunky 3D object | UI cards rotated in perspective (`rotateX/rotateY`), checks ticking down a list, a calendar day marked; one solid 3D-looking object (a dumbbell-like shape) sits in front for depth. |
 | Dashed crosshair grid framing a word | Thin dashed guide lines and corner ticks draw in around a single word, like a designer's frame; the word lands in the centre. |
 | Progress ring around an avatar | A circle avatar (drawn, never a real person without permission) with a ring that fills to a value; the value counts up beside it. |
-| Paper-texture editorial type | Paper grain (`Grain`) on a warm base, mixed sizes and weights in one centred block, an italic serif for the accent word. |
+| Paper-texture editorial type | Paper grain (`.hr-grain` + `HR.grain`) on a warm base, mixed sizes and weights in one centred block, an italic serif for the accent word. |
 | Old TV with content on its screen | A drawn retro TV; the screen content switches with a quick flicker or scan-line roll between beats. |
 | Keyboard sliding in at an angle | A drawn keyboard enters tilted from below; keys depress as words are "typed" into a field above it. |
 | Warm orange editorial with a compass, an arc of icon nodes, stacked bars with a playhead | A compass needle swings to a heading; icon nodes travel along an arc path; stacked bars grow while a vertical playhead scrubs across them, revealing values as it passes. |
@@ -93,19 +93,19 @@ Keep busy character scenes readable: one idea per scene, a scrim behind any text
 
 ## C. Transition set
 
-No background or camera holds longer than about 5 s. Change it with a transition, a different one each time, and log it in `moves.json`. The kit's `Transition` covers six; invent more in the same way (a function of the frame, revealing the next stage over the current one).
+No background or camera holds longer than about 5 s. Change it with a transition, a different one each time, and log it in `moves.json`. The kit's `HR.transition` covers six; invent more in the same way (tweens on the scene's paused timeline, or `HR.drive` for a pure function of t, revealing the next stage over the current one).
 
 | Transition | Kit | What it does | Good for |
 |---|---|---|---|
-| Circle wipe | `kind="circle"` (`x`, `y` = origin) | The next stage grows out of a point, often the word or prop just spoken | A turn in the story ("but…"); revealing from a prop |
-| Colour flood | `kind="flood"` (`color`) | A brand colour sweeps up over the frame, then uncovers the next stage | Resetting the stage between ideas |
-| Swipe | `kind="swipe"` | The next stage slides in from the right like a phone screen | UI and step-by-step beats |
-| Zoom-through | `kind="zoom"` | The next stage grows from a small rounded card to full frame | Going "into" a phone, card or detail |
-| Mask reveal | `kind="mask"` | A soft diagonal wipe | Calm changes, editorial scenes |
-| Object wipe | `kind="object"` (`shape` = the object, default a brand-colour slab) | An object passes close to the lens and the next stage is already behind it | Any change a prop of this beat can carry |
-| Shot change (in the scene) | `Camera` with `shots` (see F) | Close-up on the element that speaks, back to wide, close on the next | Holding one stage longer while the camera still tells the story |
+| Circle wipe | `"circle"` (`o.x`, `o.y` = origin) | The next stage grows out of a point, often the word or prop just spoken | A turn in the story ("but…"); revealing from a prop |
+| Colour flood | `"flood"` (`o.cover` = a full-bleed colour layer) | A brand colour sweeps up over the frame, then uncovers the next stage | Resetting the stage between ideas |
+| Swipe | `"swipe"` | The next stage slides in from the right like a phone screen | UI and step-by-step beats |
+| Zoom-through | `"zoom"` | The next stage grows from a small rounded card to full frame | Going "into" a phone, card or detail |
+| Mask reveal | `"mask"` | A soft diagonal wipe | Calm changes, editorial scenes |
+| Object wipe | `"object"` (`o.shape` = the object, a giant prop or brand-colour slab) | An object passes close to the lens and the next stage is already behind it | Any change a prop of this beat can carry |
+| Shot change (in the scene) | `HR.camera` with `shots` (see F) | Close-up on the element that speaks, back to wide, close on the next | Holding one stage longer while the camera still tells the story |
 
-**Transitions carried by objects** (no kit component; build them per beat, as functions of the frame like the rest; from the Motion Format skill, see F):
+**Transitions carried by objects** (no kit helper; build them per beat, as functions of timeline time like the rest; from the Motion Format skill, see F):
 - The next beat's prop is the wipe: a phone, door, envelope or card rises from the edge and covers the frame; the camera is already in the new stage.
 - Out of the screen: the item picked in a UI lifts toward the camera, the screen folds away, and the item is a real object in the next stage.
 - Match cut on shape: a coloured object on dark cuts to the same shape as an outline on light, then gets its colour back.
@@ -119,23 +119,23 @@ No background or camera holds longer than about 5 s. Change it with a transition
 - Dim, then change: the line greys out before it leaves; the next line lands in the same place.
 - Delete and type: the old line deletes letter by letter from the left; the new one is typed in its place.
 
-**Transition craft.** Never slide the whole stage until its edge shows (it reads as "next page"; `Camera` clamps the world for this reason). A sudden spin or zoom with blur on every cut is an editor preset, not motion design. One kind of transition on every cut is a template, however expensive. Most changes are carried by elements that overlap in time (one leaves while the next arrives) or by an object wipe; a fast zoom-through only when it is motivated (diving into a phone screen).
+**Transition craft.** Never slide the whole stage until its edge shows (it reads as "next page"; `HR.camera` clamps the world for this reason). A sudden spin or zoom with blur on every cut is an editor preset, not motion design. One kind of transition on every cut is a template, however expensive. Most changes are carried by elements that overlap in time (one leaves while the next arrives) or by an object wipe; a fast zoom-through only when it is motivated (diving into a phone screen).
 
 ## D. Font library (every brand)
 
-The same three Google Fonts for every brand's creative motion, loaded by `src/proto/kit.tsx` through `@remotion/google-fonts`:
+The same three fonts for every brand's creative motion, bundled as woff2 in the engine's `engine/kit/fonts/` and declared in `engine/kit/kit.css`:
 
-| Font | Weights | Use | Kit export |
+| Font | Weights | Use | Kit CSS |
 |---|---|---|---|
-| Open Sans | 800 | Headlines and big numbers (tight letter-spacing, about -0.04em) | `FONT.display` |
-| Rubik | 500–700 | Supporting text, labels, source lines, UI mockups | `FONT.sans` |
-| Instrument Serif | 400 italic | The accent on the key word | `FONT.serif` |
+| Open Sans | 800 | Headlines and big numbers (tight letter-spacing, about -0.04em) | `var(--display)`, `.hr-display` |
+| Rubik | 500–700 | Supporting text, labels, source lines, UI mockups | `var(--sans)`, `.hr-sans` |
+| Instrument Serif | 400 italic | The accent on the key word | `var(--serif)`, `.hr-serif` |
 
 Mix them in one block: a big Open Sans word, a Rubik line under it, one Instrument Serif italic word as the accent. Use the brand's own fonts only when its rulebook requires them.
 
 ## E. Past work
 
-Breakdowns of videos already made with hookreel or plain Remotion, as references for **moves, timing and code**. Truemission and Gwenchana are the plugin author's own brands. Customer stories, claim amounts, client names, voice recordings, music, logos and character images are left out on purpose. Times are scene seconds unless marked; `w("word")` is when that word is spoken (from `words.json`).
+Breakdowns of videos already made with hookreel or plain Remotion, as references for **moves, timing and code**. Their code is Remotion (React) from before 0.18.0; read it as formulas and write it in HyperFrames: `prog(t, a, d)` is a `tl.fromTo(…, { duration: d, ease: HR.EASE }, a)` tween, any other pure function of t is `HR.drive(tl, a, b, fn)`, `w("word")` is `HR.at(scene, "word")`, `<Sfx at={…}>` is an `<audio class="clip" data-start=…>` in the scene, `TransitionSeries` and `Sequence` are scene hosts and `data-start`. Truemission and Gwenchana are the plugin author's own brands. Customer stories, claim amounts, client names, voice recordings, music, logos and character images are left out on purpose. Times are scene seconds unless marked; `w("word")` is when that word is spoken (from `words.json`).
 
 Ranked by how useful they are now: E1 is the current default look (custom motion). E2 and E3 are the older template look. Study them for timing and props, but do not rebuild them as layouts. E4 is a footage overlay.
 
@@ -237,22 +237,22 @@ Fonts: Barlow Condensed 600/800 for numbers and titles, Inter 500/600 for labels
 
 ## F. Camera: shot sizes
 
-Sections F–H and the object transitions in C are adapted from the **Motion Format** skill v1.0.0 (MIT), itself built on [Bang Motion](https://github.com/bangtutorial/bang-motion) by Bang Tutorial (MIT), rewritten for Remotion and vertical reels.
+Sections F–H and the object transitions in C are adapted from the **Motion Format** skill v1.0.0 (MIT), itself built on [Bang Motion](https://github.com/bangtutorial/bang-motion) by Bang Tutorial (MIT), rewritten for vertical reels (first for Remotion, now HyperFrames).
 
 "Zoom in and out" in motion design means **changing the shot size**, not a camera breath: a push of a few percent is nearly invisible and the video still reads as still.
 
 | Shot | Kit | Use |
 |---|---|---|
-| Wide | `SHOT.wide` (1) | The whole composition: several elements, or a line that needs the full width |
-| Medium | `SHOT.medium` (about 1.45) or `frameOn(box, 0.45)` | The element that speaks plus a little context, about a third to half of the frame |
-| Close | `SHOT.close` (about 2.1) or `frameOn(box, 0.7)` | One element or its detail fills the frame: emphasis, the moment of action, a small detail that must be read |
+| Wide | `HR.SHOT.wide` (1) | The whole composition: several elements, or a line that needs the full width |
+| Medium | `HR.SHOT.medium` (about 1.45) or `HR.frameOn(box, 0.45)` | The element that speaks plus a little context, about a third to half of the frame |
+| Close | `HR.SHOT.close` (about 2.1) or `HR.frameOn(box, 0.7)` | One element or its detail fills the frame: emphasis, the moment of action, a small detail that must be read |
 
 - Aim at the element that is speaking now: the line that just landed, the prop that arrived, the button being tapped, the detail the voice names. The camera meets it; it does not chase it.
 - Change the shot on the beat: close on A → back to wide when the composition needs the whole frame → close on B. Never three beats in a row at the same size (`npm run fresh` fails on it). Log each beat's size as `shot` in `moves.json`.
 - Two tempos: the shot change itself (0.6–0.9 s, ease in-out) and a slow push while holding.
 - A scene may be born in a close-up (`cut: true`) and pull back; the video may open in one.
 - Text lands after the camera arrives, never mid-move. Do not swing close and wide faster than a viewer can read.
-- World inside `Camera`, screen layer outside: labels, source lines, captions and the CTA sit outside the rig so they never scale or get cut. Raster images inside the world need the resolution for the close-up (at least scale × displayed size).
+- World inside the `HR.camera` wrapper, screen layer outside: labels, source lines, captions and the CTA sit outside the rig so they never scale or get cut. Raster images inside the world need the resolution for the close-up (at least scale × displayed size).
 - **UI demos:** move close to the area about to be tapped (scale 1.4–2.2, 0.6–0.9 s ease in-out) so the tap reads, then pull back or pan to the result. Not on every tap.
 
 ## G. Style brief menus (one pick each per video, in `style.json`)
@@ -351,7 +351,7 @@ A frame that is technically correct still fails when it reads as a presentation.
 - **Sentence case.** All caps for one emphasis beat at most. Short phrases (4 words or fewer) without a full stop; `?` for a real question. The punctuation style is decided once in the style brief.
 - **Template skeleton.** The order hook → point → point → promise → logo → CTA, three feature tiles side by side, a search box being typed, a first line zooming in then leaving left, logo and CTA stacked in the centre: two or more of these in one video without the story asking for them is a template, whatever the colours. Pick the opener, the closing and the way of presenting points from G4–G6 instead.
 - **Every named thing is on screen.** Each product, brand, kind of person, object or number the voice names in a beat appears in that beat (as a prop, an icon, a logo, or the number with its source), unless a ban or a missing permission rules it out; then `06-motion` says so for that beat.
-- **Enter slow, leave fast.** Entrances 0.7–1.3 s with a firm ease-out, exits 0.35–0.55 s with an ease-in (`life(t, at, until)` in the kit). Symmetric in and out reads mechanical.
+- **Enter slow, leave fast.** Entrances 0.7–1.3 s with a firm ease-out, exits 0.35–0.55 s with an ease-in (`HR.life(tl, sel, at, until)` in the kit). Symmetric in and out reads mechanical.
 - **One special moment.** The most expensive effect (a 3D move, the logo build, a big object wipe) is used once, on the beat marked `"special": true` in `moves.json`. Used everywhere, it stops being special.
 - **When in doubt,** darken the text pocket and make the type bigger.
 
@@ -363,7 +363,7 @@ A frame that is technically correct still fails when it reads as a presentation.
 
 ## I. AI Code-Motion Reference Library (Opus 5.5 & Guanmo AI Motion)
 
-Studied from `yihui-dev/awesome-opus5-5-videos` (700+ prompts, 418 remakes on Skillry) and `guanmo-ai/awesome-ai-motion` (1,400+ curated code animations across 7 domains). Read whenever designing scenes, writing prompts, or building Remotion/HTML components.
+Studied from `yihui-dev/awesome-opus5-5-videos` (700+ prompts, 418 remakes on Skillry) and `guanmo-ai/awesome-ai-motion` (1,400+ curated code animations across 7 domains). Read whenever designing scenes, writing prompts, or building HyperFrames scenes.
 
 ### I1. Core Philosophy: Zero Cuts, Continuous Flow & Beat Math
 - **Animation as $f(t)$:** Every visual attribute is a closed-form pure function of time. No mutable component state between frames, no drift.

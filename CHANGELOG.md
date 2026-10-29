@@ -1,5 +1,82 @@
 # Changelog
 
+## 0.18.0 — 2026-10-29
+
+One video took about ten replies from the user and two or three session hops. The user now replies four
+times, and the renderer moved from Remotion to HyperFrames. Every quality gate stays: facts from primary
+sources, the hook audit, the read-aloud pass, freshness, retention, contrast, the critique loop (8+ on
+stills) and the self-critique.
+
+**Four stops per video**
+- **`/hookreel:make`**: one entry point from brief to posting folder. It stops four times: the brief,
+  the script, the prototype and the final.
+- Brief: the four interview rounds became one message. It asks at most six questions, only what the
+  context profile or preset does not answer, and shows the rest as a pre-filled brief. The user's reply
+  is the confirmation.
+- Facts run on their own and stop only on a claim that is NOT FOUND or CONTRADICTED.
+- Story and script are approved together. The review page opens with the three hooks, the recommended
+  one already in scene 1. The pronunciation table lives in `04-script.md`. `VOICEOVER_<CODE>.md` is
+  written only when a person records.
+- `/hookreel:produce` now ends with publish: preview, covers and caption in one message. There is no
+  separate "listen to the mix" stop, and no "start a new session" hop. `/hookreel:resume` is for when
+  the context runs low.
+
+**HyperFrames renderer** (`template/`, HyperFrames 0.8.188 pinned)
+- Each video is a HyperFrames project in `reels/<id>/`. The scenes are hand-written HTML with a paused
+  GSAP timeline in `compositions/<scene id>.html`. `words.json`, `moves.json` and `style.json` moved
+  there from `src/proto/<id>/`.
+- `kit/kit.js` (global `HR`) ports the Remotion kit: `at` (word times), `life`, `word`, `spr`,
+  `camera` (same `camAt` maths), `frameOn`, `shake`, `squash`, `grain` and the six transitions, plus
+  `drive` for any value that is a pure function of time. `kit/kit.css` carries the font library
+  (Open Sans 800, Rubik, Instrument Serif italic, shipped as woff2 under the OFL), grain and source
+  lines.
+- `npm run assemble -- <id>` writes the root page: scenes back to back, voice clips, and the music
+  ducked under the voice in Node (the old `Music` envelope). It also copies the assets the scenes name
+  from `public/`.
+- `npm run render -- <id>` does assemble, render, a frame-count check and a loudness readout. The
+  voice sits at 0.8, which landed the test mix at -16.5 LUFS and -3.6 dBTP. Measured on this laptop:
+  an 18.8 s two-scene reel from the deposito take renders in 0.9 min. Remotion took about 25 min for
+  a 92 s reel.
+- Chunked render (`npm run chunks`) is removed: a full render now costs minutes.
+- `npm run sheets` and `npm run sweep` build the critique pages from `hyperframes snapshot` stills, as
+  an HTML page that is snapshotted too. 37 s and 18 s on the test reel. `--gate` is unchanged.
+- `npm run cover` makes the covers from still pages in `reels/<id>-cover-<n>/`.
+- `retention` also checks `<img>` in HTML scenes.
+- Audio, voice and check scripts call `ffmpeg` and `ffprobe` from PATH. Remotion's ffmpeg is gone.
+- The studio installs 2 packages in 5 s. Whisper stays for recorded takes.
+- `template-remotion/`: the old Remotion template, kept for studios made before 0.18.0 and for the
+  template look (data-driven slides, storyboard).
+
+**Engine and brand studios**
+- The repo is also the npm package **`hookreel-engine`**.
+  - Every tool lives in `engine/`: kit, scripts, and `src/motion.mjs` / `align.mjs`, now plain JS because
+    Node does not strip TypeScript types inside `node_modules`.
+  - The tools run through the `hookreel` CLI (`engine/cli.mjs`).
+- `template/` is now a thin brand studio.
+  - Its `package.json` depends on `github:lawzphilemon/hookreel-plugin#main`, and every npm script calls
+    `hookreel <command>`.
+  - `npm run update-engine` pulls the newest engine.
+  - `.npmrc` sets `allow-git=root`, because npm 12 refuses git dependencies by default.
+  - No engine code is copied into a studio any more, so a studio never needs a merge.
+- Tested end to end with a thin studio installed from the GitHub branch (10 s install): retention,
+  render (1.0 min, 566 frames, -16.5 LUFS) and sweep all ran through the CLI.
+- **Watermark**: `brand.json` → `watermark` (`tile` or `corner`) is drawn over every scene by
+  `assemble`. It fades in after the hook and steps aside for the end card. `"watermark": "off"` per
+  video only where the brand allows it. The defaults are the Truemission values (0.13 opacity, 58 px,
+  offset rows).
+- `brands/truemission/` is removed from this public repo. Brand rules now live in each brand's own
+  studio repository: `BRAND.md` plus `brand.json`, which `/hookreel:brief` reads as the context profile.
+  Truemission's is the private `lawzphilemon/truemission-studio`, with its logo, character, licensed
+  sound effects and music.
+
+**Naming and disclaimer**
+- The bundled hook skills are renamed to **HookLab**:
+  - `wtf-hook-999*` → `hooklab`, `hooklab-generator`, `hooklab-auditor`, `hooklab-optimizer`.
+  - The two hook groups are now "Shock Hook" (types 1–6) and "Power Hook" (types 7–15).
+  - The third-party framework's brand names are removed.
+- README and both manifests say in large type that the plugin is made by Lawrence Philemon for
+  personal use and is not sold.
+
 ## 0.17.0 — 2026-10-28
 
 Rules from a read of seven public Claude Code motion toolkits (whaleyxbt/claude-motion, howseen-ai/claude-motion-design,

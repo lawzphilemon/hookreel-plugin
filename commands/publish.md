@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash
 
 # HKR-9 — Cover and Caption
 
-**Mission:** The reel goes out with a cover that still reads in the profile grid and a caption that earns the "more" tap. Run inside `hookreel-studio/<brand-slug>/` after `/hookreel:qa`. Read the project's `CLAUDE_<CODE>.md` first: every ban applies to the cover and the caption too. Follow the `hookreel-rules` skill, and the `creator-os` skill (bundled with this plugin) for hooks and captions.
+**Mission:** The reel goes out with a cover that still reads in the profile grid and a caption that earns the "more" tap. Run inside `hookreel-studio/<brand>-studio/` after `/hookreel:qa`: as the last step of `/hookreel:produce` (the user then gets preview, covers and caption in one message), or alone. Read the project's `CLAUDE_<CODE>.md` first: every ban applies to the cover and the caption too. Follow the `hookreel-rules` skill, and the `creator-os` skill (bundled with this plugin) for hooks and captions.
 
 `<project>` is the project folder `hookreel-output/<CODE>_<slug>/` and `<CODE>` its project code (see `hookreel-rules`); `<id>` is a video id, always `<CODE>-<name>`.
 
@@ -21,17 +21,17 @@ Read `creator-os` `references/hook-frameworks.md` (Simplify Method, 8 Human Desi
 2. one big number (`big`) with a short headline,
 3. an open loop the video pays off.
 
-Rules: headline at most about 10 words, one message, one emotion; accent words marked `*like this*`; every number carries `source`; no claim, number or word the script did not already approve (the facts gate still holds); the brand's bans apply.
+Rules: headline at most about 10 words, one message, one emotion; one accent word (the kit's serif or a brand colour); every number carries its source line (`.hr-source`); no claim, number or word the script did not already approve (the facts gate still holds); the brand's bans apply.
 
 Score each with the creator-os rubric (Pattern, Relevansi, Janji, Spesifik, Ringkas, 0–2 each). Below 8, fix the weakest criterion before rendering.
 
-Add them to `videos/<id>.json` as `cover` (see `CoverSpec` in `src/schema.ts`) and render:
+Write each variant as a still HyperFrames page, `reels/<id>-cover-<n>/index.html`: 1080×1920, `data-no-timeline` on the root, the kit linked as `assets/kit.css` (fonts and classes as in the scenes), images named `assets/<path>` from `public/<path>`. Design it in the video's look, not a template card. Keep all cover content inside y 420–1500. Then render:
 
 ```bash
 npm run cover -- <id>
 ```
 
-This writes `out/<id>-cover-<n>.png` (1080×1920) and `out/<id>-cover-<n>-grid.png`, the centre 1080×1440 that Instagram's profile grid shows (3:4; 240 px off the top and bottom). The template keeps cover content inside y 420–1500. Read every grid preview: nothing cut off, nothing broken mid-word, text fits.
+This copies the kit and every `public/` file the pages name into their `assets/`, and writes `out/<id>-cover-<n>.png` (1080×1920) and `out/<id>-cover-<n>-grid.png`, the centre 1080×1440 that Instagram's profile grid shows (3:4; 240 px off the top and bottom). Read every grid preview: nothing cut off, nothing broken mid-word, text fits. In a Remotion studio (before 0.18.0) without the HyperFrames tooling, covers stay `cover` in `videos/<id>.json` (`CoverSpec` in its `src/schema.ts`).
 
 ## Step 2 — Caption
 
@@ -49,7 +49,7 @@ Check the caption line by line against `CLAUDE_<CODE>.md` (claims, words, punctu
 
 ## Step 3 — Publish for the user
 
-Write `<project>/08-publish-<id>.md`: the cover variants with scores and file names (recommend one), and the final caption in a code block, ready to paste. Send the user the cover PNGs (full and grid) and the file. The chosen cover is uploaded in Instagram as a custom cover (otherwise Instagram uses the first frame).
+Write `<project>/08-publish-<id>.md`: the cover variants with scores and file names (recommend one), and the final caption in a code block, ready to paste. Send the user the cover PNGs (full and grid) and the file; inside `/hookreel:produce`, in the same message as the preview. The chosen cover is uploaded in Instagram as a custom cover (otherwise Instagram uses the first frame).
 
 Update `<project>/project.json` (`stages.publish.<id>`: covers, chosen cover once the user picks, caption file) and `PROJECTS.md`.
 

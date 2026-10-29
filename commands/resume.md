@@ -21,7 +21,7 @@ If `PROJECTS.md` is missing or out of date, rebuild it from the `project.json` f
 
 ## Step 2 — Load it
 
-Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, `VOICEOVER_<CODE>.md`, `06-motion-<id>.md`, any storyboards, and the studio's `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports the studio's coded file; restore the import line if it is missing.
+Read, in this order: `project.json`, **`CLAUDE_<CODE>.md`** (the rulebook: follow it for everything that follows), `01-brief.md`, `02-facts.md`, `03-story.md`, `04-script.md`, `VOICEOVER_<CODE>.md` (only when a human records), `06-motion-<id>.md`, any storyboards, and the studio's `BRAND.md` and `CLAUDE_<CODE>.md` if the project was built. Check that the project folder's `CLAUDE.md` imports `CLAUDE_<CODE>.md` and that the studio's `CLAUDE.md` imports `@BRAND.md` and the studio's coded file; restore the import line if it is missing.
 
 ## Step 3 — Show where it stands
 
@@ -41,14 +41,14 @@ Ask what the user wants, then route:
 
 | Change | Do | Then |
 |---|---|---|
-| A rule or ban | Edit `CLAUDE_<CODE>.md` (and the studio's coded file for brand-level rules) | Re-check the script and the built scenes against it |
+| A rule or ban | Edit `CLAUDE_<CODE>.md` (and the studio's `BRAND.md` for brand-level rules, with the user's yes) | Re-check the script and the built scenes against it |
 | Facts | `/hookreel:facts` | Everything after it needs re-approval |
-| Hook or beats | `/hookreel:story` | Script and build need re-approval |
-| A line or a beat idea | Edit `04-script.md` | Republish the script for approval, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then update `videos/<id>.json`, `npm run words` and the affected scenes |
-| Motion, layout or sound only | Edit the scenes in the studio's `src/proto/<id>/` | Render the changed scene and send it |
+| Hook or beats | `/hookreel:story` | Flows into `/hookreel:script`: one review picks the hook and re-approves the script; build needs re-approval |
+| A line or a beat idea | Edit `04-script.md` | Republish the script for approval, update its pronunciation table and, when a human records, rewrite `VOICEOVER_<CODE>.md` (mark changed lines; recorded takes of them are void), then update `videos/<id>.json`, `npm run words` and the affected scenes |
+| Motion, layout or sound only | Edit the scenes in the studio's `reels/<id>/compositions/` (`src/proto/<id>/` in a Remotion studio from before 0.18.0) | `npm run assemble -- <id>`, snapshot the changed scene and send it |
 | Too long or loose pacing | `npm run trim -- "<recording>"` (caps the pauses, no retake), then `/hookreel:voice` on the trimmed file | QA again |
 | New voiceover take | `/hookreel:voice` | QA again |
-| The rest of a video after its prototype is approved | `/hookreel:produce <id>` | Cover and caption: `/hookreel:publish` |
+| The rest of a video after its prototype is approved | `/hookreel:produce <id>` (voice, QA, cover and caption in one run) | Pick a cover: the posting folder follows |
 | Cover or caption | `/hookreel:publish` | — |
 | A carousel slide (copy or look) | Edit `carousel/<id>/02-copy.md` (re-approve) or `carousel.html` | Re-run `/hookreel:carousel` Step 4 and update `report.md` |
 
@@ -56,7 +56,7 @@ Ask what the user wants, then route:
 1. Name the target (scene, beat, element or sound) and the change. When the target is ambiguous, take the most likely one and say which in one sentence; ask only when it cannot be guessed.
 2. Change only the target. Other scenes, colours, timing and sounds stay as they are unless the user asks.
 3. When a length changes, shift what follows (`until`, cues, the next beat's `at`) and re-run `npm run fresh` and `npm run retention`.
-4. Re-render only the changed seconds (`npx remotion still` at the changed frames, or `--frames=` for the range); for the deliverable, `npm run chunks -- <id>` re-renders only the scenes whose files changed and joins them with the rest. Then report in one sentence what changed, with numbers: "Scene 3 is now 2 s shorter, the logo 30 % larger."
+4. Look at only the changed seconds first (`npm run assemble -- <id>`, then `npm run hf -- snapshot reels/<id> --at <s>,<s> --no-end`); for the deliverable, `npm run render -- <id>` re-renders the whole reel in minutes. Then report in one sentence what changed, with numbers: "Scene 3 is now 2 s shorter, the logo 30 % larger."
 
 These edits stay inside the approved script; a new line, claim or number still goes back through the script gate.
 
@@ -64,4 +64,4 @@ These edits stay inside the approved script; a new line, claim or number still g
 
 Never create a new project code for an existing project; a new code is only for a new project.
 
-End: tell the user the code, the current status, and the next command to run.
+End: tell the user the code, the current status, and the next command to run (for a project started with `/hookreel:make`, continue its flow from the first stage that is not done, stopping only at its four stops).
