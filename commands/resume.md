@@ -17,7 +17,7 @@ Argument: $ARGUMENTS
 - A slug, brand or words from a title were given: search `hookreel-output/PROJECTS.md` and every `hookreel-output/*/project.json`; if several match, list them and ask which one.
 - Nothing was given: show `hookreel-output/PROJECTS.md` (code, slug, brand, title, created, status) and ask which project.
 
-If `PROJECTS.md` is missing or out of date, rebuild it from the `project.json` files.
+If `PROJECTS.md` is missing or out of date, rebuild it from the `project.json` files. If the opened project has no `meta.json`, write it from `project.json` as `/hookreel:brief` Step 5 does (`file_utama`: `render/<id>.mp4` when it exists, else empty; `status`: `"selesai"` when every video has a posting folder, else `"berjalan"`).
 
 ## Step 2 — Load it
 

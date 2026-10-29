@@ -51,6 +51,8 @@ Check the caption line by line against `CLAUDE_<CODE>.md` (claims, words, punctu
 
 Write `<project>/08-publish-<id>.md`: the cover variants with scores and file names (recommend one), and the final caption in a code block, ready to paste. Send the user the cover PNGs (full and grid) and the file; inside `/hookreel:produce`, in the same message as the preview. The chosen cover is uploaded in Instagram as a custom cover (otherwise Instagram uses the first frame).
 
+Copy the final render and every cover into the project, so the finished files live with the project and not only in the studio: `out/<id>.mp4` and every `out/<id>-cover-<n>.png` and `out/<id>-cover-<n>-grid.png` go to `<project>/render/` (create it; copy, do not move; check the MP4 has the same size as the original). Whenever the render or a cover changes later, overwrite the matching file there. In `<project>/meta.json` set `file_utama` to `render/<id>.mp4` (the first video's, for a project with several).
+
 Update `<project>/project.json` (`stages.publish.<id>`: covers, chosen cover once the user picks, caption file) and `PROJECTS.md`.
 
 End: "Pick a cover. The caption is in 08-publish-<id>.md, ready to paste. Once you pick, everything to post goes in one folder."
@@ -67,6 +69,6 @@ When the user picks a cover, put everything needed to post this video in one fol
 
 Copy, do not move: `out/` stays the studio's render folder. Check the copied MP4 has the same size as the original. Whenever the cover choice, the caption or the render changes later, overwrite the matching file here.
 
-Record it in `project.json` (`stages.publish.<id>.folder`: `"publish/"`, plus the chosen cover) and in `PROJECTS.md`.
+Record it in `project.json` (`stages.publish.<id>.folder`: `"publish/"`, plus the chosen cover) and in `PROJECTS.md`. Once every video of the project has its posting folder, set `status` in `<project>/meta.json` to `"selesai"`.
 
 End: "Ready to post: `<project>/publish/` has <id>.mp4, <id>-cover.png and <id>-caption.txt. Upload the cover as the custom cover in Instagram."

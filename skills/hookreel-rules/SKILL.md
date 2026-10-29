@@ -20,7 +20,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 
 | Stage | Output |
 |---|---|
-| brief | project code, `<project>/01-brief.md`, **`<project>/CLAUDE_<CODE>.md`** (mandatory rulebook) + `CLAUDE.md` import, `project.json`, row in `hookreel-output/PROJECTS.md` |
+| brief | project code, `<project>/01-brief.md`, **`<project>/CLAUDE_<CODE>.md`** (mandatory rulebook) + `CLAUDE.md` import, `project.json`, `meta.json`, row in `hookreel-output/PROJECTS.md` |
 | facts | `02-facts.md` (bans added to `CLAUDE_<CODE>.md`) |
 | story | `03-story.md` (hooks + beat sheets, uses HookLab; confirmed with the script) |
 | script | `04-script.md` (hook options on top, scenes, pronunciation table, checks), published for review, `Status: approved`; then `VOICEOVER_<CODE>.md` (recording guide, only when a human records) |
@@ -29,7 +29,7 @@ Short vertical videos (Reels, TikTok, Shorts) for any brand, built from a brand 
 | voice | `public/vo/<id>/`, `reels/<id>/words.json` re-timed on the recording |
 | qa | `07a-critique-<id>.md` (scored critique rounds on `out/sheets/<id>/`), `07-qa-<id>.md`, `out/<id>.mp4` + `out/<id>-mix.wav` (`npm run render`), `out/<id>-preview.mp4`, then the mandatory **`07b-critique-<id>.md`** (the video, the workflow, plugin updates) |
 | carousel (any time, own gate) | `<project>/carousel/<id>/`: `01-source.md`, `02-copy.md` (approved), `carousel.html`, `slide-NN.png`, `verification.json` (`scripts/carousel.mjs`), `report.md` |
-| publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` (only after `07b-critique-<id>.md` exists), then once a cover is picked the posting folder `<project>/publish/` (`<id>.mp4`, `<id>-cover.png`, `<id>-caption.txt`) |
+| publish | `08-publish-<id>.md`, `out/<id>-cover-<n>.png` (only after `07b-critique-<id>.md` exists), copies of the render and every cover in `<project>/render/`, then once a cover is picked the posting folder `<project>/publish/` (`<id>.mp4`, `<id>-cover.png`, `<id>-caption.txt`) |
 
 Each stage reads the previous files and updates `project.json` and `PROJECTS.md`, so the pipeline resumes after a restart.
 

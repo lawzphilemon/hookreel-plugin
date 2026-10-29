@@ -122,6 +122,12 @@ So the project can be recalled by its code later (`/hookreel:resume <CODE>`):
 }
 ```
 
+- Write `<project>/meta.json`, the short record that workspace indexes read (keys exactly as shown; `klien` is the brand, `tanggal` the created date):
+
+```json
+{ "kode": "HKR-261012-7QF3", "jenis": "Video", "klien": "…", "alat": "hookreel", "tanggal": "2026-10-12", "status": "berjalan", "file_utama": "" }
+```
+
 - Add a row to `hookreel-output/PROJECTS.md` (create it with this header if missing):
 
 ```text

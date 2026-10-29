@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.1 — 2026-10-29
+
+Finished files now live with the project, not only in the studio.
+
+- `/hookreel:brief` writes `<project>/meta.json` (`kode`, `jenis`, `klien`, `alat`, `tanggal`, `status`, `file_utama`), the short record workspace indexes read. `/hookreel:carousel` writes it with `"jenis": "Carousel"`.
+- `/hookreel:publish` Step 3 copies `out/<id>.mp4` and every cover (full and grid) to `<project>/render/` and sets `file_utama`; Step 4 sets `status` to `"selesai"` once every video has its posting folder.
+- `/hookreel:resume` writes a missing `meta.json` for older projects.
+
 ## 0.18.0 — 2026-10-29
 
 One video took about ten replies from the user and two or three session hops. The user now replies four
