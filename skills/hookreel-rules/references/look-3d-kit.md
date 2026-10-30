@@ -7,6 +7,20 @@ Two looks besides custom motion, chosen per project in the brief (`Look:`):
 
 **Brand-neutral.** The 3D looks (`3d dialog`, `3d toons`), the kit's characters and worlds, and the motion library are neutral tools for any video and any brand; none of them is a default for one brand. Brand specifics (characters modelled on a person, colours, watermark, bans, disclaimers, brand worlds) live only in that brand's private studio and its project `CLAUDE_<CODE>.md`, and reach a video only through them (for example `kit-finish` reads the watermark from the studio passed in).
 
+**Brand guideline first.** The guideline is the brand studio's `BRAND.md` + `brand.json`, a context profile, or a guideline file the user gives. When one exists, every kit setting takes its value from it; neutral kit defaults apply only where it says nothing:
+
+| Setting | From the guideline into |
+|---|---|
+| Screen and monitor page colours | the page themes and the world's page palette in `episode.json` (per episode) |
+| Fonts | the page fonts, where the world or page type allows them |
+| Subtitle style | `subs` options, or the `subs.ass` style after `build` (colours, box) |
+| Voices, characters, place | `setup.py set-voice`, `--characters`, `--world` |
+| Watermark | `kit-finish` (reads `brand.json` → `watermark` of the studio passed in) |
+| Bans | `project.json` → `rules.forbidWords`, plus the project's `CLAUDE_<CODE>.md` |
+| Disclaimers, CTA shape, pacing | the end-card page and last line, the CTA line, the line budget |
+
+The kit's `project.json` stays neutral between videos: `setup.py init` sets it per video from the guideline. The brief reads these values from the guideline, the build applies them, and both record in `CLAUDE_<CODE>.md` which value was applied for each setting (or "neutral default").
+
 Hookreel keeps every gate (brief, facts, story + script, prototype, QA, self-critique, publish). The pictures and the sound come from **video-3d-kit** (`github.com/artosku/video-3d-kit`, MIT for its code, characters, worlds and skill files; its `ASSETS_NOTICE.md` lists the rest), installed once as a tool. The kit is called, never copied into this plugin or a studio.
 
 ## The kit
