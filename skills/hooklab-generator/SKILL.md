@@ -87,7 +87,7 @@ For every curiosity or contradiction hook, state exactly what the content must e
 
 ## Special mode: insurance and financial protection
 
-When the topic involves insurance, financial planning, Prudential, medical coverage, claims, or PAYDI:
+When the topic involves insurance, financial planning, medical coverage, claims, or PAYDI:
 
 - Use a protective, consultative, low-pressure tone.
 - Do not guarantee claim approval without complete medical and policy information.

@@ -14,6 +14,7 @@ Fixes from the first end-to-end run of the `3d dialog` look (two reels: one in t
   - New places: the world `screen` contract (`setPage`, `page`, `glow()`), debugging a silent hang with `VIDEO3D_DEBUG=1`; a place variant copies the episode with `takes/` and sets `"world"` (no new voice credits).
 - `/hookreel:facts`: a `Scope` column; a source that covers only a subtype (one claim route, one product) never becomes a general claim. `/hookreel:script` Step 4 checks every line stays inside its claim's scope.
 - Output root: `hookreel-output/` can be another folder named once in the workspace `CLAUDE.md` (`hookreel output root: <path>`).
+- **Brand-neutral.** The 3D looks, the kit's characters and worlds, and the motion library are neutral tools for any brand, stated as a rule in `hookreel-rules` (Custom motion) and `look-3d-kit.md`. Brand specifics live only in the brand's private studio and its `CLAUDE_<CODE>.md`. The motion library's past-work examples are anonymised (no brand, product or project-code names; palettes described, not given as hex). Studio examples use `hookreel-studio/acme-studio/`; brand names and brand project codes are gone from the commands, engine comments and the hooklab insurance mode.
 - Stops: questions left open by a short reply use their defaults, go into `DECISIONS.md`, and open the next stop's message. Brief Q5: a product-neutral end-card line when the brand's disclaimer names one product and the topic spans several.
 
 ## 0.19.0 — 2026-10-30

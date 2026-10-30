@@ -135,15 +135,15 @@ Mix them in one block: a big Open Sans word, a Rubik line under it, one Instrume
 
 ## E. Past work
 
-Breakdowns of videos already made with hookreel or plain Remotion, as references for **moves, timing and code**. Their code is Remotion (React) from before 0.18.0; read it as formulas and write it in HyperFrames: `prog(t, a, d)` is a `tl.fromTo(…, { duration: d, ease: HR.EASE }, a)` tween, any other pure function of t is `HR.drive(tl, a, b, fn)`, `w("word")` is `HR.at(scene, "word")`, `<Sfx at={…}>` is an `<audio class="clip" data-start=…>` in the scene, `TransitionSeries` and `Sequence` are scene hosts and `data-start`. Truemission and Gwenchana are the plugin author's own brands. Customer stories, claim amounts, client names, voice recordings, music, logos and character images are left out on purpose. Times are scene seconds unless marked; `w("word")` is when that word is spoken (from `words.json`).
+Breakdowns of videos already made with hookreel or plain Remotion, as references for **moves, timing and code**. Their code is Remotion (React) from before 0.18.0; read it as formulas and write it in HyperFrames: `prog(t, a, d)` is a `tl.fromTo(…, { duration: d, ease: HR.EASE }, a)` tween, any other pure function of t is `HR.drive(tl, a, b, fn)`, `w("word")` is `HR.at(scene, "word")`, `<Sfx at={…}>` is an `<audio class="clip" data-start=…>` in the scene, `TransitionSeries` and `Sequence` are scene hosts and `data-start`. The examples are anonymised: brand names, product names and project codes are left out, and so are customer stories, claim amounts, client names, voice recordings, music, logos and character images are left out on purpose. Times are scene seconds unless marked; `w("word")` is when that word is spoken (from `words.json`).
 
-Ranked by how useful they are now: E1 is the current default look (custom motion). E2 and E3 are the older template look. Study them for timing and props, but do not rebuild them as layouts. E4 is a footage overlay.
+Ranked by how useful they are now: E1 is custom motion, the way every video is made now. E2 and E3 are the older template look. Study them for timing and props, but do not rebuild them as layouts. E4 is a footage overlay.
 
-### E1. Truemission · HKR-261015-3A9P-reel-v2: "health insurance is not enough" (custom motion, 2026-10-15)
+### E1. A regulated insurance brand · "health insurance is not enough" (custom motion, 2026-10-15)
 
 8 scenes, about 103 s at 60 fps, hard cuts between scenes (each scene opens with its own reveal over the previous scene's colour). Scene lengths: 8.9 / 12.1 / 11.8 / 14.8 / 14.9 / 17.6 / 13.9 / 8.7 s. Built as `src/proto/` (`kit.tsx`, `HookProto.tsx`, `scenes.tsx`, `words.json`), not from template visuals.
 
-**Look.** Cream `#F6EDE6`, ink `#140C0B`, red `#AE0001`, dark scene `#1A1110`, muted `#5E5450`, coral `#FF7A6B` for red text on dark. Open Sans 800 (tight, -0.04 to -0.06em) for the big words and numbers, Rubik 500 for lines and labels, Instrument Serif italic for the accent word. Every scene: a slow radial glow drifting on `sin/cos(t)`, coarse paper grain (reseeded every 8 frames so it survives Instagram compression), camera push 1 → 1.04 over the scene, content lowered 70 px.
+**Look** (that brand's palette, from its studio; another brand uses its own). Cream background, near-black ink, one deep red accent, a dark scene colour, a muted grey, and a lighter coral for red text on dark. Open Sans 800 (tight, -0.04 to -0.06em) for the big words and numbers, Rubik 500 for lines and labels, Instrument Serif italic for the accent word. Every scene: a slow radial glow drifting on `sin/cos(t)`, coarse paper grain (reseeded every 8 frames so it survives Instagram compression), camera push 1 → 1.04 over the scene, content lowered 70 px.
 
 **Kit patterns (reuse these):**
 
@@ -179,16 +179,16 @@ const prog = (t, start, dur, easing = Easing.bezier(0.16, 1, 0.3, 1)) =>
 
 **Lessons from its self-critique (apply next time).** The middle drags: scenes 4–6 run 15–18 s against a 75 s script, so write to length and change the background or camera every 4–5 s. Hard cuts between all scenes and one exit style everywhere felt flat: the floods and the five exits above were added for that reason. Red on dark is 2.47:1, so use coral or cream there. Grey source lines at 28 px were 3.36:1, so make them darker. The bottom third (y 1250–1500) was often empty. Fine grain inflated the file to 376 MB and smears on Instagram, so keep it coarse. Scenes 2, 3 and 5 repeated "card slides in + tick + red serif word", so log moves and do not repeat them inside one video.
 
-### E2. Truemission · HKR-261013-TYYC-reel: waiting period 12 → 6 months (template look, 2026-10-14)
+### E2. A regulated insurance brand · waiting period 12 → 6 months (template look, 2026-10-14)
 
 8 scenes, planned at 73.2 s, recorded at about 90 s, 60 fps. Built from `videos/<id>.json` with template visuals (bars, swap, months, split, list, headline, cta). This is the look the creative mandate now replaces. Keep the props and the timing ideas, not the layout (header + headline + one card per scene).
 
-**Look.** Cream `#F9F0EC`, black text, muted `#6F6360`, track `#E6D9D3`, red `#AE0001` as the only accent, white cards, grey pills with white text. Open Sans 800 + Rubik. Headlines enter word by word, 0.06 s apart, each from a 14 px blur. Accent words in red with a marker bar that draws in 0.1 s after the word lands, over 0.35 s. Camera push +2.5% per scene. Centred captions of at most 4 words, each word fading in as it is spoken.
+**Look** (that brand's palette). Cream, black text, a muted grey, a light track colour, one deep red as the only accent, white cards, grey pills with white text. Open Sans 800 + Rubik. Headlines enter word by word, 0.06 s apart, each from a 14 px blur. Accent words in red with a marker bar that draws in 0.1 s after the word lands, over 0.35 s. Camera push +2.5% per scene. Centred captions of at most 4 words, each word fading in as it is spoken.
 
 | Scene | Visual | What moves | Worth reusing |
 |---|---|---|---|
 | 1 Hook | `bars` | Two horizontal bars, the old period (ratio 1) then the new one (ratio 0.5, red). Each grows on its spoken phrase; a snip sound lands 0.4 s before the second | Comparing two durations as bar lengths, the change in red |
-| 2 Basis | `swap` | A stat card (the regulation, "6 bulan") with a stamp sound, then on "Dan di Prudential," it swaps for a headline with two accent words | A mid-scene swap on a spoken phrase, instead of a new scene |
+| 2 Basis | `swap` | A stat card (the regulation, "6 bulan") with a stamp sound, then on "Dan di <insurer>," it swaps for a headline with two accent words | A mid-scene swap on a spoken phrase, instead of a new scene |
 | 3 Until now | `months`, calendar | A 12-cell calendar card, all grey: the whole first year is waiting | The calendar as a time container |
 | 4 From December | `months`, calendar + notes | The same calendar, now staged: months 1–6 grey, 7–11 marked 25%, month 12 marked 100%. Each group lights on its phrase, with a rising piano scale as the months light up, then a riser into month 12 and a ding | **Before/after on the same prop across two scenes**: the viewer sees the rule change, not two charts |
 | 5 Illustration | `split` | A total ("Ilustrasi", a round example) as one grey block that **splits into 4 parts** (gaps grow, corners round), then only the first part fades to red. A swatch legend: kept vs not paid | Showing a share as a block that splits, then colouring the share |
@@ -198,11 +198,11 @@ const prog = (t, start, dur, easing = Easing.bezier(0.16, 1, 0.3, 1)) =>
 
 Sound for this video was a "dramatic" palette with booms muted after review (the author found low hits disturbing). Whooshes start from scene 2; the voice opens the video.
 
-### E3. Gwenchana · ChatGPT Ads reels: teaser + phases 1–3 (template look, 2026-10-12)
+### E3. A marketing agency · ad-platform tutorial reels: teaser + phases 1–3 (template look, 2026-10-12)
 
 Four English reels for a free guide, 30 fps, plain Remotion (`src/reels/*.tsx`, one React component per scene, cues found by phrase in the voiceover). An older generation: one header, one headline and one card stack per scene.
 
-**Look.** Obsidian `#1E1E1E` / `#2F2F2F` / `#3D3D3D`, white, grey `#9A9A9A`, citron `#ECCE22` as a rationed accent, paper `#F4F4F2` for light UI panels. Montserrat 400–800 for everything, JetBrains Mono for event names and code. Every element: fade plus a 28 px rise over 0.36 s (`Appear`), no bounce. A citron outline and tint **switch on** around the thing that matters (`Highlight`, with a click sound).
+**Look** (that brand's palette). Three near-black greys, white, a mid grey, one citron accent used sparingly, an off-white paper for light UI panels. Montserrat 400–800 for everything, JetBrains Mono for event names and code. Every element: fade plus a 28 px rise over 0.36 s (`Appear`), no bounce. A citron outline and tint **switch on** around the thing that matters (`Highlight`, with a click sound).
 
 ```tsx
 // cue frame from a phrase in the voiceover (character offset → word time from the transcript)

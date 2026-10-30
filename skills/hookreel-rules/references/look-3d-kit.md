@@ -5,6 +5,8 @@ Two looks besides custom motion, chosen per project in the brief (`Look:`):
 - **`3d dialog`**: two 3D characters talk in a 3D place (a night bedroom, a park), with a laptop screen they can point at. Voiced dialogue, one-line subtitles, music, sound effects, lighting that follows the mood.
 - **`3d toons`**: the same two characters stand flat at the bottom edges of a video the user already has (a phone or PC screen recording, portrait 9:16) and explain what is on it, one short sentence per screen, one-word captions.
 
+**Brand-neutral.** The 3D looks (`3d dialog`, `3d toons`), the kit's characters and worlds, and the motion library are neutral tools for any video and any brand; none of them is a default for one brand. Brand specifics (characters modelled on a person, colours, watermark, bans, disclaimers, brand worlds) live only in that brand's private studio and its project `CLAUDE_<CODE>.md`, and reach a video only through them (for example `kit-finish` reads the watermark from the studio passed in).
+
 Hookreel keeps every gate (brief, facts, story + script, prototype, QA, self-critique, publish). The pictures and the sound come from **video-3d-kit** (`github.com/artosku/video-3d-kit`, MIT for its code, characters, worlds and skill files; its `ASSETS_NOTICE.md` lists the rest), installed once as a tool. The kit is called, never copied into this plugin or a studio.
 
 ## The kit
@@ -20,7 +22,7 @@ Hookreel keeps every gate (brief, facts, story + script, prototype, QA, self-cri
 ## Characters
 
 - Each brand gets its **own pair**, made with the kit's `skill/guides/new-character.md` (easy path: shape, three colours, how it talks; `python tools/setup.py preview-character <id>` until the user is happy). They live in `~/.video-3d-kit/characters/<id>/`; keep a copy in the brand's **private** studio (`hookreel-studio/<brand>-studio/characters/3d/<id>/`). Record the pair in `BRAND.md`.
-- A character modelled on a real person (for example the Truemission Lawrence character) only with that person's yes, and only in private folders; never in this plugin or any public repository.
+- A character modelled on a real person (for example a character modelled on the user) only with that person's yes, and only in private folders; never in this plugin or any public repository.
 - **A new place** (a shop, a clinic, an office) goes through the kit's ADVANCED path in `skill/guides/new-world.md` (own `worlds/<id>/world.js` + `world.json`). A world with `features.screen` must give the screen object episode.js expects: `setPage(name, t)`, `page` (the current page name) and **`glow()`**, which episode.js calls every frame; without `glow()`, `preview-world` hangs silently until its timeout. Debug a silent hang with `VIDEO3D_DEBUG=1` and read `out/chrome.log`. A brand world with brand pages (brand colours and fonts, big type) lives in the kit folder and the brand's private studio, never in this plugin.
 - **A place variant of an approved video** (same script, another place): copy `episodes/<slug>/` with its `takes/` to a new slug and set `"world": "<id>"` in the copy's `episode.json` (no `setup.py init`). `build` reuses every take, so it costs no voice credits; redo the shots, pages and stills for the new place.
 - Never in a published video: the kit's `claude` pixel mascot (an unofficial fan model of Anthropic's mascot, for demos only). The `ayam` demo chicken only when the user picks it for that video.
