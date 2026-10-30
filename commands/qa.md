@@ -44,6 +44,7 @@ It writes `out/sheets/<id>/`: `contact-NN.png` (every 0.5 s), `strip-NN.png` (12
 
 ```text
 Status: critique round <n> — [date]
+## Round <n>
 | Criterion | Score | Evidence (sheet, timestamp) |
 | Hook | | first 3 s: does it stop the scroll, is the payoff promised |
 | Phone readability | | phone sheets: every word readable at 360 px, source lines included |
@@ -56,7 +57,7 @@ Status: critique round <n> — [date]
 | # | Problem | Sheet and timestamp | Fix |
 ```
 
-Fix the three biggest problems, run `npm run sheets -- <id>` again and score the new sheets in a new round (the file keeps every round). `npm run sheets -- <id> --gate <project>/07a-critique-<id>.md` passes only when every criterion is 8 or more on sheets made after the last code change. Run it before Step 2; a full render does not start on a failed gate (an assemble after the sheets counts as a change: assemble first, then the sheets). Three rounds at most: still under 8 after the third, send the sheets and scores to the user and ask.
+Fix the three biggest problems, run `npm run sheets -- <id>` again and score the new sheets in a new round under a `## Round <n>` heading (the file keeps every round; the gate reads only the round with the highest n, so older score tables can stay as they are). `npm run sheets -- <id> --gate <project>/07a-critique-<id>.md` passes only when every criterion is 8 or more on sheets made after the last code change. Run it before Step 2; a full render does not start on a failed gate (an assemble after the sheets counts as a change: assemble first, then the sheets). Three rounds at most: still under 8 after the third, send the sheets and scores to the user and ask.
 
 **Close every open item before the render leaves the studio.** The "Open before posting" list is not a to-do for later: a deferred length decision ships as the shipped length. HKR-261019-Y6VQ carried `decide on the length: 92 s against ~75 s` into the post, and the 17 extra seconds pushed the keyword ask to 88 % of the runtime, past almost the whole audience. Every item is either done, or the reason it is dropped is written in the file.
 

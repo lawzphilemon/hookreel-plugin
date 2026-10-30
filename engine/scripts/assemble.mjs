@@ -22,8 +22,9 @@ import { pcm } from "./vo-audio.mjs";
 export const ENGINE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const r3 = (n) => Math.round(n * 1000) / 1000;
 export const key = (scene) => `s${scene}`;
-// The clips are levelled for a stereo mix; at 0.8 a typical take lands near -16.5 LUFS with music and effects.
-export const VO_GAIN = 0.8;
+// The clips are levelled to -16 LUFS for a stereo mix; at 0.9 (-0.9 dB) the mix with music and effects
+// lands near -16.7 LUFS. `voiceGain` in videos/<id>.json overrides it for one video (a take that is off).
+export const VO_GAIN = 0.9;
 
 // Scene layout on the video timeline: [{ id, start, secs }] and the total length, in seconds.
 export const layout = (words) => {
@@ -121,13 +122,13 @@ export const watermarkHtml = (wm, { scenes, total }) => {
   };
 };
 
-export const rootHtml = (id, { scenes, total }, music, voiced = true, wm = null) => {
+export const rootHtml = (id, { scenes, total }, music, voiced = true, wm = null, voGain = VO_GAIN) => {
   const mark = watermarkHtml(wm, { scenes, total });
   const hosts = scenes
     .map((s, i) => `      <div id="${key(s.id)}" data-composition-id="${key(s.id)}" data-composition-src="compositions/${s.id}.html" data-start="${s.start}" data-duration="${s.secs}" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: ${i + 1}"></div>`)
     .join("\n");
   const vo = (voiced ? scenes : [])
-    .map((s) => `      <audio id="vo-${s.id}" class="clip" data-start="${r3(s.start + TIME.leadIn)}" data-track-index="2" data-volume="${VO_GAIN}" src="assets/vo/${s.id}.wav"></audio>`)
+    .map((s) => `      <audio id="vo-${s.id}" class="clip" data-start="${r3(s.start + TIME.leadIn)}" data-track-index="2" data-volume="${voGain}" src="assets/vo/${s.id}.wav"></audio>`)
     .join("\n");
   const bed = music ? `\n      <audio id="music" class="clip" data-start="0" data-duration="${total}" data-track-index="3" data-volume="1" src="assets/music.wav"></audio>` : "";
   return `<!doctype html>
@@ -191,7 +192,9 @@ const main = (id) => {
     if (fs.existsSync(src)) copy(src, path.join(assets, wm.src));
     else errors.push(`watermark not found: ${src}`);
   }
-  fs.writeFileSync(path.join(dir, "index.html"), rootHtml(id, plan, musicSrc, voiced, wm));
+  const voGain = video.voiceGain ?? VO_GAIN;
+  if (!(voGain > 0 && voGain <= 2)) errors.push(`voiceGain ${video.voiceGain} in videos/${id}.json: use a number above 0, at most 2`);
+  fs.writeFileSync(path.join(dir, "index.html"), rootHtml(id, plan, musicSrc, voiced, wm, voGain));
   errors.forEach((e) => console.error(`error: ${e}`));
   if (errors.length) process.exit(1);
   console.log(`assembled reels/${id}: ${plan.scenes.length} scenes, ${plan.total} s${voiced ? "" : " (no voiceover yet)"}${musicSrc ? ", music ducked" : ""}${wm?.src ? `, watermark ${wm.mode ?? WATERMARK.mode}` : video.watermark === "off" ? ", watermark off (videos json)" : ""}`);
@@ -210,6 +213,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const tiled = rootHtml("x", plan, null, true, { src: "brand/logo.png" });
     if ((tiled.match(/assets\/brand\/logo\.png/g) || []).length < 20 || !tiled.includes(`}, ${plan.scenes[1].start});`)) throw new Error("self-test watermark tile");
     if (rootHtml("x", plan, null, true, null).includes('id="wm"')) throw new Error("self-test watermark off");
+    if (!rootHtml("x", plan, null, true, null, 1.2).includes('data-volume="1.2" src="assets/vo/')) throw new Error("self-test voiceGain");
     console.log("self-test ok");
   } else if (!id) {
     console.error("Usage: node scripts/assemble.mjs <video id>");

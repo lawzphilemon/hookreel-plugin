@@ -66,9 +66,19 @@ export const loudness = (file) => {
 // One fixed gain to -16 LUFS for the whole take, with a look-ahead peak limiter at -3.5 dBFS (about
 // -3 dBTP) on the loudest syllables. Single-pass loudnorm is dynamic instead: it lifts the
 // room noise before the first word by 30 dB, heard as a burst when the first clip starts.
+// The limiter takes back about 1 dB on a peaky take (an ElevenLabs take landed at -17.1), so the
+// residual is measured and applied again, up to three passes, until the take is within 0.2 dB.
 export const level = (file, lufs = -16, ceilingDb = -3.5) => {
+  for (let pass = 0; pass < 3; pass++) {
+    const off = lufs - loudness(file);
+    if (pass && Math.abs(off) <= 0.2) break;
+    limitTo(file, off, ceilingDb);
+  }
+};
+
+const limitTo = (file, offDb, ceilingDb) => {
   const w0 = pcm(file);
-  const gain = 10 ** ((lufs - loudness(file)) / 20), ceiling = 32767 * 10 ** (ceilingDb / 20);
+  const gain = 10 ** (offDb / 20), ceiling = 32767 * 10 ** (ceilingDb / 20);
   const look = Math.round(w0.rate * 0.005), release = 1 - Math.exp(-1 / (w0.rate * 0.08));
   const g = new Float32Array(w0.n).fill(1);
   for (let i = 0; i < w0.n; i++) {

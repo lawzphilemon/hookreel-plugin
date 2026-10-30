@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "HOOKREEL short video pipeline plugin for Claude Code",
-    "version": "0.18.1"
+    "version": "0.18.2"
   },
   "plugins": [
     {
       "name": "hookreel",
       "source": "./",
       "description": "Interview-to-video pipeline for short vertical videos for any brand: interview and project CLAUDE.md, fact gate, HookLab story, reviewed script, then new custom motion design per video invented from your reference reels (prototype scene approved first) on a 30 fps HyperFrames toolkit. Made by Lawrence Philemon for personal use; not for sale.",
-      "version": "0.18.1",
+      "version": "0.18.2",
       "author": {
         "name": "Lawrence Philemon"
       },

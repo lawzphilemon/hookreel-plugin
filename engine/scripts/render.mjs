@@ -42,4 +42,4 @@ const mix = path.join("out", `${id}-mix.wav`);
 execSync(`ffmpeg -y -loglevel error -i "${mp4}" -vn -ac 2 -ar 48000 -c:a pcm_s16le "${mix}"`, { stdio: "inherit" });
 const r = measure(readWav(fs.readFileSync(mix)));
 console.log(`rendered ${mp4} in ${minutes} min: ${got} frames | mix ${r.integrated.toFixed(1)} LUFS, true peak ${r.truePeak.toFixed(2)} dBTP`);
-if (r.truePeak > -0.5 || r.integrated > -15 || r.integrated < -18) console.log("warn: mix outside -16 to -17 LUFS / -0.5 dBTP: adjust data-volume on the voice, music or effects and render again");
+if (r.truePeak > -0.5 || r.integrated > -15 || r.integrated < -18) console.log("warn: mix outside -16 to -17 LUFS / -0.5 dBTP: set voiceGain in videos/<id>.json (default 0.9; +1 dB = x1.12), or data-volume on the music or effects, and render again");
