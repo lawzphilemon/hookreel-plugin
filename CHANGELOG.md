@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.18.2 — 2026-10-30
+
+Six fixes from the Truemission reel HKR-261030-K7RD, each of which needed a manual workaround.
+
+- `npm run tts` no longer calls `scripts/register-videos.mjs`, a file an engine studio does not have. It used to exit 1 after the clips were written.
+- `tts.prefix` in `videos/<id>.json` now works with `eleven_v3` and `eleven_v4`. The audio tag goes in front of the take, and its characters are dropped from the alignment before the cut, so the word times do not move. Other models skip the prefix with a warning, because they would read it aloud. The prefix is part of the cache hash.
+- Loudness: `level()` (used by `tts` and `vo`) measures again after the peak limiter and applies the remaining gain, up to three passes. The K7RD take landed at -17.1 LUFS before this fix and at -16.1 after it. `VO_GAIN` goes from 0.8 to 0.9, so -16 LUFS clips mix near -16.7 LUFS. `"voiceGain"` in `videos/<id>.json` overrides it for one video. The render warning names the setting.
+- `kit.css` has a `.hr-screen` class (absolute, inset 0, pointer-events none, `z-index: 10`) for the text layer. The scene contract in `hookreel-rules` and `/hookreel:build` now puts every text, label and source line in it, after the `HR.camera` world. In K7RD, transformed props painted over the text in 3 of 8 scenes.
+- `npm run sheets -- <id> --gate` reads only the newest round: the `## Round <n>` section with the highest n, or else the first table after `Status:`. Older rounds can keep their score tables. The `07a` template in `/hookreel:qa` now has the `## Round <n>` heading.
+- Template `update-engine` works on npm 12 when `~/.npmrc` sets `allow-scripts`. `npm run` passed that setting to the child npm as `npm_config_allow_scripts`, which npm 12 refuses with `EALLOWSCRIPTS`. The script now removes the variable before it installs. Existing studios: copy the template's `update-engine` script into `package.json` (`/hookreel:build` says so too).
+
 ## 0.18.1 — 2026-10-29
 
 Finished files now live with the project, not only in the studio.

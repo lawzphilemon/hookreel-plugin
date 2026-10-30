@@ -8,7 +8,7 @@
 //   2. levels the take for the stereo mix (-16 LUFS, peak limiter; the same as prepare-vo.mjs),
 //   3. cuts it at the middle of the silence between the last character of one scene and the first of
 //      the next, and writes public/vo/<id>/<scene>.wav plus <scene>.words.json from the character times,
-//   4. runs the pace gate (scripts/pace.mjs) and registers the clips. Then `npm run words -- <id>`.
+//   4. runs the pace gate (scripts/pace.mjs). Then `npm run words -- <id>`.
 //
 // Numbers and abbreviations: put the spoken form in the scene's `say`, as {shown|spoken} spans, e.g.
 //   "vo":  "Klaim Rp900 juta dibayar."
@@ -19,12 +19,14 @@
 // videos/<id>.json, or ELEVENLABS_VOICE_ID; there is no fallback voice on purpose (only the
 // account owner's own or a licensed voice). Model: --model, `tts.model`, ELEVENLABS_MODEL_ID, else
 // eleven_multilingual_v2. `tts.settings` is passed as voice_settings (e.g. { "stability": 0.5, "speed": 1 }).
+// `tts.prefix` (eleven_v3 and eleven_v4 only, e.g. "[warm, calm, like explaining to a friend]") is an
+// audio tag put in front of the take; its characters are dropped from the alignment before the cut, so
+// the word times do not move. Other models would read the tag aloud, so it is skipped there with a warning.
 // The take and its character times are cached in out/<id>-tts.*: an unchanged script costs no credits.
 // --dry prints what would be sent and spends nothing.
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 import { splitWords } from "../src/align.mjs";
 import { TIME } from "../src/motion.mjs";
@@ -63,6 +65,18 @@ export const charTimes = (spoken, alignment) => {
   return { start: (i) => at(i, "character_start_times_seconds"), end: (i) => at(i, "character_end_times_seconds") };
 };
 
+// The prefix's characters at the head of the alignment, removed so it lines up with the script text
+// again. An alignment that already leaves the tag out is returned unchanged.
+export const dropPrefix = (alignment, head) => {
+  if (!head || !alignment.characters.join("").startsWith(head)) return alignment;
+  const n = head.length;
+  return {
+    characters: alignment.characters.slice(n),
+    character_start_times_seconds: alignment.character_start_times_seconds.slice(n),
+    character_end_times_seconds: alignment.character_end_times_seconds.slice(n),
+  };
+};
+
 // Clip ranges and word fragments for every scene of the take. `parts` = parseSay per scene, `offsets` =
 // where each scene's spoken text starts in the take, `total` = take length in seconds.
 export const cutTake = (parts, offsets, times, total) => {
@@ -89,6 +103,9 @@ const main = async (reelId, argv) => {
   const voice = opt("--voice") ?? video.tts?.voice ?? process.env.ELEVENLABS_VOICE_ID;
   const model = opt("--model") ?? video.tts?.model ?? process.env.ELEVENLABS_MODEL_ID ?? "eleven_multilingual_v2";
   const settings = video.tts?.settings;
+  const tags = /^eleven_v[34]/.test(model);
+  if (video.tts?.prefix && !tags) console.warn(`warn: tts.prefix skipped: ${model} reads audio tags aloud (eleven_v3 or eleven_v4 only)`);
+  const head = video.tts?.prefix && tags ? `${video.tts.prefix} ` : "";
 
   const parts = scenes.map((s) => parseSay(s.say ?? s.vo));
   const offsets = [];
@@ -101,13 +118,13 @@ const main = async (reelId, argv) => {
   console.log(`${reelId}: ${scenes.length} scenes, ${text.length} characters, model ${model}, voice ${voice ?? "(none)"}`);
   if (!voice) throw new Error("No voice: set tts.voice in videos/<id>.json, ELEVENLABS_VOICE_ID in .env.local, or pass --voice <id>.");
   if (argv.includes("--dry")) {
-    console.log(`\n--dry: nothing sent.\n${text}`);
+    console.log(`\n--dry: nothing sent.\n${head}${text}`);
     return;
   }
 
   // Cached take: the same text, voice, model and settings cost nothing the second time.
   fs.mkdirSync("out", { recursive: true });
-  const hash = crypto.createHash("sha1").update(JSON.stringify({ text, voice, model, settings })).digest("hex").slice(0, 12);
+  const hash = crypto.createHash("sha1").update(JSON.stringify({ text, voice, model, settings, ...(head ? { head } : {}) })).digest("hex").slice(0, 12);
   const cacheFile = path.join("out", `${reelId}-tts.json`);
   const takeFile = path.join("out", `${reelId}-tts.mp3`);
   let cached = fs.existsSync(cacheFile) ? JSON.parse(fs.readFileSync(cacheFile, "utf8")) : null;
@@ -116,7 +133,7 @@ const main = async (reelId, argv) => {
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}/with-timestamps?output_format=mp3_44100_128`, {
       method: "POST",
       headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY, "content-type": "application/json" },
-      body: JSON.stringify({ text, model_id: model, ...(settings ? { voice_settings: settings } : {}) }),
+      body: JSON.stringify({ text: head + text, model_id: model, ...(settings ? { voice_settings: settings } : {}) }),
     });
     if (!res.ok) throw new Error(`ElevenLabs ${res.status}: ${(await res.text()).slice(0, 300)}`);
     const body = await res.json();
@@ -130,7 +147,7 @@ const main = async (reelId, argv) => {
   const take = path.join("out", `${reelId}-tts.wav`);
   ffmpeg(`-i "${takeFile}" -ac 2 -ar 48000 -c:a pcm_s16le "${take}"`);
   level(take);
-  const cuts = cutTake(parts, offsets, charTimes(text, cached.alignment), duration(take));
+  const cuts = cutTake(parts, offsets, charTimes(text, dropPrefix(cached.alignment, head)), duration(take));
 
   const outDir = path.join("public", "vo", reelId);
   fs.mkdirSync(outDir, { recursive: true });
@@ -151,7 +168,6 @@ const main = async (reelId, argv) => {
     process.exit(1);
   }
   console.log(`\n${pace.message}`);
-  execSync("node scripts/register-videos.mjs", { stdio: "inherit" });
   console.log(`\nNext: npm run words -- ${reelId}`);
 };
 
@@ -173,6 +189,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (JSON.stringify(got) !== JSON.stringify([["Klaim", "Rp900 juta", "dibayar."], ["Cek", "polis."]])) throw new Error(`self-test words: ${JSON.stringify(got)}`);
     if (!(cuts[0].end <= cuts[1].start && cuts[0].end > cuts[0].words[2].end)) throw new Error(`self-test cut: ${JSON.stringify(cuts.map((c) => [c.start, c.end]))}`);
     if (cuts[1].words[0].start < 0 || cuts[0].words[1].start <= cuts[0].words[0].start) throw new Error("self-test times");
+    // A prefix in the alignment: dropped, the same cuts as without it; absent: unchanged.
+    const head = "[warm, calm] ";
+    const late = { characters: alignment.characters }; // the same take, 1.5 s later behind the tag
+    for (const k of ["character_start_times_seconds", "character_end_times_seconds"]) late[k] = alignment[k].map((x) => x + 1.5);
+    const tagged = { characters: [...head, ...late.characters] };
+    for (const k of ["character_start_times_seconds", "character_end_times_seconds"]) tagged[k] = [...[...head].map((_, i) => i * 0.1), ...late[k]];
+    const words = (a) => JSON.stringify(cutTake(parts, [0, text.indexOf("Cek")], charTimes(text, a), 10).map((c) => c.words));
+    if (words(dropPrefix(tagged, head)) !== words(late)) throw new Error("self-test prefix");
+    if (dropPrefix(alignment, head) !== alignment) throw new Error("self-test prefix absent");
     console.log("self-test ok");
   } else if (!argv[0] || argv[0].startsWith("--")) {
     console.error("Usage: node scripts/tts-vo.mjs <video id> [--dry] [--voice <id>] [--model <id>] [--allow-drift]");

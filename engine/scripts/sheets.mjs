@@ -16,6 +16,7 @@
 // --gate reads the scored critique (/hookreel:qa Step 1b) and fails unless it is newer than the sheets,
 // the sheets are newer than every file in reels/<id>/, and every criterion scores 8 or more:
 //   | Hook | 8 | …   one table row per criterion in CRITERIA, the score in the second column.
+// Only the newest round counts: the `## Round <n>` section with the highest n, else the first table after `Status:`.
 import fs from "fs";
 import path from "path";
 import { spawnSync } from "child_process";
@@ -70,6 +71,24 @@ export const readScores = (md) => {
   return scores;
 };
 
+// Only the newest round is scored, since the file keeps every round: the `## Round <n>` section with
+// the highest n, wherever it sits; without round headings, the first table after the `Status:` line.
+export const newestRound = (md) => {
+  const rounds = [...md.matchAll(/^##\s+Round\s+(\d+)/gim)];
+  if (rounds.length) {
+    const top = rounds.reduce((a, b) => (Number(b[1]) > Number(a[1]) ? b : a));
+    const rest = md.slice(top.index + top[0].length);
+    const next = rest.search(/^##\s/m);
+    return next < 0 ? rest : rest.slice(0, next);
+  }
+  const lines = md.split(/\r?\n/);
+  let i = Math.max(0, lines.findIndex((l) => /^Status:/i.test(l)));
+  while (i < lines.length && !lines[i].trim().startsWith("|")) i++;
+  const table = [];
+  while (i < lines.length && lines[i].trim().startsWith("|")) table.push(lines[i++]);
+  return table.join("\n");
+};
+
 const newest = (files) => Math.max(0, ...files.map((f) => fs.statSync(f).mtimeMs));
 
 const gate = (id, critique) => {
@@ -82,7 +101,7 @@ const gate = (id, critique) => {
   if (!fs.existsSync(critique)) errors.push(`${critique} not found`);
   else {
     if (sheets.length && fs.statSync(critique).mtimeMs < newest(sheets)) errors.push("the critique is older than the sheets: score the current sheets");
-    const scores = readScores(fs.readFileSync(critique, "utf8"));
+    const scores = readScores(newestRound(fs.readFileSync(critique, "utf8")));
     for (const c of CRITERIA) {
       if (scores[c] === undefined) errors.push(`no score for "${c}"`);
       else if (scores[c] < PASS) errors.push(`${c}: ${scores[c]} (needs ${PASS}+)`);
@@ -192,6 +211,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const md = "| Criterion | Score |\n|---|---|\n| Hook | 9 |\n| phone readability | 7 |";
     const s = readScores(md);
     if (s.Hook !== 9 || s["Phone readability"] !== 7) throw new Error(`self-test scores: ${JSON.stringify(s)}`);
+    // Round 1's 7 must not fail a passing round 2, whether the newest round is on top or at the bottom.
+    const r1 = "## Round 1\n| Hook | 7 |\n", r2 = "## Round 2\n| Hook | 9 |\n";
+    for (const doc of [`Status: round 2\n${r2}\n## Three problems\n| Hook | 3 |\n${r1}`, `Status: round 2\n${r1}${r2}`])
+      if (readScores(newestRound(doc)).Hook !== 9) throw new Error(`self-test newest round: ${doc}`);
+    if (readScores(newestRound("Status: x\n\n| Hook | 9 |\n\nold:\n| Hook | 6 |")).Hook !== 9) throw new Error("self-test first table");
     console.log("self-test ok");
   } else if (!argv[0] || argv[0].startsWith("--")) {
     console.error("Usage: node scripts/sheets.mjs <video id> [--gate <critique.md>]");

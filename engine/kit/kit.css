@@ -24,6 +24,10 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
 /* full-bleed layer */
 .hr-fill { position: absolute; inset: 0; }
 
+/* the screen layer: text, labels and source lines outside HR.camera. z-index 10 keeps it above the world,
+   whose transformed props open their own stacking contexts and otherwise paint over later siblings */
+.hr-screen { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+
 /* film grain: a fixed noise tile; HR.grain() steps its position, so every frame is a function of time */
 .hr-grain {
   position: absolute; inset: -64px; pointer-events: none; mix-blend-mode: overlay;
