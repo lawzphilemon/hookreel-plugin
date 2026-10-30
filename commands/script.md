@@ -12,6 +12,8 @@ allowed-tools: Read, Write, Edit
 
 ## Step 1 — Voiceover lines
 
+**3D looks** (`3d dialog`, `3d toons`): the script is a dialogue between the brand's two characters, one table per video (`# · who · line`, 3–8 words a line), written and turned into the kit episode as `references/look-3d-kit.md` of the `hookreel-rules` skill says; Step 2 sketches what the laptop screen (dialog) or the recording (toons) shows per line. Every other rule below still applies.
+
 Scene 1 uses the **recommended hook** from `03-story.md` unless the user already picked another. One scene per beat. For each scene write the line exactly as it will be spoken:
 - Written for the ear: short sentences, one idea per sentence, 10–30 words per scene.
 - Numbers written the way they are said where it matters ("900 million", "September 24"), and only numbers from the allowed claims.

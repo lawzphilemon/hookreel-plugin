@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.19.0 — 2026-10-30
+
+Two new looks besides custom motion, made with [video-3d-kit](https://github.com/artosku/video-3d-kit) (MIT code) as an external tool in `~/.video-3d-kit`. Hookreel calls it and never copies it.
+
+- `3d dialog`: two 3D characters talk in a 3D place, with voiced dialogue, subtitles, music and lighting that follows the mood. `3d toons`: the same characters stand over a screen recording and explain it.
+- Chosen in the brief (`Look:`). Every gate stays: facts, the script approval, the prototype (now the kit's stills contact sheet), QA, the self-critique and publish. The script becomes a dialogue table.
+- `skills/hookreel-rules/references/look-3d-kit.md`: kit setup, the per-brand character pair, the stage-by-stage mapping, evidence in a 3D video (source lines on the laptop screen, disclaimers on the last line or end card), and the open sound licence question for the kit's sound effects.
+- Never in a published video: the kit's `claude` pixel mascot (an unofficial fan model of Anthropic's mascot).
+
 ## 0.18.2 — 2026-10-30
 
 Six fixes from the Truemission reel HKR-261030-K7RD, each of which needed a manual workaround.

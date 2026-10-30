@@ -156,6 +156,8 @@ Rules:
 
 Safe area for 1080×1920: keep text inside x 80–1000 and above y ≈ 1500; the platform UI covers the bottom ~420 px and the right edge. Key words large (headlines at least 84 px), supporting text at least 32 px, source lines at least 26 px.
 
+**3D looks (chosen in the brief).** `3d dialog` (two 3D characters talking in a 3D place) and `3d toons` (the characters over a screen recording) are made with video-3d-kit, an external tool in `~/.video-3d-kit`, called and never copied. Every gate, evidence rule and ban stays; the custom motion rules above do not apply. Read `references/look-3d-kit.md` before the script of a 3D video.
+
 **Template look (only on request).** The data-driven template stays available in the legacy Remotion template (`template-remotion/`, a Remotion studio) when the user explicitly asks for it: `videos/<id>.json` visuals, `references/visual-catalog.md`, the `clean` and `playful` styles, `npm run storyboard`.
 
 ## Private library (optional)

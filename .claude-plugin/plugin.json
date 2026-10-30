@@ -1,7 +1,7 @@
 {
   "name": "hookreel",
   "displayName": "HOOKREEL Short Video Pipeline",
-  "version": "0.18.2",
+  "version": "0.19.0",
   "description": "Interview-to-video pipeline for short vertical videos (Reels, TikTok, Shorts) for any brand with its own context profile, in four stops: /hookreel:make runs a one-message brief, auto-checked facts, a HookLab story and script approved together, one prototype scene, then the rest in one run (every scene, ElevenLabs voice with exact word times or a recording, loudness, a scored critique loop on stills, render, QA, self-critique, covers and caption). Each video gets new custom motion invented from the user's reference reels, rendered with HyperFrames (HTML + GSAP, frame = f(t)); plus photo carousels from a source post. Made by Lawrence Philemon for personal use; not for sale.",
   "author": {
     "name": "Lawrence Philemon"

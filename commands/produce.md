@@ -11,6 +11,8 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Agent, Skill
 
 Argument: $ARGUMENTS (the video id, and the path of a recording if there is one).
 
+**3D looks** (`Look: 3d dialog` or `3d toons`): run in `~/.video-3d-kit` instead of the studio. Steps 1–4 become the kit's render and hookreel's checks as `references/look-3d-kit.md` of the `hookreel-rules` skill says (`video <slug>` in the background, the checklist on frames from the MP4, `deliver <slug>`); Steps 5–6 and the stops stay as written.
+
 ## Step 0 — Gates
 
 Stop and say which is missing unless all hold:

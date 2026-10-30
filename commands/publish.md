@@ -31,7 +31,7 @@ Write each variant as a still HyperFrames page, `reels/<id>-cover-<n>/index.html
 npm run cover -- <id>
 ```
 
-This copies the kit and every `public/` file the pages name into their `assets/`, and writes `out/<id>-cover-<n>.png` (1080×1920) and `out/<id>-cover-<n>-grid.png`, the centre 1080×1440 that Instagram's profile grid shows (3:4; 240 px off the top and bottom). Read every grid preview: nothing cut off, nothing broken mid-word, text fits. In a Remotion studio (before 0.18.0) without the HyperFrames tooling, covers stay `cover` in `videos/<id>.json` (`CoverSpec` in its `src/schema.ts`).
+This copies the kit and every `public/` file the pages name into their `assets/`, and writes `out/<id>-cover-<n>.png` (1080×1920) and `out/<id>-cover-<n>-grid.png`, the centre 1080×1440 that Instagram's profile grid shows (3:4; 240 px off the top and bottom). Read every grid preview: nothing cut off, nothing broken mid-word, text fits. A 3D look has no HyperFrames project: draw the cover over a kit still (`stills <slug> --at <s>`) in a cover page of the brand's studio, or crop and letter the still with ffmpeg when the brand has no studio. In a Remotion studio (before 0.18.0) without the HyperFrames tooling, covers stay `cover` in `videos/<id>.json` (`CoverSpec` in its `src/schema.ts`).
 
 ## Step 2 — Caption
 

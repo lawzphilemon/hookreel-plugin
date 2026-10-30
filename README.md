@@ -93,6 +93,8 @@ When the template look is chosen (a Remotion studio from `template-remotion/`), 
 
 Videos render with [HyperFrames](https://github.com/heygen-com/hyperframes) by HeyGen (Apache-2.0); older studios and the template look use [Remotion](https://www.remotion.dev).
 
+**3D looks.** `3d dialog` (two 3D characters talking) and `3d toons` (the characters over a screen recording) are made with [video-3d-kit](https://github.com/artosku/video-3d-kit) (MIT code), installed once in `~/.video-3d-kit` and called by the build; every hookreel gate stays. See `skills/hookreel-rules/references/look-3d-kit.md`.
+
 Breakdowns of past videos (scene by scene, with code patterns): `skills/hookreel-rules/references/motion-library.md` → E. Past work.
 
 The pause trim, the retention lint and the register rule (threat → photoreal, screen → real screenshot, concept → drawn; never fake a UI) are adapted from ideas in [Hyperframe Pro](https://github.com/buildwithhanif/hyperframe-pro) (MIT), rewritten for hookreel and recorded voiceovers.
