@@ -33,6 +33,7 @@ const COMMANDS = {
   sweep: ["sheets", "--sweep"],
   preview: ["preview"],
   cover: ["covers"],
+  "kit-finish": ["kit-finish"],
 };
 
 const [cmd, ...args] = process.argv.slice(2);

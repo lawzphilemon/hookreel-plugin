@@ -29,7 +29,7 @@ Ask **once**, in **one message**, at most **six** numbered questions, and only w
 2. Audience and awareness: who watches, and how much do they know? (never heard of it / know it, don't use it / already use it)
 3. Sources and numbers: source material (guide, report, PDF, link, own experience), and every number to show with where it comes from.
 4. Proof and must-not-claim: own experience or a client's (named? results allowed?), and anything that must not be claimed or shown (results, prices, client names, competitors, regulated claims).
-5. Call to action: the exact action (comment a keyword, link in bio, DM, page) and what the viewer gets.
+5. Call to action: the exact action (comment a keyword, link in bio, DM, page) and what the viewer gets. Pre-fill the end card from `BRAND.md`. When its disclaimer names one product (for example "<product summary> <product name>") and the topic spans several products, default to a product-neutral line that points to the viewer's own documents (an Indonesian insurance brand, for example: "Manfaat sesuai ketentuan polis. Detail di polis dan RIPLAY produkmu."), and show it in the brief as a default to change.
 6. Reference reels: the reels whose look you want (files or links) and what to take from each. None: say so, and I propose a direction from a few public examples. (Template infographic look only if asked: clean, or playful with AI 3D cartoon characters.) For a 3D look (`3d dialog`: two 3D characters talking; `3d toons`: the characters over a screen recording), ask instead for the brand's character pair and place (dialog) or the video to explain (toons); see `references/look-3d-kit.md` of the `hookreel-rules` skill.
 
 Anything that becomes a claim on screen (numbers, sources, proof, must-not-claim) stays among the questions while it is unknown; never fill it with a default.
@@ -43,7 +43,7 @@ Anything that becomes a claim on screen (numbers, sources, proof, must-not-claim
 
 In the **same message**, below the questions, show the brief as it will be saved (Step 3 format) with every default filled in and every open field marked `[Q1]`, `[Q2]`…, headed "Reply to change any line." List which questions you skipped and why in one line.
 
-The user's answer **is** the confirmation: apply the answers and any changed lines, then go on to Step 3 without asking again. Ask a follow-up only when an answer leaves a claim on screen still unknown or contradicts the profile's hard rules.
+The user's answer **is** the confirmation: apply the answers and any changed lines, then go on to Step 3 without asking again. A short reply ("ok", "setuju") that leaves questions unanswered confirms their defaults: record each one in `DECISIONS.md` ("Q5 unanswered at stop 1, default used: …") and list them at the top of the next stop's message, so the user sees what was assumed. Ask a follow-up only when an answer leaves a claim on screen still unknown or contradicts the profile's hard rules.
 
 ## Step 3 — Project code, folder and brief
 
@@ -51,7 +51,7 @@ The user's answer **is** the confirmation: apply the answers and any changed lin
 
 **Slug.** A short kebab-case name for humans (for example `chatgpt-ads-wa`), proposed in the Step 2 message; the user may change it in the same reply.
 
-**Folder.** Everything for this project lives in `<project>` = `hookreel-output/<CODE>_<slug>/`. Nothing is ever written outside it except the studio (at build).
+**Folder.** Everything for this project lives in `<project>` = `hookreel-output/<CODE>_<slug>/`, under the output root (`hookreel-output/` by default, or the root the workspace `CLAUDE.md` names; see `hookreel-rules` → Project codes). A workspace that keeps finished work elsewhere (for example `Work/Results/Video/`) names it once there. Nothing is ever written outside it except the studio (at build).
 
 **Video ids.** Every video id is `<CODE>-<name>` (for example `HKR-261012-7QF3-teaser`), so two projects for the same brand never collide in one studio, in `public/vo/`, or in rendered file names.
 

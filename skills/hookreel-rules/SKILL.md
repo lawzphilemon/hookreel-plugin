@@ -51,6 +51,7 @@ Many users run this on plans with a limited token budget. Save tokens without cu
 
 - Every project gets a unique code at `/hookreel:brief`: `HKR-YYMMDD-XXXX` (date plus four characters from `23456789ABCDEFGHJKMNPQRSTVWXYZ`).
 - The code is in every name that must stay findable and must never collide: the project folder `<project>` = `hookreel-output/<CODE>_<slug>/`, the rulebook `CLAUDE_<CODE>.md`, the studio file `CLAUDE_<CODE>.md`, every video id `<CODE>-<name>` (so compositions, `videos/<id>.json`, `public/vo/<id>/`, storyboards and `out/<id>.mp4` all carry it).
+- **Output root.** `hookreel-output/` in every hookreel file means the output root: `hookreel-output/` in the working directory by default, or the folder the workspace names instead (a line `hookreel output root: <path>` in the workspace `CLAUDE.md`, or the user's answer at stop 1, then written there). `PROJECTS.md` and every project folder live in it; `/hookreel:resume` searches it.
 - Claude Code auto-loads only files named `CLAUDE.md`, so each folder's `CLAUDE.md` imports the coded files with `@CLAUDE_<CODE>.md` lines. Never delete another project's import line or coded file.
 - `/hookreel:resume <CODE>` reopens a project; editing a stage marks every later stage `needs re-approval`.
 

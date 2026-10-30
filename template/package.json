@@ -33,6 +33,7 @@
     "sweep": "hookreel sweep",
     "preview": "hookreel preview",
     "cover": "hookreel cover",
+    "kit-finish": "hookreel kit-finish",
     "hf": "hookreel hf"
   },
   "engines": {

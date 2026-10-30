@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.19.1 — 2026-10-30
+
+Fixes from the first end-to-end run of the `3d dialog` look (two reels: one in the kit's bedroom, one in a new place built for the run).
+
+- **`hookreel kit-finish <kit mp4> <brand studio> <out> --end-card-at <s>`** (`npm run kit-finish` in a studio): one ffmpeg encode that adds what video-3d-kit does not, the `brand.json` watermark (same grid and values as `npm run assemble`: opacity 0.13, height 58, step 330×300, row offset 165, in at 1.2 s, off at the end card) and loudness at −16.5 LUFS, true peak −1.5 dB (linear loudnorm after an audio-only measuring pass). `--self-test` checks loudness, length and the watermark on/off on a synthetic clip.
+- `look-3d-kit.md`:
+  - Portrait: a custom `screen` shot (bedroom values given) on every line whose page carries a claim, a source or the end card, held through the tail with `camExtra`; every built-in shot crops the laptop screen in 9:16.
+  - QA and publish: `kit-finish` after `video`; the finished file is the one delivered and posted (`deliver` copies only the kit original); a boxed `subs.ass` style on bright worlds; covers placed over the burned-in subtitle band, never over a face.
+  - Kit traps: never `setup.py init --help` (it runs init and overwrites `project.json`); run kit commands from the kit root (WinError 183 inside `out/<slug>/stills`); `subs` changes need `build`, not only `stills`.
+  - Script: 16–18 lines for a 45–60 s target.
+  - Voices: premade ElevenLabs voices through the API when the account has only the user's clone; three samples of one script line.
+  - New places: the world `screen` contract (`setPage`, `page`, `glow()`), debugging a silent hang with `VIDEO3D_DEBUG=1`; a place variant copies the episode with `takes/` and sets `"world"` (no new voice credits).
+- `/hookreel:facts`: a `Scope` column; a source that covers only a subtype (one claim route, one product) never becomes a general claim. `/hookreel:script` Step 4 checks every line stays inside its claim's scope.
+- Output root: `hookreel-output/` can be another folder named once in the workspace `CLAUDE.md` (`hookreel output root: <path>`).
+- Stops: questions left open by a short reply use their defaults, go into `DECISIONS.md`, and open the next stop's message. Brief Q5: a product-neutral end-card line when the brand's disclaimer names one product and the topic spans several.
+
 ## 0.19.0 — 2026-10-30
 
 Two new looks besides custom motion, made with [video-3d-kit](https://github.com/artosku/video-3d-kit) (MIT code) as an external tool in `~/.video-3d-kit`. Hookreel calls it and never copies it.

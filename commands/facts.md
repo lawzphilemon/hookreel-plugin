@@ -24,6 +24,8 @@ For each claim, in this order of preference:
 
 Record for each: the exact wording the source supports, the source, its date, and what it measures (visits are not people; a survey of internet users aged 16+ is not the whole population; a run rate is not booked revenue).
 
+**Scope.** Record what each source covers. When a source covers only a subtype of the topic (one claim route, one product, one plan, one country; for example a document list on a reimbursement form, when the video talks about claims in general), write that scope in the `Scope` column and in the allowed wording ("for reimbursement claims, the form asks for …"). A claim from a subtype source never becomes a general claim.
+
 When a number the user wants does not exist in any credible source, say so plainly and offer the closest defensible alternatives (a percentage instead of an absolute count, a ranking instead of a user number, or a labelled estimate). Let the user choose (Step 4).
 
 ## Step 3 — Make it age well
@@ -38,7 +40,7 @@ Save `<project>/02-facts.md`:
 
 ```text
 Checked: [date]
-| # | Claim as it may appear | Verdict | Exact supported wording | Source (page) | Source date | Measures | On-screen source label |
+| # | Claim as it may appear | Verdict | Exact supported wording | Source (page) | Source date | Measures | Scope | On-screen source label |
 Verdicts: VERIFIED · ESTIMATE (label "estimate" on screen) · NOT FOUND · CONTRADICTED
 
 Allowed claims: [bullets, ready to use]
