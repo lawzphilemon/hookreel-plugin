@@ -12,6 +12,8 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Agent
 
 The studio is the brand's data plus one HyperFrames project per video; the **tooling** comes from the engine (`hookreel-engine`): voiceover prep (`npm run vo`, `npm run tts`), word times (`npm run words`), sound effect synthesis (`npm run sfx`), the assembler (`npm run assemble`), checks, sheets and render. The template look (data-driven infographic slides, `videos/<id>.json` visuals, `plan.ts`, the visual catalog) lives only in the legacy Remotion template (`template-remotion/`) and is used only when the user explicitly asks for it.
 
+**3D looks.** When `CLAUDE_<CODE>.md` sets `Look: 3d dialog` or `3d toons`, skip Steps 1–6 and 8: build with video-3d-kit as `references/look-3d-kit.md` of the `hookreel-rules` skill says (the prototype is its stills contact sheet), then Step 7 if the brand has a studio, and Step 9 becomes sending the stills.
+
 ## Step 0 — Gate
 
 Stop unless `04-script.md` starts with `Status: approved`. A storyboard is not required; if one was approved, use it as a plan, not as a layout to copy.

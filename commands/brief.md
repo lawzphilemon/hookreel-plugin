@@ -30,7 +30,7 @@ Ask **once**, in **one message**, at most **six** numbered questions, and only w
 3. Sources and numbers: source material (guide, report, PDF, link, own experience), and every number to show with where it comes from.
 4. Proof and must-not-claim: own experience or a client's (named? results allowed?), and anything that must not be claimed or shown (results, prices, client names, competitors, regulated claims).
 5. Call to action: the exact action (comment a keyword, link in bio, DM, page) and what the viewer gets.
-6. Reference reels: the reels whose look you want (files or links) and what to take from each. None: say so, and I propose a direction from a few public examples. (Template infographic look only if asked: clean, or playful with AI 3D cartoon characters.)
+6. Reference reels: the reels whose look you want (files or links) and what to take from each. None: say so, and I propose a direction from a few public examples. (Template infographic look only if asked: clean, or playful with AI 3D cartoon characters.) For a 3D look (`3d dialog`: two 3D characters talking; `3d toons`: the characters over a screen recording), ask instead for the brand's character pair and place (dialog) or the video to explain (toons); see `references/look-3d-kit.md` of the `hookreel-rules` skill.
 
 Anything that becomes a claim on screen (numbers, sources, proof, must-not-claim) stays among the questions while it is unknown; never fill it with a default.
 
@@ -79,7 +79,8 @@ CTA: [exact action] → [what they get]
 Voiceover: [who, one take per video | none]
 Music: [synthesised, mood … | file and licence | none]
 SFX: [off | subtle | medium | dramatic]
-Reference reels: [files or links, and what to take from each] · Look: [custom motion (default) | template clean | template playful]
+Reference reels: [files or links, and what to take from each] · Look: [custom motion (default) | 3d dialog | 3d toons | template clean | template playful]
+3D cast (3D looks only): [left character, right character, place | the video to explain]
 Visual assets: [logo path, screenshots allowed?] · Dislikes: [list]
 Open questions: [anything still unknown]
 ```

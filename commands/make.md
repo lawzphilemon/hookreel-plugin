@@ -11,7 +11,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Agent, AskUserQuestion, WebSearch,
 
 1. **Brief** — one message: at most six questions plus the pre-filled brief. The reply is the confirmation.
 2. **Story + script** — the script review with the three hooks on top (recommended one in scene 1). One reply: pick the hook and approve, or ask for changes.
-3. **Prototype** — one rendered scene. Approve the look, or ask for changes.
+3. **Prototype** — one rendered scene (a 3D look: the stills contact sheet). Approve the look, or ask for changes.
 4. **Final** — preview, cover variants and caption in one message. Pick a cover, or ask for fixes.
 
 Other stops only when the user must decide: facts with a claim NOT FOUND or CONTRADICTED (or an alternative to choose), and the "stop and ask" cases of `/hookreel:produce` (a changed line, claim, number or timing; a ban that cannot be met; a voice problem; a critique still under 8 after three rounds). Between stops, never wait for the user and never suggest a new session.
