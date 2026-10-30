@@ -2,7 +2,7 @@
 //
 // The pace gate. The script plans at a fixed spoken rate (`04-script.md`: "~2.5 words/s", 2.1 since
 // 0.14.0); a take that reads slower stretches every scene, and the CTA slides with them, out of the part
-// of the runtime where viewers still are. On HKR-261019-Y6VQ a 1.94 words/s take turned a 75 s plan into
+// of the runtime where viewers still are. On one reel a 1.94 words/s take turned a 75 s plan into
 // 91.8 s and moved the keyword ask from about 58 s to 81 s — where the retention curve had about 8 % of
 // viewers left. Nothing else in the build notices: every beat is still in sync, the video is just long.
 export const MAX_PACE_DRIFT = 0.08;

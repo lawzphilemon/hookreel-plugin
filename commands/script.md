@@ -33,6 +33,7 @@ For every beat, name its **cue**: the word (or short phrase) copied exactly from
 Before showing anything, check the whole script against `CLAUDE_<CODE>.md` and report the result:
 - No banned phrase (brand never-say list and the generic filler list), no banned punctuation or emoji.
 - No claim outside the allowed list; every number has a source label.
+- **Source scope:** every line that uses a claim stays inside that claim's `Scope` in `02-facts.md`. A line that states a subtype fact (one claim route, one product) as general, or mixes general lines with a subtype-only list, gets reworded to name the scope or cut.
 - The CTA matches the exact wording.
 - Length: about 2.1 words per second plus one second per scene, against the target length (measured: a human take about 2.0, an ElevenLabs clone about 2.15; use the chosen voice's own pace once a take exists). If it runs long, propose specific cuts.
 - **Hook audit:** run `hooklab-auditor` on scene 1 as written (not the story draft). Credibility and payoff at least 3, weighted score at least 4; otherwise apply its recommended rewrite (within the allowed claims) and audit again.

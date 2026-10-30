@@ -14,6 +14,8 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Agent, AskUserQuestion, WebSearch,
 3. **Prototype** — one rendered scene (a 3D look: the stills contact sheet). Approve the look, or ask for changes.
 4. **Final** — preview, cover variants and caption in one message. Pick a cover, or ask for fixes.
 
+**Unanswered questions carry over.** When the user's reply at a stop leaves one of its questions open, use the stated default, record it in `<project>/DECISIONS.md`, and open the next stop's message with a short "Still open from the last stop" list (question, default used). The user can change any of them there.
+
 Other stops only when the user must decide: facts with a claim NOT FOUND or CONTRADICTED (or an alternative to choose), and the "stop and ask" cases of `/hookreel:produce` (a changed line, claim, number or timing; a ban that cannot be met; a voice problem; a critique still under 8 after three rounds). Between stops, never wait for the user and never suggest a new session.
 
 Argument: $ARGUMENTS (a topic or brief notes; use them to answer what they can in stop 1). Follow the `hookreel-rules` skill and, once it exists, `<project>/CLAUDE_<CODE>.md`. Each stage's steps are in its own command file; run them as written there, do not shorten them.

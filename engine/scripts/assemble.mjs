@@ -100,7 +100,7 @@ export const syncAssets = (dir, htmlDir) => {
 // Brand watermark over every scene, from brand.json "watermark" (a video can say "watermark": "off" only
 // when the brand allows it). "tile": the logo in offset rows across the whole frame, so cropping one corner
 // does not remove it; "corner": one small logo top right. Fades in after the hook (inAt) and steps aside
-// for the end card (the last scene, which carries the real logo). Defaults are the Truemission values:
+// for the end card (the last scene, which carries the real logo). Defaults were measured on real posts:
 // 0.10 vanished after Instagram's re-encode, 0.13 survives.
 export const WATERMARK = { mode: "tile", opacity: 0.13, height: 58, stepX: 330, stepY: 300, offset: 165, margin: 40, inAt: 1.2 };
 export const watermarkHtml = (wm, { scenes, total }) => {

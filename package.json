@@ -1,6 +1,6 @@
 {
   "name": "hookreel-engine",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "hookreel engine: HyperFrames kit, audio, checks and render tools that every brand studio runs through the hookreel CLI. Made by Lawrence Philemon for personal use; not for sale.",
   "license": "MIT",
   "private": true,
